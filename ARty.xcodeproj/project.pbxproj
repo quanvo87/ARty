@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		590BD76720BB716400FCA038 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590BD76620BB716400FCA038 /* Animation.swift */; };
 		590BD76920BB72F600FCA038 /* ARty+yPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590BD76820BB72F600FCA038 /* ARty+yPosition.swift */; };
-		590BD76B20BB754500FCA038 /* ARty+animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590BD76A20BB754500FCA038 /* ARty+animation.swift */; };
+		590BD76B20BB754500FCA038 /* ARty+animationNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 590BD76A20BB754500FCA038 /* ARty+animationNames.swift */; };
 		59389A1520B6313D00F7FA67 /* ARtyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59389A1420B6313D00F7FA67 /* ARtyError.swift */; };
 		59412B8A20B5721300A2ED02 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59412B8920B5721300A2ED02 /* AppDelegate.swift */; };
 		59412B8C20B5721300A2ED02 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 59412B8B20B5721300A2ED02 /* art.scnassets */; };
@@ -32,7 +32,7 @@
 /* Begin PBXFileReference section */
 		590BD76620BB716400FCA038 /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
 		590BD76820BB72F600FCA038 /* ARty+yPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+yPosition.swift"; sourceTree = "<group>"; };
-		590BD76A20BB754500FCA038 /* ARty+animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+animation.swift"; sourceTree = "<group>"; };
+		590BD76A20BB754500FCA038 /* ARty+animationNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+animationNames.swift"; sourceTree = "<group>"; };
 		59389A1420B6313D00F7FA67 /* ARtyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARtyError.swift; sourceTree = "<group>"; };
 		59412B8620B5721300A2ED02 /* ARty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARty.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		59412B8920B5721300A2ED02 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -102,7 +102,7 @@
 			children = (
 				590BD76620BB716400FCA038 /* Animation.swift */,
 				595D8BE320B63C9600DB8DD7 /* ARty.swift */,
-				590BD76A20BB754500FCA038 /* ARty+animation.swift */,
+				590BD76A20BB754500FCA038 /* ARty+animationNames.swift */,
 				59D529CB20BCA0FB0093E647 /* ARty+idleAnimation.swift */,
 				59D529BC20BC6D630093E647 /* ARty+ModelName.swift */,
 				59D529C020BC8CC70093E647 /* ARty+passiveAnimation.swift */,
@@ -217,7 +217,7 @@
 				59D529CC20BCA0FC0093E647 /* ARty+idleAnimation.swift in Sources */,
 				590BD76720BB716400FCA038 /* Animation.swift in Sources */,
 				59D529C320BC8D7F0093E647 /* ARty+pokeAnimation.swift in Sources */,
-				590BD76B20BB754500FCA038 /* ARty+animation.swift in Sources */,
+				590BD76B20BB754500FCA038 /* ARty+animationNames.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

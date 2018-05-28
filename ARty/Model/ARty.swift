@@ -69,7 +69,6 @@ class ARty: SCNNode {
 
     func stopAnimation(_ animation: Animation) throws {
         removeAnimation(forKey: animation.rawValue, blendOutDuration: 0.5)
-        currentAnimation = .none
     }
 
     func playWalkAnimation(location: CLLocation) throws {
@@ -124,6 +123,31 @@ private extension ARty {
         scene.rootNode.childNodes.forEach {
             addChildNode($0)
         }
+    }
+
+    func makeAnimations() throws -> [String: CAAnimation] {
+        var animationsDictionary = [String: CAAnimation]()
+        try animationNames.forEach {
+            animationsDictionary[$0.rawValue] = try makeAnimation($0)
+        }
+        return animationsDictionary
+    }
+
+    func makeAnimation(_ animation: Animation) throws -> CAAnimation {
+        let resourcePath = modelName.asResourcePath + "/" + animation.rawValue
+        guard let url = Bundle.main.url(forResource: resourcePath, withExtension: "dae") else {
+            throw ARtyError.resourceNotFound(resourcePath + ".dae")
+        }
+        let sceneSource = SCNSceneSource(url: url)
+        guard let caAnimation = sceneSource?.entryWithIdentifier(
+            animation.identifier,
+            withClass: CAAnimation.self) else {
+                throw ARtyError.animationIdentifierNotFound(animation.identifier)
+        }
+        caAnimation.repeatCount = animation.repeatCount
+        caAnimation.fadeInDuration = 1
+        caAnimation.fadeOutDuration = 0.5
+        return caAnimation
     }
 
     func getAnimation(_ animation: Animation) throws -> CAAnimation {

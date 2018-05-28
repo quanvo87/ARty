@@ -23,12 +23,14 @@ enum Animation: String {
     
     var repeatCount: Float {
         switch self {
-        case .elvira_walk_0:
-            return .infinity
         case .elvira_wave_0:
             return 4
         default:
-            return 1
+            if isWalk {
+                return .infinity
+            } else {
+                return 1
+            }
         }
     }
 

@@ -11,7 +11,7 @@ import CoreLocation
 
 extension CLLocationDirection {
     var toRadians: CGFloat {
-        let adjustment = Float((450 - self).remainder(dividingBy: 360)) + 90
-        return CGFloat(GLKMathDegreesToRadians(adjustment))
+        let adjusted = Float((450 - self).remainder(dividingBy: 360)) + 90
+        return CGFloat(GLKMathDegreesToRadians(adjusted))
     }
 }

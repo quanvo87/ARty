@@ -11,113 +11,100 @@ import CoreLocation
 
 class ARty: SCNNode {
     let ownerId: String
-    let artyName: Name
-    let yPosition: Float
-    let animations: [String: CAAnimation]
 
-    var passiveAnimation: AnimationName
-    var pokeAnimation: AnimationName
-    var walkAnimation: AnimationName
+    private(set) var modelName: ModelName
+    private(set) var yPosition: Float = 0
+    private(set) var animations: [String: CAAnimation] = [:]
+    private(set) var passiveAnimation: Animation = .none
+    private(set) var pokeAnimation: Animation = .none
+    private(set) var walkAnimation: Animation = .none
 
-    var xPosition: Float = 0
-
-    private var state: State = .idle
-
+    private var currentAnimation: Animation = .none
     private var lastLocation = CLLocation()
 
     init(ownerId: String,
-         name: ARty.Name,
-         scale: Float = 1,
-         yPosition: Float = 0,
-         animationNames: [AnimationName],
-         passiveAnimation: AnimationName,
-         pokeAnimation: AnimationName,
-         walkAnimation: AnimationName) throws {
+         modelName: ModelName,
+         passiveAnimation: Animation = .none,
+         pokeAnimation: Animation = .none,
+         walkAnimation: Animation = .none) throws {
         self.ownerId = ownerId
-        self.artyName = name
-        self.yPosition = yPosition
-        self.animations = try AnimationFactory.make(artyName: name, animationNames: animationNames)
-        self.passiveAnimation = passiveAnimation
-        self.pokeAnimation = pokeAnimation
-        self.walkAnimation = walkAnimation
+        self.modelName = modelName
 
         super.init()
-
-        self.name = ownerId
-
-        let idleScene = try SceneFactory.makeIdleScene(artyName: name)
-
-        idleScene.rootNode.childNodes.forEach {
-            addChildNode($0)
-        }
-
-        self.scale = SCNVector3(scale, scale, scale)
-
+        
+        name = ownerId
+        try loadModel(modelName)
+        setPassiveAnimation(passiveAnimation)
+        setPokeAnimation(pokeAnimation)
+        setWalkAnimation(walkAnimation)
         playPassiveAnimation()
     }
 
-    func setPosition(x: Float, z: Float) {
-        position = SCNVector3(x, yPosition, z)
+    func loadModel(_ modelName: ModelName) throws {
+        self.modelName = modelName
+        try loadIdleScene()
+        scale = defaultScale
+        yPosition = defaultYPosition
+        animations = try makeAnimations()
     }
 
-    func playPokeAnimation() throws {
-        try playAnimation(named: pokeAnimation)
+    func setPassiveAnimation(_ animation: Animation) {
+        passiveAnimation = animation == .none ? defaultPassiveAnimation : animation
+    }
+
+    func setPokeAnimation(_ animation: Animation) {
+        pokeAnimation = animation == .none ? defaultPokeAnimaton : animation
+    }
+
+    func setWalkAnimation(_ animation: Animation) {
+        walkAnimation = animation == .none ? defaultWalkAnimation : animation
+    }
+
+    func playAnimation(_ animation: Animation) throws {
+        let caAnimation = try getAnimation(animation)
+        addAnimation(caAnimation, forKey: animation.rawValue)
+        caAnimation.delegate = self
+        currentAnimation = animation
+    }
+
+    func stopAnimation(_ animation: Animation) throws {
+        removeAnimation(forKey: animation.rawValue, blendOutDuration: 0.5)
+        currentAnimation = .none
     }
 
     func playWalkAnimation(location: CLLocation) throws {
         let speed = location.speed
         if speed > 0 {
             if speed < 0.5 {
-                stopAnimation(named: walkAnimation)
-            } else if state == .idle {
-                try playAnimation(named: walkAnimation, walkAnimation: true)
+                try stopAnimation(walkAnimation)
+            } else if currentAnimation == .none {
+                try playAnimation(walkAnimation)
             }
         } else {
             let distance = lastLocation.distance(from: location)
             if distance > 5 {
-                try playAnimation(named: walkAnimation, walkAnimation: true)
+                if currentAnimation == .none {
+                    try playAnimation(walkAnimation)
+                }
                 lastLocation = location
             } else {
-                stopAnimation(named: walkAnimation)
+                try stopAnimation(walkAnimation)
             }
         }
     }
 
     func turn(location: CLLocation) {
-        guard state == .walking, location.course > -1 else {
+        guard currentAnimation.isWalk, location.course > -1 else {
             return
         }
-        let course = Float((450 - location.course).remainder(dividingBy: 360)) + 90
-        let radians = CGFloat(GLKMathDegreesToRadians(course))
-        let rotateAction = SCNAction.rotateTo(x: 0, y: radians, z: 0, duration: 1, usesShortestUnitArc: true)
-        runAction(rotateAction)
-    }
-
-    func playAnimation(named name: String) throws {
-        let animationName = try AnimationName(name)
-        try playAnimation(named: animationName)
-    }
-
-    func playAnimation(named name: AnimationName, walkAnimation: Bool = false) throws {
-        let animation = try getAnimation(named: name)
-        let key = AnimationFactory.makeKey(arty: self, animationName: name)
-        parent?.childNode(withName: ownerId, recursively: false)?.addAnimation(animation, forKey: key)
-        state = walkAnimation ? .walking : .emoting
-        animation.delegate = self
-    }
-
-    func stopAnimation(named name: String) throws {
-        let animationName = try AnimationName(name)
-        stopAnimation(named: animationName)
-    }
-
-    func stopAnimation(named name: AnimationName) {
-        let key = AnimationFactory.makeKey(arty: self, animationName: name)
-        parent?.childNode(withName: ownerId, recursively: false)?.removeAnimation(
-            forKey: key,
-            blendOutDuration: 0.5
+        let rotateAction = SCNAction.rotateTo(
+            x: 0,
+            y: location.course.toRadians,
+            z: 0,
+            duration: 1,
+            usesShortestUnitArc: true
         )
-        state = .idle
+        runAction(rotateAction)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -126,11 +113,24 @@ class ARty: SCNNode {
 }
 
 private extension ARty {
-    func getAnimation(named name: AnimationName) throws -> CAAnimation {
-        guard let animation = animations[name.rawValue] else {
-            throw ARtyError.animationNotSupported(self, name)
+    func loadIdleScene() throws {
+        childNodes.forEach {
+            $0.removeFromParentNode()
         }
-        return animation
+        let resourcePath = modelName.asResourcePath + "/" + defaultIdleAnimation.rawValue
+        guard let scene = SCNScene(named: resourcePath) else {
+            throw ARtyError.resourceNotFound(resourcePath)
+        }
+        scene.rootNode.childNodes.forEach {
+            addChildNode($0)
+        }
+    }
+
+    func getAnimation(_ animation: Animation) throws -> CAAnimation {
+        guard let caAnimation = animations[animation.rawValue] else {
+            throw ARtyError.invalidAnimationName(animation.rawValue)
+        }
+        return caAnimation
     }
 
     func playPassiveAnimation() {
@@ -139,8 +139,8 @@ private extension ARty {
             guard let `self` = self else {
                 return
             }
-            if self.state == .idle {
-                try? self.playAnimation(named: self.passiveAnimation)
+            if self.currentAnimation == .none {
+                try? self.playAnimation(self.passiveAnimation)
             }
             self.playPassiveAnimation()
         }
@@ -149,32 +149,9 @@ private extension ARty {
 
 extension ARty: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        if state == .walking {
-            // todo: turn arty back to face camera/user
+        if currentAnimation.isWalk {
+            // todo: turn arty to camera
         }
-        state = .idle
-    }
-}
-
-extension ARty {
-    enum State {
-        case idle
-        case walking
-        case emoting
-    }
-}
-
-extension ARty {
-    enum Name: String {
-        case elvira
-        
-        init(name: String) throws {
-            switch name {
-            case "elvira":
-                self = .elvira
-            default:
-                throw ARtyError.invalidARtyName(name)
-            }
-        }
+        currentAnimation = .none
     }
 }

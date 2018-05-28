@@ -9,22 +9,19 @@
 import Foundation
 
 enum ARtyError: LocalizedError {
-    case animationNotFound(String)
-    case animationNotSupported(ARty, AnimationName)
+    case animationIdentifierNotFound(String)
     case invalidAnimationName(String)
-    case invalidARtyName(String)
+    case invalidModelName(String)
     case resourceNotFound(String)
 
     var localizedDescription: String {
         switch self {
-        case .animationNotFound(let identifier):
-            return "animation not found with identifier: " + identifier
-        case .animationNotSupported(let arty, let animationName):
-            return "arty " + arty.artyName.rawValue + " doesn't support animation " + animationName.rawValue
+        case .animationIdentifierNotFound(let identifier):
+            return "animation identifier not found: " + identifier
         case .invalidAnimationName(let animationName):
             return "invalid animation name: " + animationName
-        case .invalidARtyName(let artyName):
-            return "invalid ARty name: " + artyName
+        case .invalidModelName(let artyName):
+            return "invalid model name: " + artyName
         case .resourceNotFound(let path):
             return "could not find resource at path: " + path
         }

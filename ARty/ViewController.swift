@@ -54,13 +54,11 @@ class ViewController: UIViewController {
         
         let configuration = ARWorldTrackingConfiguration()
         configuration.worldAlignment = .gravityAndHeading
-        
         sceneView.session.run(configuration)
 
-        let arty = try! Elvira(ownerId: uid)
-        arty.setPosition(x: 0, z: -2)
+        let arty = try! ARty(ownerId: uid, modelName: .elvira)
+        arty.position = SCNVector3(0, arty.yPosition, -2)
         sceneView.scene.rootNode.addChildNode(arty)
-
         arties[arty.ownerId] = arty
     }
     
@@ -74,15 +72,12 @@ class ViewController: UIViewController {
         guard let location = touches.first?.location(in: sceneView) else {
             return
         }
-
         let hitTest = sceneView.hitTest(location, options: [SCNHitTestOption.boundingBoxOnly: true])
-
         guard let uid = (hitTest.first?.node.parent as? ARty)?.ownerId,
             let arty = arties[uid] else {
                 return
         }
-
-        try? arty.playPokeAnimation()
+        try? arty.playAnimation(arty.pokeAnimation)
     }
 }
 

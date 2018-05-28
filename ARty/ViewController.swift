@@ -60,6 +60,8 @@ class ViewController: UIViewController {
         arty.position = SCNVector3(0, arty.yPosition, -2)
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.ownerId] = arty
+
+        arty.label = label
     }
     
     override func viewWillDisappear(_ animated: Bool) {

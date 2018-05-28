@@ -22,6 +22,8 @@ class ARty: SCNNode {
     private var currentAnimation: Animation = .none
     private var lastLocation = CLLocation()
 
+    weak var label: UILabel?
+
     init(ownerId: String,
          modelName: ModelName,
          passiveAnimation: Animation = .none,
@@ -61,14 +63,18 @@ class ARty: SCNNode {
     }
 
     func playAnimation(_ animation: Animation) throws {
+        try stopAnimation(currentAnimation)
         let caAnimation = try getAnimation(animation)
         addAnimation(caAnimation, forKey: animation.rawValue)
-        caAnimation.delegate = self
         currentAnimation = animation
     }
 
     func stopAnimation(_ animation: Animation) throws {
         removeAnimation(forKey: animation.rawValue, blendOutDuration: 0.5)
+        if currentAnimation.isWalk {
+            // todo: turn arty to camera
+        }
+        currentAnimation = .none
     }
 
     func playWalkAnimation(location: CLLocation) throws {
@@ -168,14 +174,5 @@ private extension ARty {
             }
             self.playPassiveAnimation()
         }
-    }
-}
-
-extension ARty: CAAnimationDelegate {
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        if currentAnimation.isWalk {
-            // todo: turn arty to camera
-        }
-        currentAnimation = .none
     }
 }

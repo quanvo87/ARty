@@ -44,7 +44,6 @@ class ViewController: UIViewController {
 
         if CLLocationManager.locationServicesEnabled() {
             locationManager.startUpdatingLocation()
-            locationManager.startUpdatingHeading()
             startDate = Date()
         }
     }

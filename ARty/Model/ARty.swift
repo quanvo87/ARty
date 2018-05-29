@@ -63,16 +63,17 @@ class ARty: SCNNode {
     }
 
     func playAnimation(_ animation: Animation) throws {
-        try stopAnimation(currentAnimation)
+        stopAnimation(currentAnimation)
         let caAnimation = try getAnimation(animation)
         addAnimation(caAnimation, forKey: animation.rawValue)
+        caAnimation.delegate = self
         currentAnimation = animation
     }
 
-    func stopAnimation(_ animation: Animation) throws {
+    func stopAnimation(_ animation: Animation) {
         removeAnimation(forKey: animation.rawValue, blendOutDuration: 0.5)
         if currentAnimation.isWalk {
-            // todo: turn arty to camera
+            faceCamera()
         }
         currentAnimation = .none
     }
@@ -81,7 +82,7 @@ class ARty: SCNNode {
         let speed = location.speed
         if speed > 0 {
             if speed < 0.5 {
-                try stopAnimation(walkAnimation)
+                stopAnimation(walkAnimation)
             } else if currentAnimation == .none {
                 try playAnimation(walkAnimation)
             }
@@ -93,7 +94,7 @@ class ARty: SCNNode {
                 }
                 lastLocation = location
             } else {
-                try stopAnimation(walkAnimation)
+                stopAnimation(walkAnimation)
             }
         }
     }
@@ -174,5 +175,22 @@ private extension ARty {
             }
             self.playPassiveAnimation()
         }
+    }
+
+    func faceCamera() {
+        let rotateAction = SCNAction.rotateTo(
+            x: 0,
+            y: 0,
+            z: 0,
+            duration: 1,
+            usesShortestUnitArc: true
+        )
+        runAction(rotateAction)
+    }
+}
+
+extension ARty: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        currentAnimation = .none
     }
 }

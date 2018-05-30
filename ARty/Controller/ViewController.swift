@@ -32,10 +32,11 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        UIApplication.shared.isIdleTimerDisabled = true
+
         let scene = SCNScene()
         sceneView.scene = scene
         sceneView.delegate = self
-        sceneView.showsStatistics = true
         sceneView.session.delegate = self
 
         locationManager.delegate = self
@@ -46,24 +47,16 @@ class ViewController: UIViewController {
             locationManager.startUpdatingLocation()
             startDate = Date()
         }
+
+        setARty(.mutant)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        UIApplication.shared.isIdleTimerDisabled = true
-
         let configuration = ARWorldTrackingConfiguration()
         configuration.worldAlignment = .gravityAndHeading
         sceneView.session.run(configuration, options: [.resetTracking])
-
-        let arty = try! ARty(ownerId: uid, modelName: .mutant)
-        arty.position = SCNVector3(0, arty.yPosition, arty.yPosition)
-        sceneView.scene.rootNode.addChildNode(arty)
-
-        arties[arty.ownerId] = arty
-
-        arty.label = label
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -82,6 +75,32 @@ class ViewController: UIViewController {
                 return
         }
         try? arty.playAnimation(arty.pokeAnimation)
+    }
+
+    @IBAction func didTapHoldPositionButton(_ sender: Any) {
+    }
+
+    @IBAction func didTapEditAnimationsButton(_ sender: Any) {
+    }
+    
+    @IBAction func didTapEditARtyButton(_ sender: Any) {
+        let controller = EditARtyViewController(delegate: self)
+        let navigationController = UINavigationController(rootViewController: controller)
+        present(navigationController, animated: true)
+    }
+}
+
+private extension ViewController {
+    func setARty(_ modelName: ARty.ModelName) {
+        sceneView.scene.rootNode.childNode(withName: uid, recursively: false)?.removeFromParentNode()
+
+        let arty = try! ARty(ownerId: uid, modelName: modelName)
+        arty.position = SCNVector3(0, arty.yPosition, arty.yPosition)
+        sceneView.scene.rootNode.addChildNode(arty)
+
+        arties[arty.ownerId] = arty
+
+        arty.label = label
     }
 }
 
@@ -111,4 +130,12 @@ extension ViewController: ARSessionDelegate {
 }
 
 extension ViewController: ARSCNViewDelegate {
+}
+
+extension ViewController: EditARtyViewControllerDelegate {
+    func didSelectARrty(_ modelName: ARty.ModelName) {
+        if modelName != arty?.modelName {
+            setARty(modelName)
+        }
+    }
 }

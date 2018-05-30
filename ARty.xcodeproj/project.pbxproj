@@ -20,6 +20,7 @@
 		5957F8A920BB587A000201A8 /* Extension+SCNVector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5957F8A820BB587A000201A8 /* Extension+SCNVector3.swift */; };
 		595D8BE420B63C9600DB8DD7 /* ARty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595D8BE320B63C9600DB8DD7 /* ARty.swift */; };
 		5965CE5320BA0B3F000730F6 /* Extension+CLLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5965CE5220BA0B3F000730F6 /* Extension+CLLocation.swift */; };
+		59B386EC20BF491D003BC2E5 /* EditARtyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */; };
 		59D529B720BB807A0093E647 /* ARty+scale.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529B620BB807A0093E647 /* ARty+scale.swift */; };
 		59D529BD20BC6D630093E647 /* ARty+ModelName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529BC20BC6D630093E647 /* ARty+ModelName.swift */; };
 		59D529C120BC8CC70093E647 /* ARty+passiveAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529C020BC8CC70093E647 /* ARty+passiveAnimation.swift */; };
@@ -27,6 +28,7 @@
 		59D529C520BC8E7B0093E647 /* ARty+walkAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529C420BC8E7B0093E647 /* ARty+walkAnimation.swift */; };
 		59D529CA20BC9EB20093E647 /* Extension+CLLocationDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */; };
 		59D529CC20BCA0FC0093E647 /* ARty+idleAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529CB20BCA0FB0093E647 /* ARty+idleAnimation.swift */; };
+		59EFDEE320BF4B820022E440 /* EditARtyViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59EFDEE220BF4B820022E440 /* EditARtyViewControllerDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +47,7 @@
 		5957F8A820BB587A000201A8 /* Extension+SCNVector3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+SCNVector3.swift"; sourceTree = "<group>"; };
 		595D8BE320B63C9600DB8DD7 /* ARty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARty.swift; sourceTree = "<group>"; };
 		5965CE5220BA0B3F000730F6 /* Extension+CLLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+CLLocation.swift"; sourceTree = "<group>"; };
+		59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditARtyViewController.swift; sourceTree = "<group>"; };
 		59D529B620BB807A0093E647 /* ARty+scale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+scale.swift"; sourceTree = "<group>"; };
 		59D529BC20BC6D630093E647 /* ARty+ModelName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+ModelName.swift"; sourceTree = "<group>"; };
 		59D529C020BC8CC70093E647 /* ARty+passiveAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+passiveAnimation.swift"; sourceTree = "<group>"; };
@@ -52,6 +55,7 @@
 		59D529C420BC8E7B0093E647 /* ARty+walkAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+walkAnimation.swift"; sourceTree = "<group>"; };
 		59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+CLLocationDirection.swift"; sourceTree = "<group>"; };
 		59D529CB20BCA0FB0093E647 /* ARty+idleAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARty+idleAnimation.swift"; sourceTree = "<group>"; };
+		59EFDEE220BF4B820022E440 /* EditARtyViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditARtyViewControllerDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,8 +91,8 @@
 				59412B9720B5721400A2ED02 /* Info.plist */,
 				59412B8B20B5721300A2ED02 /* art.scnassets */,
 				59412B8920B5721300A2ED02 /* AppDelegate.swift */,
-				59412B8D20B5721300A2ED02 /* ViewController.swift */,
 				59412B9220B5721400A2ED02 /* Assets.xcassets */,
+				59B386EA20BF48DF003BC2E5 /* Controller */,
 				59412B9420B5721400A2ED02 /* LaunchScreen.storyboard */,
 				59412B8F20B5721300A2ED02 /* Main.storyboard */,
 				59412B9D20B5929600A2ED02 /* Model */,
@@ -123,6 +127,16 @@
 				59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		59B386EA20BF48DF003BC2E5 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				59412B8D20B5721300A2ED02 /* ViewController.swift */,
+				59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */,
+				59EFDEE220BF4B820022E440 /* EditARtyViewControllerDelegate.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,8 +216,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59B386EC20BF491D003BC2E5 /* EditARtyViewController.swift in Sources */,
 				59D529CA20BC9EB20093E647 /* Extension+CLLocationDirection.swift in Sources */,
 				5965CE5320BA0B3F000730F6 /* Extension+CLLocation.swift in Sources */,
+				59EFDEE320BF4B820022E440 /* EditARtyViewControllerDelegate.swift in Sources */,
 				59D529C520BC8E7B0093E647 /* ARty+walkAnimation.swift in Sources */,
 				59D529BD20BC6D630093E647 /* ARty+ModelName.swift in Sources */,
 				59412B8E20B5721300A2ED02 /* ViewController.swift in Sources */,

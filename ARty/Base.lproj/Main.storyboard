@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="WLz-NS-WUy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="WLz-NS-WUy">
     <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -23,18 +23,48 @@
                                 <autoresizingMask key="autoresizingMask"/>
                             </arscnView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ep-KU-O3Q">
-                                <rect key="frame" x="183.33333333333334" y="727" width="8.3333333333333428" height="21"/>
+                                <rect key="frame" x="183" y="727" width="8" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYK-VT-FEI">
+                                <rect key="frame" x="258" y="698" width="107" height="30"/>
+                                <state key="normal" title="Edit Animations"/>
+                                <connections>
+                                    <action selector="didTapEditAnimationsButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="txw-Wn-IKP"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6dM-UU-1Cs">
+                                <rect key="frame" x="274" y="658" width="91" height="30"/>
+                                <state key="normal" title="Hold Position"/>
+                                <connections>
+                                    <action selector="didTapHoldPositionButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="e0D-ad-vrI"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7az-ZH-489">
+                                <rect key="frame" x="301" y="738" width="64" height="30"/>
+                                <state key="normal" title="Edit ARty"/>
+                                <connections>
+                                    <action selector="didTapEditARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9ep-KU-O3Q" secondAttribute="trailing" id="4jH-BV-uXQ"/>
+                            <constraint firstItem="6Pb-WM-QEe" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" constant="10" id="5jr-bJ-WSv"/>
                             <constraint firstItem="9ep-KU-O3Q" firstAttribute="centerX" secondItem="6Pb-WM-QEe" secondAttribute="centerX" id="7uf-kn-Gl1"/>
+                            <constraint firstItem="7az-ZH-489" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="DhY-Uu-1rd"/>
+                            <constraint firstItem="6dM-UU-1Cs" firstAttribute="trailing" secondItem="pYK-VT-FEI" secondAttribute="trailing" id="FBJ-v5-e2t"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="9ep-KU-O3Q" secondAttribute="bottom" constant="30" id="Lp9-18-aJ3"/>
+                            <constraint firstItem="6dM-UU-1Cs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="MbE-ci-zFN"/>
+                            <constraint firstItem="pYK-VT-FEI" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" id="QQo-pY-exH"/>
+                            <constraint firstItem="pYK-VT-FEI" firstAttribute="top" secondItem="6dM-UU-1Cs" secondAttribute="bottom" constant="10" id="RUH-6V-iTk"/>
+                            <constraint firstItem="7az-ZH-489" firstAttribute="top" secondItem="pYK-VT-FEI" secondAttribute="bottom" constant="10" id="SKa-6e-qgR"/>
                             <constraint firstItem="9ep-KU-O3Q" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Pb-WM-QEe" secondAttribute="leading" id="kv5-rq-ifm"/>
+                            <constraint firstItem="pYK-VT-FEI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="o47-Eh-wfc"/>
+                            <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="7az-ZH-489" secondAttribute="bottom" constant="10" id="sLo-0y-vwu"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Pb-WM-QEe"/>
                     </view>

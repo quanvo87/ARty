@@ -13,6 +13,8 @@ extension ARty {
         switch modelName {
         case .elvira:
             return .elvira_walk_0
+        case .mutant:
+            return .mutant_walk_0
         }
     }
 }

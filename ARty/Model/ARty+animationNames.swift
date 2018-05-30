@@ -18,6 +18,15 @@ extension ARty {
                 .elvira_walk_0,
                 .elvira_wave_0
             ]
+        case .mutant:
+            return [
+                .mutant_chestthump,
+                .mutant_dance_thriller,
+                .mutant_fall_0,
+                .mutant_taunt_battlecry,
+                .mutant_walk_0,
+                .mutant_wave_0
+            ]
         }
     }
 }

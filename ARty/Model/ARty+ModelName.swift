@@ -11,6 +11,7 @@ import Foundation
 extension ARty {
     enum ModelName: String {
         case elvira
+        case mutant
 
         private static let artFolder = "art.scnassets"
 
@@ -22,6 +23,8 @@ extension ARty {
             switch name {
             case "elvira":
                 self = .elvira
+            case "mutant":
+                self = .mutant
             default:
                 throw ARtyError.invalidModelName(name)
             }

@@ -14,6 +14,8 @@ extension ARty {
         switch modelName {
         case .elvira:
             scale = 0.075
+        case .mutant:
+            scale = 0.06
         }
         return SCNVector3(scale, scale, scale)
     }

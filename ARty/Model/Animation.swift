@@ -14,6 +14,13 @@ enum Animation: String {
     case elvira_taunt_buttslap
     case elvira_walk_0
     case elvira_wave_0
+    case mutant_chestthump
+    case mutant_dance_thriller
+    case mutant_fall_0
+    case mutant_idle_0
+    case mutant_taunt_battlecry
+    case mutant_walk_0
+    case mutant_wave_0
 
     case none
     
@@ -36,7 +43,7 @@ enum Animation: String {
 
     var isWalk: Bool {
         switch self {
-        case .elvira_walk_0:
+        case .elvira_walk_0, .mutant_walk_0:
             return true
         default:
             return false

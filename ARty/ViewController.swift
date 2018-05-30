@@ -50,14 +50,17 @@ class ViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
+        UIApplication.shared.isIdleTimerDisabled = true
+
         let configuration = ARWorldTrackingConfiguration()
         configuration.worldAlignment = .gravityAndHeading
-        sceneView.session.run(configuration)
+        sceneView.session.run(configuration, options: [.resetTracking])
 
-        let arty = try! ARty(ownerId: uid, modelName: .elvira)
-        arty.position = SCNVector3(0, arty.yPosition, -2)
+        let arty = try! ARty(ownerId: uid, modelName: .mutant)
+        arty.position = SCNVector3(0, arty.yPosition, arty.yPosition)
         sceneView.scene.rootNode.addChildNode(arty)
+
         arties[arty.ownerId] = arty
 
         arty.label = label
@@ -100,7 +103,7 @@ extension ViewController: ARSessionDelegate {
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        let adjustment = SCNVector3(0, arty.yPosition, -2)
+        let adjustment = SCNVector3(0, arty.yPosition, arty.yPosition)
         let newVector = currentPosition + adjustment
         let moveAction = SCNAction.move(to: newVector, duration: 1.0)
         arty.runAction(moveAction)

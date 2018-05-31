@@ -6,9 +6,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var label: UILabel!
 
     private let locationManager = CLLocationManager()
-
     private var startDate = Date()
-
     private var lastLocation = CLLocation()
 
     private let uid = UUID().uuidString
@@ -32,11 +30,7 @@ class ViewController: UIViewController {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
-
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager.startUpdatingLocation()
-            startDate = Date()
-        }
+        startUpdatingLocation()
 
         setARty("mutant")
     }
@@ -81,6 +75,11 @@ class ViewController: UIViewController {
 }
 
 private extension ViewController {
+    func startUpdatingLocation() {
+        locationManager.startUpdatingLocation()
+        startDate = Date()
+    }
+
     func setARty(_ model: String) {
         do {
             let arty = try ARty(ownerId: uid, model: model)
@@ -94,14 +93,23 @@ private extension ViewController {
 }
 
 extension ViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let newLocation = locations.last {
-            if newLocation.isValid(oldLocation: lastLocation, startDate: startDate) {
-                try? arty?.playWalkAnimation(location: newLocation)
-                arty?.turn(location: newLocation)
-            }
-            lastLocation = newLocation
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedAlways || status == .authorizedWhenInUse {
+            startUpdatingLocation()
+        } else {
+            // show alert
         }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let newLocation = locations.last else {
+            return
+        }
+        if newLocation.isValid(oldLocation: lastLocation, startDate: startDate) {
+            try? arty?.playWalkAnimation(location: newLocation)
+            arty?.turn(location: newLocation)
+        }
+        lastLocation = newLocation
     }
 }
 
@@ -113,8 +121,7 @@ extension ViewController: ARSessionDelegate {
         }
         let adjustment = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment)
         let newVector = currentPosition + adjustment
-        let moveAction = SCNAction.move(to: newVector, duration: 1.0)
-        arty.runAction(moveAction)
+        arty.position = newVector
     }
 }
 

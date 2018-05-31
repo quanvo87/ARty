@@ -5,11 +5,11 @@ class ARty: SCNNode {
     let ownerId: String
     let model: String
     let positionAdjustment: Float
+    let animations: [String: CAAnimation]
 
     private(set) var passiveAnimation = ""
     private(set) var pokeAnimation = ""
 
-    private let animations: [String: CAAnimation]
     private let walkAnimation: String
 
     private var currentAnimation = ""
@@ -23,14 +23,14 @@ class ARty: SCNNode {
          pokeAnimation: String = "") throws {
         self.ownerId = ownerId
         self.model = model
-        positionAdjustment = try metaData.positionAdjustment(model)
-        animations = try metaData.animations(model)
-        walkAnimation = try metaData.walkAnimation(model)
+        positionAdjustment = try schema.positionAdjustment(model)
+        animations = try schema.animations(model)
+        walkAnimation = try schema.walkAnimation(model)
 
         super.init()
 
         name = ownerId
-        scale = try metaData.scale(model)
+        scale = try schema.scale(model)
         try loadIdleScene()
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
@@ -38,11 +38,11 @@ class ARty: SCNNode {
     }
 
     func setPassiveAnimation(_ animation: String) throws {
-        passiveAnimation = try metaData.passiveAnimation(model, animation: animation)
+        passiveAnimation = try schema.passiveAnimation(model, animation: animation)
     }
 
     func setPokeAnimation(_ animation: String) throws {
-        pokeAnimation = try metaData.pokeAnimation(model, animation: animation)
+        pokeAnimation = try schema.pokeAnimation(model, animation: animation)
     }
 
     func playAnimation(_ animation: String) throws {
@@ -103,7 +103,7 @@ class ARty: SCNNode {
 
 private extension ARty {
     func loadIdleScene() throws {
-        let scene = try metaData.idleScene(model)
+        let scene = try schema.idleScene(model)
         scene.rootNode.childNodes.forEach {
             addChildNode($0)
         }

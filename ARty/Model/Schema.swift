@@ -1,7 +1,7 @@
 import SceneKit
 
-struct MetaData {
-    let arties: [String: ARtyMetaData]
+struct Schema {
+    let arties: [String: ARtySchema]
     let animationRepeatCounts: [String: Float]
     let walkAnimations: [String]
 
@@ -18,7 +18,7 @@ struct MetaData {
         var animations = [String: CAAnimation]()
         let animationNames = try self.animationNames(model)
         try animationNames.forEach {
-            animations[$0] = try MetaData.animation(model, animation: $0)
+            animations[$0] = try Schema.animation(model, animation: $0)
         }
         return animations
     }
@@ -51,24 +51,12 @@ struct MetaData {
     }
 }
 
-private extension MetaData {
-    func arty(_ model: String) throws -> ARtyMetaData {
-        guard let artyMetaData = arties[model] else {
+private extension Schema {
+    func arty(_ model: String) throws -> ARtySchema {
+        guard let arty = arties[model] else {
             throw ARtyError.invalidModelName(model)
         }
-        return artyMetaData
-    }
-
-    func idleAnimation(_ model: String) throws -> String {
-        return try arty(model).idleAnimation
-    }
-
-    func defaultPassiveAnimation(_ model: String) throws -> String {
-        return try arty(model).passiveAnimation
-    }
-
-    func defaultPokeAnimation(_ model: String) throws -> String {
-        return try arty(model).pokeAnimation
+        return arty
     }
 
     func animationNames(_ model: String) throws -> [String] {
@@ -96,6 +84,18 @@ private extension MetaData {
         caAnimation.fadeOutDuration = 0.5
         return caAnimation
     }
+
+    func idleAnimation(_ model: String) throws -> String {
+        return try arty(model).idleAnimation
+    }
+
+    func defaultPassiveAnimation(_ model: String) throws -> String {
+        return try arty(model).passiveAnimation
+    }
+
+    func defaultPokeAnimation(_ model: String) throws -> String {
+        return try arty(model).pokeAnimation
+    }
 }
 
 private extension String {
@@ -113,6 +113,6 @@ private extension String {
         if isWalkAnimation {
             return .infinity
         }
-        return metaData.animationRepeatCounts[self] ?? 1
+        return schema.animationRepeatCounts[self] ?? 1
     }
 }

@@ -2,7 +2,7 @@ import UIKit
 
 class EditARtyViewController: UIViewController {
     private let tableView = UITableView(frame: .zero, style: .grouped)
-    private let arties = Array(metaData.arties.keys)
+    private let arties = Array(schema.arties.keys)
     private weak var delegate: EditARtyViewControllerDelegate?
 
     init(delegate: EditARtyViewControllerDelegate) {

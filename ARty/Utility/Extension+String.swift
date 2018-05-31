@@ -1,5 +1,5 @@
 extension String {
     var isWalkAnimation: Bool {
-        return metaData.walkAnimations.contains(self)
+        return schema.walkAnimations.contains(self)
     }
 }

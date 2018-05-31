@@ -1,4 +1,4 @@
-var metaData = MetaData(
+var schema = Schema(
     arties: [
         elvira.model: elvira,
         mutant.model: mutant
@@ -7,7 +7,7 @@ var metaData = MetaData(
     walkAnimations: walkAnimations
 )
 
-let elvira = ARtyMetaData(
+let elvira = ARtySchema(
     model: "elvira",
     scale: 0.075,
     positionAdjustment: -2,
@@ -23,7 +23,7 @@ let elvira = ARtyMetaData(
     pokeAnimation: "elvira_buttslap"
 )
 
-let mutant = ARtyMetaData(
+let mutant = ARtySchema(
     model: "mutant",
     scale: 0.065,
     positionAdjustment: -10,

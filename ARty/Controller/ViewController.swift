@@ -1,11 +1,3 @@
-//
-//  ViewController.swift
-//  ARty
-//
-//  Created by Quan Vo on 5/23/18.
-//  Copyright © 2018 Quan Vo. All rights reserved.
-//
-
 import ARKit
 import CoreLocation
 
@@ -18,8 +10,6 @@ class ViewController: UIViewController {
     private var startDate = Date()
 
     private var lastLocation = CLLocation()
-
-    private var trueHeading = CLLocationDirection()
 
     private let uid = UUID().uuidString
 
@@ -48,7 +38,7 @@ class ViewController: UIViewController {
             startDate = Date()
         }
 
-        setARty(.mutant)
+        setARty("mutant")
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -91,16 +81,15 @@ class ViewController: UIViewController {
 }
 
 private extension ViewController {
-    func setARty(_ modelName: ARty.ModelName) {
-        sceneView.scene.rootNode.childNode(withName: uid, recursively: false)?.removeFromParentNode()
-
-        let arty = try! ARty(ownerId: uid, modelName: modelName)
-        arty.position = SCNVector3(0, arty.yPosition, arty.yPosition)
-        sceneView.scene.rootNode.addChildNode(arty)
-
-        arties[arty.ownerId] = arty
-
-        arty.label = label
+    func setARty(_ model: String) {
+        do {
+            let arty = try ARty(ownerId: uid, model: model)
+            arty.position = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment)
+            sceneView.scene.rootNode.childNode(withName: uid, recursively: false)?.removeFromParentNode()
+            sceneView.scene.rootNode.addChildNode(arty)
+            arties[arty.ownerId] = arty
+            arty.label = label
+        } catch {}
     }
 }
 
@@ -122,7 +111,7 @@ extension ViewController: ARSessionDelegate {
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        let adjustment = SCNVector3(0, arty.yPosition, arty.yPosition)
+        let adjustment = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment)
         let newVector = currentPosition + adjustment
         let moveAction = SCNAction.move(to: newVector, duration: 1.0)
         arty.runAction(moveAction)
@@ -133,9 +122,9 @@ extension ViewController: ARSCNViewDelegate {
 }
 
 extension ViewController: EditARtyViewControllerDelegate {
-    func didSelectARrty(_ modelName: ARty.ModelName) {
-        if modelName != arty?.modelName {
-            setARty(modelName)
+    func didSelectARrty(_ model: String) {
+        if model != arty?.model {
+            setARty(model)
         }
     }
 }

@@ -1,11 +1,3 @@
-//
-//  ARtyError.swift
-//  ARty
-//
-//  Created by Quan Vo on 5/23/18.
-//  Copyright © 2018 Quan Vo. All rights reserved.
-//
-
 import Foundation
 
 enum ARtyError: LocalizedError {

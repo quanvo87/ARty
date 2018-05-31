@@ -1,81 +1,64 @@
-//
-//  ARty.swift
-//  ARty
-//
-//  Created by Quan Vo on 5/23/18.
-//  Copyright © 2018 Quan Vo. All rights reserved.
-//
-
-import ARKit
+import SceneKit
 import CoreLocation
 
 class ARty: SCNNode {
     let ownerId: String
+    let model: String
+    let positionAdjustment: Float
 
-    private(set) var modelName: ModelName
-    private(set) var yPosition: Float = 0
-    private(set) var animations: [String: CAAnimation] = [:]
-    private(set) var passiveAnimation: Animation = .none
-    private(set) var pokeAnimation: Animation = .none
-    private(set) var walkAnimation: Animation = .none
+    private(set) var passiveAnimation = ""
+    private(set) var pokeAnimation = ""
 
-    private var currentAnimation: Animation = .none
+    private let animations: [String: CAAnimation]
+    private let walkAnimation: String
+
+    private var currentAnimation = ""
     private var lastLocation = CLLocation()
 
     weak var label: UILabel?
 
     init(ownerId: String,
-         modelName: ModelName,
-         passiveAnimation: Animation = .none,
-         pokeAnimation: Animation = .none,
-         walkAnimation: Animation = .none) throws {
+         model: String,
+         passiveAnimation: String = "",
+         pokeAnimation: String = "") throws {
         self.ownerId = ownerId
-        self.modelName = modelName
+        self.model = model
+        positionAdjustment = try metaData.positionAdjustment(model)
+        animations = try metaData.animations(model)
+        walkAnimation = try metaData.walkAnimation(model)
 
         super.init()
-        
+
         name = ownerId
-        try loadModel(modelName)
-        setPassiveAnimation(passiveAnimation)
-        setPokeAnimation(pokeAnimation)
-        setWalkAnimation(walkAnimation)
-        playPassiveAnimation()
-    }
-
-    func loadModel(_ modelName: ModelName) throws {
-        self.modelName = modelName
         try loadIdleScene()
-        scale = defaultScale
-        yPosition = defaultYPosition
-        animations = try makeAnimations()
+        scale = try metaData.scale(model)
+        try setPassiveAnimation(passiveAnimation)
+        try setPokeAnimation(pokeAnimation)
+        loopPassiveAnimation()
     }
 
-    func setPassiveAnimation(_ animation: Animation) {
-        passiveAnimation = animation == .none ? defaultPassiveAnimation : animation
+    func setPassiveAnimation(_ animation: String) throws {
+        passiveAnimation = try metaData.passiveAnimation(model, animation: animation)
     }
 
-    func setPokeAnimation(_ animation: Animation) {
-        pokeAnimation = animation == .none ? defaultPokeAnimaton : animation
+    func setPokeAnimation(_ animation: String) throws {
+        pokeAnimation = try metaData.pokeAnimation(model, animation: animation)
     }
 
-    func setWalkAnimation(_ animation: Animation) {
-        walkAnimation = animation == .none ? defaultWalkAnimation : animation
-    }
-
-    func playAnimation(_ animation: Animation) throws {
+    func playAnimation(_ animation: String) throws {
         stopAnimation(currentAnimation)
-        let caAnimation = try getAnimation(animation)
-        addAnimation(caAnimation, forKey: animation.rawValue)
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
         caAnimation.delegate = self
         currentAnimation = animation
     }
 
-    func stopAnimation(_ animation: Animation) {
-        removeAnimation(forKey: animation.rawValue, blendOutDuration: 0.5)
-        if currentAnimation.isWalk {
+    func stopAnimation(_ animation: String) {
+        removeAnimation(forKey: animation, blendOutDuration: 0.5)
+        if currentAnimation.isWalkAnimation {
             faceCamera()
         }
-        currentAnimation = .none
+        currentAnimation = ""
     }
 
     func playWalkAnimation(location: CLLocation) throws {
@@ -83,13 +66,13 @@ class ARty: SCNNode {
         if speed > 0 {
             if speed < 0.5 {
                 stopAnimation(walkAnimation)
-            } else if currentAnimation == .none {
+            } else if currentAnimation == "" {
                 try playAnimation(walkAnimation)
             }
         } else {
             let distance = lastLocation.distance(from: location)
             if distance > 5 {
-                if currentAnimation == .none {
+                if currentAnimation == "" {
                     try playAnimation(walkAnimation)
                 }
                 lastLocation = location
@@ -100,7 +83,7 @@ class ARty: SCNNode {
     }
 
     func turn(location: CLLocation) {
-        guard currentAnimation.isWalk, location.course > -1 else {
+        guard currentAnimation.isWalkAnimation, location.course > -1 else {
             return
         }
         let rotateAction = SCNAction.rotateTo(
@@ -120,60 +103,29 @@ class ARty: SCNNode {
 
 private extension ARty {
     func loadIdleScene() throws {
-        childNodes.forEach {
-            $0.removeFromParentNode()
-        }
-        let resourcePath = modelName.asResourcePath + "/" + defaultIdleAnimation.rawValue
-        guard let scene = SCNScene(named: resourcePath) else {
-            throw ARtyError.resourceNotFound(resourcePath)
-        }
+        let scene = try metaData.idleScene(model)
         scene.rootNode.childNodes.forEach {
             addChildNode($0)
         }
     }
 
-    func makeAnimations() throws -> [String: CAAnimation] {
-        var animationsDictionary = [String: CAAnimation]()
-        try animationNames.forEach {
-            animationsDictionary[$0.rawValue] = try makeAnimation($0)
-        }
-        return animationsDictionary
-    }
-
-    func makeAnimation(_ animation: Animation) throws -> CAAnimation {
-        let resourcePath = modelName.asResourcePath + "/" + animation.rawValue
-        guard let url = Bundle.main.url(forResource: resourcePath, withExtension: "dae") else {
-            throw ARtyError.resourceNotFound(resourcePath + ".dae")
-        }
-        let sceneSource = SCNSceneSource(url: url)
-        guard let caAnimation = sceneSource?.entryWithIdentifier(
-            animation.identifier,
-            withClass: CAAnimation.self) else {
-                throw ARtyError.animationIdentifierNotFound(animation.identifier)
-        }
-        caAnimation.repeatCount = animation.repeatCount
-        caAnimation.fadeInDuration = 1
-        caAnimation.fadeOutDuration = 0.5
-        return caAnimation
-    }
-
-    func getAnimation(_ animation: Animation) throws -> CAAnimation {
-        guard let caAnimation = animations[animation.rawValue] else {
-            throw ARtyError.invalidAnimationName(animation.rawValue)
+    func animation(_ animation: String) throws -> CAAnimation {
+        guard let caAnimation = animations[animation] else {
+            throw ARtyError.invalidAnimationName(animation)
         }
         return caAnimation
     }
 
-    func playPassiveAnimation() {
+    func loopPassiveAnimation() {
         let random = Double(arc4random_uniform(10) + 10)
         DispatchQueue.main.asyncAfter(deadline: .now() + random) { [weak self] in
             guard let `self` = self else {
                 return
             }
-            if self.currentAnimation == .none {
+            if self.currentAnimation == "" {
                 try? self.playAnimation(self.passiveAnimation)
             }
-            self.playPassiveAnimation()
+            self.loopPassiveAnimation()
         }
     }
 
@@ -191,6 +143,6 @@ private extension ARty {
 
 extension ARty: CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        currentAnimation = .none
+        currentAnimation = ""
     }
 }

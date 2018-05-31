@@ -52,7 +52,7 @@ extension EditARtyViewController: UITableViewDataSource {
 extension EditARtyViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let arty = arties[indexPath.row]
-        delegate?.didSelectARrty(arty)
+        delegate?.didChangeARty(to: arty)
         close()
     }
 }

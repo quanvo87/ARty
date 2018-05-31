@@ -1,3 +1,3 @@
 protocol EditARtyViewControllerDelegate: class {
-    func didSelectARrty(_ model: String)
+    func didChangeARty(to arty: String)
 }

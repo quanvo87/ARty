@@ -2,7 +2,7 @@ import SceneKit
 import CoreLocation
 
 class ARty: SCNNode {
-    let ownerId: String
+    let uid: String
     let model: String
     let positionAdjustment: Float
     let animations: [String: CAAnimation]
@@ -17,11 +17,11 @@ class ARty: SCNNode {
 
     weak var label: UILabel?
 
-    init(ownerId: String,
+    init(uid: String,
          model: String,
          passiveAnimation: String = "",
          pokeAnimation: String = "") throws {
-        self.ownerId = ownerId
+        self.uid = uid
         self.model = model
         positionAdjustment = try schema.positionAdjustment(model)
         animations = try schema.animations(model)
@@ -29,7 +29,7 @@ class ARty: SCNNode {
 
         super.init()
 
-        name = ownerId
+        name = uid
         scale = try schema.scale(model)
         try loadIdleScene()
         try setPassiveAnimation(passiveAnimation)

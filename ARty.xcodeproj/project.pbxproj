@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		59298B0520BF9373003D1D98 /* Extension+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B0420BF9373003D1D98 /* Extension+String.swift */; };
 		59298B0720BF973A003D1D98 /* ARty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B0620BF973A003D1D98 /* ARty.swift */; };
+		59298B1220C02D82003D1D98 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B1120C02D82003D1D98 /* Constant.swift */; };
 		592C08D920BF5CEF00E23EEC /* ARtySchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592C08D820BF5CEF00E23EEC /* ARtySchema.swift */; };
-		592C08DF20BF741F00E23EEC /* MockSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592C08DE20BF741F00E23EEC /* MockSchema.swift */; };
 		592C08E120BF7F8200E23EEC /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592C08E020BF7F8200E23EEC /* Schema.swift */; };
 		59389A1520B6313D00F7FA67 /* ARtyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59389A1420B6313D00F7FA67 /* ARtyError.swift */; };
 		59412B8A20B5721300A2ED02 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59412B8920B5721300A2ED02 /* AppDelegate.swift */; };
@@ -21,6 +21,7 @@
 		59412B9620B5721400A2ED02 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 59412B9420B5721400A2ED02 /* LaunchScreen.storyboard */; };
 		5957F8A920BB587A000201A8 /* Extension+SCNVector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5957F8A820BB587A000201A8 /* Extension+SCNVector3.swift */; };
 		5965CE5320BA0B3F000730F6 /* Extension+CLLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5965CE5220BA0B3F000730F6 /* Extension+CLLocation.swift */; };
+		5993889520C046750060A37E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5993889420C046750060A37E /* User.swift */; };
 		59B386EC20BF491D003BC2E5 /* EditARtyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */; };
 		59D529CA20BC9EB20093E647 /* Extension+CLLocationDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */; };
 		59EFDEE320BF4B820022E440 /* EditARtyViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59EFDEE220BF4B820022E440 /* EditARtyViewControllerDelegate.swift */; };
@@ -29,8 +30,8 @@
 /* Begin PBXFileReference section */
 		59298B0420BF9373003D1D98 /* Extension+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+String.swift"; sourceTree = "<group>"; };
 		59298B0620BF973A003D1D98 /* ARty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARty.swift; sourceTree = "<group>"; };
+		59298B1120C02D82003D1D98 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		592C08D820BF5CEF00E23EEC /* ARtySchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARtySchema.swift; sourceTree = "<group>"; };
-		592C08DE20BF741F00E23EEC /* MockSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSchema.swift; sourceTree = "<group>"; };
 		592C08E020BF7F8200E23EEC /* Schema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schema.swift; sourceTree = "<group>"; };
 		59389A1420B6313D00F7FA67 /* ARtyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARtyError.swift; sourceTree = "<group>"; };
 		59412B8620B5721300A2ED02 /* ARty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARty.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -43,6 +44,7 @@
 		59412B9720B5721400A2ED02 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5957F8A820BB587A000201A8 /* Extension+SCNVector3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+SCNVector3.swift"; sourceTree = "<group>"; };
 		5965CE5220BA0B3F000730F6 /* Extension+CLLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+CLLocation.swift"; sourceTree = "<group>"; };
+		5993889420C046750060A37E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditARtyViewController.swift; sourceTree = "<group>"; };
 		59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+CLLocationDirection.swift"; sourceTree = "<group>"; };
 		59EFDEE220BF4B820022E440 /* EditARtyViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditARtyViewControllerDelegate.swift; sourceTree = "<group>"; };
@@ -59,14 +61,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		59298B0C20BFEE62003D1D98 /* Mock */ = {
-			isa = PBXGroup;
-			children = (
-				592C08DE20BF741F00E23EEC /* MockSchema.swift */,
-			);
-			path = Mock;
-			sourceTree = "<group>";
-		};
 		59412B7D20B5721300A2ED02 = {
 			isa = PBXGroup;
 			children = (
@@ -93,7 +87,6 @@
 				59B386EA20BF48DF003BC2E5 /* Controller */,
 				59412B9420B5721400A2ED02 /* LaunchScreen.storyboard */,
 				59412B8F20B5721300A2ED02 /* Main.storyboard */,
-				59298B0C20BFEE62003D1D98 /* Mock */,
 				59412B9D20B5929600A2ED02 /* Model */,
 				59412BA020B595E500A2ED02 /* Utility */,
 			);
@@ -106,6 +99,7 @@
 				59298B0620BF973A003D1D98 /* ARty.swift */,
 				592C08D820BF5CEF00E23EEC /* ARtySchema.swift */,
 				592C08E020BF7F8200E23EEC /* Schema.swift */,
+				5993889420C046750060A37E /* User.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -114,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				59389A1420B6313D00F7FA67 /* ARtyError.swift */,
+				59298B1120C02D82003D1D98 /* Constant.swift */,
 				5965CE5220BA0B3F000730F6 /* Extension+CLLocation.swift */,
 				59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */,
 				5957F8A820BB587A000201A8 /* Extension+SCNVector3.swift */,
@@ -211,11 +206,12 @@
 			files = (
 				59B386EC20BF491D003BC2E5 /* EditARtyViewController.swift in Sources */,
 				59D529CA20BC9EB20093E647 /* Extension+CLLocationDirection.swift in Sources */,
+				59298B1220C02D82003D1D98 /* Constant.swift in Sources */,
 				5965CE5320BA0B3F000730F6 /* Extension+CLLocation.swift in Sources */,
 				59EFDEE320BF4B820022E440 /* EditARtyViewControllerDelegate.swift in Sources */,
 				592C08D920BF5CEF00E23EEC /* ARtySchema.swift in Sources */,
+				5993889520C046750060A37E /* User.swift in Sources */,
 				592C08E120BF7F8200E23EEC /* Schema.swift in Sources */,
-				592C08DF20BF741F00E23EEC /* MockSchema.swift in Sources */,
 				59412B8E20B5721300A2ED02 /* ViewController.swift in Sources */,
 				5957F8A920BB587A000201A8 /* Extension+SCNVector3.swift in Sources */,
 				59298B0720BF973A003D1D98 /* ARty.swift in Sources */,

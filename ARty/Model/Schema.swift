@@ -5,6 +5,8 @@ struct Schema {
     let animationRepeatCounts: [String: Float]
     let walkAnimations: [String]
 
+    // init from json/file path
+
     func scale(_ model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
         return SCNVector3(scale, scale, scale)
@@ -16,8 +18,7 @@ struct Schema {
 
     func animations(_ model: String) throws -> [String: CAAnimation] {
         var animations = [String: CAAnimation]()
-        let animationNames = try self.animationNames(model)
-        try animationNames.forEach {
+        try self.animationNames(model).forEach {
             animations[$0] = try Schema.animation(model, animation: $0)
         }
         return animations

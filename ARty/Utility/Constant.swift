@@ -9,7 +9,7 @@ var metaData = MetaData(
 
 let elvira = ARtyMetaData(
     model: "elvira",
-    scale: 0.75,
+    scale: 0.075,
     positionAdjustment: -2,
     animations: [
         "elvira_twerk",
@@ -25,7 +25,7 @@ let elvira = ARtyMetaData(
 
 let mutant = ARtyMetaData(
     model: "mutant",
-    scale: 0.65,
+    scale: 0.065,
     positionAdjustment: -10,
     animations: [
         "mutant_battlecry",

@@ -30,8 +30,8 @@ class ARty: SCNNode {
         super.init()
 
         name = ownerId
-        try loadIdleScene()
         scale = try metaData.scale(model)
+        try loadIdleScene()
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
         loopPassiveAnimation()

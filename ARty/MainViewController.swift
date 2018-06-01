@@ -118,11 +118,35 @@ extension MainViewController: EditARtyViewControllerDelegate {
     }
 }
 
+extension MainViewController: EditAnimationsViewControllerDelegate {
+    func setPassiveAnimation(to animation: String, for arty: ARty) {
+        try? arty.setPassiveAnimation(animation)
+        Database.setPassiveAnimation(to: animation, for: arty) { _ in }
+    }
+
+    func setPokeAnimation(to animation: String, for arty: ARty) {
+        try? arty.setPokeAnimation(animation)
+        Database.setPokeAnimation(to: animation, for: arty) { _ in }
+    }
+}
+
 private extension MainViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
     }
 
     @IBAction func didTapEditAnimationsButton(_ sender: Any) {
+        guard let arty = arty,
+            let viewController = UIStoryboard(
+                name: "Main",
+                bundle: nil).instantiateViewController(
+                    withIdentifier: String(describing: EditAnimationsViewController.self)
+                ) as? EditAnimationsViewController else {
+                    return
+        }
+        viewController.setARty(arty)
+        viewController.delegate = self
+        let navigationController = UINavigationController(rootViewController: viewController)
+        present(navigationController, animated: true)
     }
 
     @IBAction func didTapEditARtyButton(_ sender: Any) {
@@ -178,8 +202,8 @@ private extension MainViewController {
     }
 
     func showEditARtyViewController() {
-        let controller = EditARtyViewController(delegate: self)
-        let navigationController = UINavigationController(rootViewController: controller)
+        let viewController = EditARtyViewController(delegate: self)
+        let navigationController = UINavigationController(rootViewController: viewController)
         present(navigationController, animated: true)
     }
 
@@ -211,21 +235,5 @@ private extension MainViewController {
             }
             Database.setARty(arty) { _ in }
         }
-    }
-
-    func setPassiveAnimation(_ passiveAnimation: String) {
-        guard let uid = uid else {
-            return
-        }
-        try? arty?.setPassiveAnimation(passiveAnimation)
-        Database.setPassiveAnimation(passiveAnimation, for: uid) { _ in }
-    }
-
-    func setPokeAnimation(_ pokeAnimation: String) {
-        guard let uid = uid else {
-            return
-        }
-        try? arty?.setPokeAnimation(pokeAnimation)
-        Database.setPokeAnimation(pokeAnimation, for: uid) { _ in }
     }
 }

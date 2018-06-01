@@ -38,22 +38,24 @@ struct Database {
         }
     }
 
-    static func setPassiveAnimation(_ passiveAnimation: String,
-                                    for uid: String,
+    static func setPassiveAnimation(to animation: String,
+                                    for arty: ARty,
                                     completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).updateData([
-            "passiveAnimation" : passiveAnimation
-        ]) { error in
+        usersCollection.document(arty.uid).setData([
+            "passiveAnimation" : animation,
+            "recentPassiveAnimations": [arty.model: animation]
+        ], merge: true) { error in
             completion(error)
         }
     }
 
-    static func setPokeAnimation(_ pokeAnimation: String,
-                                 for uid: String,
+    static func setPokeAnimation(to animation: String,
+                                 for arty: ARty,
                                  completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).updateData([
-            "pokeAnimaton" : pokeAnimation
-        ]) { error in
+        usersCollection.document(arty.uid).setData([
+            "pokeAnimation" : animation,
+            "recentPokeAnimations": [arty.model: animation]
+        ], merge: true) { error in
             completion(error)
         }
     }

@@ -7,15 +7,15 @@ class MainViewController: UIViewController {
 
     @IBOutlet weak var label: UILabel!
 
-    private let authListener = AuthListener()
+    private var isLoaded = false
 
-    private let defaults = UserDefaults.standard
+    private let authListener = AuthListener()
 
     private let locationManager = CLLocationManager()
 
-    private var lastLocation = CLLocation()
-
     private var startDate = Date()
+
+    private var lastLocation = CLLocation()
 
     private var uid: String?
 
@@ -30,25 +30,12 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        UIApplication.shared.isIdleTimerDisabled = true
-
-        let scene = SCNScene()
-        sceneView.scene = scene
-        sceneView.delegate = self
-        sceneView.session.delegate = self
-
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestAlwaysAuthorization()
-        startUpdatingLocation()
-
         authListener.listen { [weak self] user in
             if let user = user {
-                let uid = user.uid
-                self?.uid = uid
-                self?.loadUserDefaults(uid: uid)
-                self?.nearbyUsers(uid: uid)
+                self?.load()
+                self?.uid = user.uid
+                self?.loadRecentModel(for: user.uid)
+                // query nearby users
             } else {
                 self?.showLoginViewController()
             }
@@ -57,9 +44,8 @@ class MainViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        // maybe only need to do this when app minimized (not every time user is on another screen within app)
-        // add button to manually do this, in case things go weird, which they often do in AR
+        // only need to do this when app minimized (not every time user is on another screen within app)
+        // also add button to manually do this
         let configuration = ARWorldTrackingConfiguration()
         configuration.worldAlignment = .gravityAndHeading
         sceneView.session.run(configuration, options: [.resetTracking])
@@ -67,7 +53,6 @@ class MainViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         sceneView.session.pause()
     }
 
@@ -102,7 +87,7 @@ extension MainViewController: ARSessionDelegate {
 extension MainViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
-            startUpdatingLocation()
+            startUpdatingLocation() // if they only authorized when in use, ask again one more time
         } else {
             // show alert
         }
@@ -128,7 +113,7 @@ extension MainViewController: EditARtyViewControllerDelegate {
         if arty != self.arty?.model {
             let arty = try! ARty(uid: uid, model: arty)
             addARtyToScene(arty)
-            setRecentAnimations(arty: arty)
+            setAnimationsFromBackend(for: arty)
         }
     }
 }
@@ -148,31 +133,43 @@ private extension MainViewController {
         try? Auth.auth().signOut()
     }
 
-    func loadUserDefaults(uid: String) {
-        if let savedARty = defaults.object(forKey: "arty") as? [String: String],
-            let model = savedARty["model"],
-            let passiveAnimation = savedARty["passiveAnimation"],
-            let pokeAnimation = savedARty["pokeAnimation"] {
-            let arty = try! ARty(
-                uid: uid,
-                model: model,
-                passiveAnimation: passiveAnimation,
-                pokeAnimation: pokeAnimation
-            )
-            addARtyToScene(arty)
-        } else {
-            showEditARtyViewController()
+    func load() {
+        guard !isLoaded else {
+            return
+        }
+        UIApplication.shared.isIdleTimerDisabled = true
+        let scene = SCNScene()
+        sceneView.scene = scene
+        sceneView.delegate = self
+        sceneView.session.delegate = self
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestAlwaysAuthorization()
+        startUpdatingLocation()
+        isLoaded = true
+    }
+
+    func loadRecentModel(for uid: String) {
+        Database.user(uid) { [weak self] result in
+            switch result {
+            case .success(let user):
+                if user.model != "" {
+                    let arty = try! ARty(
+                        uid: user.uid,
+                        model: user.model,
+                        passiveAnimation: user.passiveAnimation,
+                        pokeAnimation: user.pokeAnimation
+                    )
+                    self?.addARtyToScene(arty)
+                } else {
+                    self?.showEditARtyViewController()
+                }
+            case .fail(let error):
+                print(error)
+            }
         }
     }
 
-    func addARtyToScene(_ arty: ARty) {
-        arty.position = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment) // extract
-        sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
-        sceneView.scene.rootNode.addChildNode(arty)
-        arties[arty.uid] = arty
-        arty.label = label
-    }
-    
     func showLoginViewController() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let loginViewController = storyboard.instantiateViewController(withIdentifier: String(describing: LoginViewController.self))
@@ -191,72 +188,27 @@ private extension MainViewController {
         startDate = Date()
     }
 
-    func nearbyUsers(uid: String) {
-        MainViewController.mockNetworkNearbyUsers(uid: uid) { [weak self] users in
-            self?.processNearbyUsers(users)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                // check if app in foreground
-                self?.nearbyUsers(uid: uid)
-            }
-        }
+    func addARtyToScene(_ arty: ARty) {
+        arty.position = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment) // extract
+        sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
+        sceneView.scene.rootNode.addChildNode(arty)
+        arties[arty.uid] = arty
+        arty.label = label
     }
 
-    static func mockNetworkNearbyUsers(uid: String, completion: ([User]) -> Void) {
-        // get json from backend
-        // convert to array of users
-    }
-
-    func processNearbyUsers(_ users: [User]) {
-        users.forEach {
-            if arties[$0.uid] != nil {
-                updateARty(for: $0)
-            } else {
-                let arty = try! ARty(
-                    uid: $0.uid,
-                    model: $0.model,
-                    passiveAnimation: $0.passiveAnimation,
-                    pokeAnimation: $0.pokeAnimation
-                )
-                addARtyToScene(arty)
-            }
-        }
-        removeStaleUsers(users)
-    }
-
-    func updateARty(for user: User) {
-        // if model != arty.model,
-        // make new arty
-        // add to scene
-        // else update mutable properties
-        // animate movement to x, z
-    }
-
-    func removeStaleUsers(_ users: [User]) {
-        let uids = users.map { return $0.uid }
-        arties.keys
-            .filter { return !uids.contains($0) }
-            .forEach {
-                sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
-                self.arties.removeValue(forKey: $0)
-        }
-    }
-
-    func setRecentAnimations(arty: ARty) {
-        Database.user(arty.uid) { [weak self] result in
+    func setAnimationsFromBackend(for arty: ARty) {
+        Database.user(arty.uid) { result in
             switch result {
             case .success(let user):
                 if let passiveAnimation = user.recentPassiveAnimations[arty.model] {
-                    self?.setPassiveAnimation(passiveAnimation)
                     try? arty.setPassiveAnimation(passiveAnimation)
                 }
                 if let pokeAnimation = user.recentPokeAnimations[arty.model] {
-                    self?.setPokeAnimation(pokeAnimation)
                     try? arty.setPokeAnimation(pokeAnimation)
                 }
             case .fail(let error):
                 print(error)
             }
-            self?.defaults.set(arty.dictionary, forKey: "arty")
             Database.setARty(arty) { _ in }
         }
     }

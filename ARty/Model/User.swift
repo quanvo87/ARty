@@ -18,6 +18,8 @@ struct User {
         model = data?["model"] as? String ?? ""
         passiveAnimation = data?["passiveAnimation"] as? String ?? ""
         pokeAnimation = data?["pokeAnimation"] as? String ?? ""
+        recentPassiveAnimations = data?["recentPassiveAnimations"] as? [String: String] ?? [:]
+        recentPokeAnimations = data?["recentPokeAnimations"] as? [String: String] ?? [:]
         if let location = data?["location"] as? GeoPoint {
             latitude = location.latitude
             longitude = location.longitude
@@ -25,7 +27,5 @@ struct User {
             latitude = .leastNormalMagnitude
             longitude = .leastNormalMagnitude
         }
-        recentPassiveAnimations = data?["recentPassiveAnimations"] as? [String: String] ?? [:]
-        recentPokeAnimations = data?["recentPokeAnimations"] as? [String: String] ?? [:]
     }
 }

@@ -31,9 +31,7 @@ class ARty: SCNNode {
         positionAdjustment = try schema.positionAdjustment(model)
         animations = try schema.animations(model)
         walkAnimation = try schema.walkAnimation(model)
-
         super.init()
-
         name = uid
         scale = try schema.scale(model)
         try loadIdleScene()

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5908371F20C0BE2E00A36103 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5908371E20C0BE2E00A36103 /* Database.swift */; };
+		5908372120C0C22D00A36103 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5908372020C0C22D00A36103 /* GoogleService-Info.plist */; };
 		59298B0520BF9373003D1D98 /* Extension+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B0420BF9373003D1D98 /* Extension+String.swift */; };
 		59298B0720BF973A003D1D98 /* ARty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B0620BF973A003D1D98 /* ARty.swift */; };
 		59298B1220C02D82003D1D98 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B1120C02D82003D1D98 /* Constant.swift */; };
@@ -25,9 +27,13 @@
 		59B386EC20BF491D003BC2E5 /* EditARtyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */; };
 		59D529CA20BC9EB20093E647 /* Extension+CLLocationDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */; };
 		59EFDEE320BF4B820022E440 /* EditARtyViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59EFDEE220BF4B820022E440 /* EditARtyViewControllerDelegate.swift */; };
+		5FF4BFC55782DF0B617E4301 /* Pods_ARty.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62A1CF86D92BA288F60E1DD /* Pods_ARty.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2E645C07E1CA6575D6B1D766 /* Pods-ARty.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ARty.release.xcconfig"; path = "Pods/Target Support Files/Pods-ARty/Pods-ARty.release.xcconfig"; sourceTree = "<group>"; };
+		5908371E20C0BE2E00A36103 /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
+		5908372020C0C22D00A36103 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		59298B0420BF9373003D1D98 /* Extension+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+String.swift"; sourceTree = "<group>"; };
 		59298B0620BF973A003D1D98 /* ARty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARty.swift; sourceTree = "<group>"; };
 		59298B1120C02D82003D1D98 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
@@ -48,6 +54,8 @@
 		59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditARtyViewController.swift; sourceTree = "<group>"; };
 		59D529C920BC9EB20093E647 /* Extension+CLLocationDirection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+CLLocationDirection.swift"; sourceTree = "<group>"; };
 		59EFDEE220BF4B820022E440 /* EditARtyViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditARtyViewControllerDelegate.swift; sourceTree = "<group>"; };
+		B62A1CF86D92BA288F60E1DD /* Pods_ARty.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ARty.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5820ED2DA6AF24C16C4CC55 /* Pods-ARty.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ARty.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ARty/Pods-ARty.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,17 +63,36 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FF4BFC55782DF0B617E4301 /* Pods_ARty.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		23384A50DB664ABB13ABB4CC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B62A1CF86D92BA288F60E1DD /* Pods_ARty.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5908371D20C0BE1D00A36103 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				5908371E20C0BE2E00A36103 /* Database.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
 		59412B7D20B5721300A2ED02 = {
 			isa = PBXGroup;
 			children = (
 				59412B8820B5721300A2ED02 /* ARty */,
 				59412B8720B5721300A2ED02 /* Products */,
+				CDE1A8D79ED443C0D97CE536 /* Pods */,
+				23384A50DB664ABB13ABB4CC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -80,11 +107,13 @@
 		59412B8820B5721300A2ED02 /* ARty */ = {
 			isa = PBXGroup;
 			children = (
+				5908372020C0C22D00A36103 /* GoogleService-Info.plist */,
 				59412B9720B5721400A2ED02 /* Info.plist */,
 				59412B8B20B5721300A2ED02 /* art.scnassets */,
 				59412B8920B5721300A2ED02 /* AppDelegate.swift */,
 				59412B9220B5721400A2ED02 /* Assets.xcassets */,
 				59B386EA20BF48DF003BC2E5 /* Controller */,
+				5908371D20C0BE1D00A36103 /* Database */,
 				59412B9420B5721400A2ED02 /* LaunchScreen.storyboard */,
 				59412B8F20B5721300A2ED02 /* Main.storyboard */,
 				59412B9D20B5929600A2ED02 /* Model */,
@@ -127,6 +156,15 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
+		CDE1A8D79ED443C0D97CE536 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C5820ED2DA6AF24C16C4CC55 /* Pods-ARty.debug.xcconfig */,
+				2E645C07E1CA6575D6B1D766 /* Pods-ARty.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -134,9 +172,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 59412B9A20B5721400A2ED02 /* Build configuration list for PBXNativeTarget "ARty" */;
 			buildPhases = (
+				A88CF2683676F0B5EA66CA27 /* [CP] Check Pods Manifest.lock */,
 				59412B8220B5721300A2ED02 /* Sources */,
 				59412B8320B5721300A2ED02 /* Frameworks */,
 				59412B8420B5721300A2ED02 /* Resources */,
+				DD5312F19D2792F2C5C6936B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -192,12 +232,68 @@
 			files = (
 				59412B8C20B5721300A2ED02 /* art.scnassets in Resources */,
 				59412B9620B5721400A2ED02 /* LaunchScreen.storyboard in Resources */,
+				5908372120C0C22D00A36103 /* GoogleService-Info.plist in Resources */,
 				59412B9320B5721400A2ED02 /* Assets.xcassets in Resources */,
 				59412B9120B5721300A2ED02 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A88CF2683676F0B5EA66CA27 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ARty-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DD5312F19D2792F2C5C6936B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ARty/Pods-ARty-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC/GRPCClient.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-ProtoRPC/ProtoRPC.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-RxLibrary/RxLibrary.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRPCClient.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProtoRPC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxLibrary.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ARty/Pods-ARty-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		59412B8220B5721300A2ED02 /* Sources */ = {
@@ -207,6 +303,7 @@
 				59B386EC20BF491D003BC2E5 /* EditARtyViewController.swift in Sources */,
 				59D529CA20BC9EB20093E647 /* Extension+CLLocationDirection.swift in Sources */,
 				59298B1220C02D82003D1D98 /* Constant.swift in Sources */,
+				5908371F20C0BE2E00A36103 /* Database.swift in Sources */,
 				5965CE5320BA0B3F000730F6 /* Extension+CLLocation.swift in Sources */,
 				59EFDEE320BF4B820022E440 /* EditARtyViewControllerDelegate.swift in Sources */,
 				592C08D920BF5CEF00E23EEC /* ARtySchema.swift in Sources */,
@@ -359,6 +456,7 @@
 		};
 		59412B9B20B5721400A2ED02 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C5820ED2DA6AF24C16C4CC55 /* Pods-ARty.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -377,6 +475,7 @@
 		};
 		59412B9C20B5721400A2ED02 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2E645C07E1CA6575D6B1D766 /* Pods-ARty.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

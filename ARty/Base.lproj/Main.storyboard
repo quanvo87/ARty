@@ -10,10 +10,38 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Login View Controller-->
+        <scene sceneID="IfM-A7-dtt">
+            <objects>
+                <viewController storyboardIdentifier="LoginViewController" id="FTP-Z3-WXW" customClass="LoginViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="9AK-hU-jiN">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EJq-h9-lkF">
+                                <rect key="frame" x="137" y="396" width="101" height="30"/>
+                                <state key="normal" title="facebook login"/>
+                                <connections>
+                                    <action selector="didTapFacebookLoginButton:" destination="FTP-Z3-WXW" eventType="touchUpInside" id="Df5-fx-FDG"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="EJq-h9-lkF" firstAttribute="centerX" secondItem="13E-gy-BBt" secondAttribute="centerX" id="0It-OM-IFZ"/>
+                            <constraint firstItem="EJq-h9-lkF" firstAttribute="centerY" secondItem="13E-gy-BBt" secondAttribute="centerY" id="Wl8-0h-E4d"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="13E-gy-BBt"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7oy-fA-l1J" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1503" y="21"/>
+        </scene>
+        <!--Main View Controller-->
         <scene sceneID="e5h-Sr-vBI">
             <objects>
-                <viewController id="WLz-NS-WUy" customClass="ViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="WLz-NS-WUy" customClass="MainViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ivM-ky-J9c">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -23,7 +51,7 @@
                                 <autoresizingMask key="autoresizingMask"/>
                             </arscnView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ep-KU-O3Q">
-                                <rect key="frame" x="183" y="727" width="8" height="21"/>
+                                <rect key="frame" x="183" y="747" width="8" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -49,6 +77,13 @@
                                     <action selector="didTapEditARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UpO-lG-qN3">
+                                <rect key="frame" x="310" y="44" width="55" height="30"/>
+                                <state key="normal" title="Log Out"/>
+                                <connections>
+                                    <action selector="didTapLogOutButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="LhO-9w-q2n"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -57,13 +92,16 @@
                             <constraint firstItem="9ep-KU-O3Q" firstAttribute="centerX" secondItem="6Pb-WM-QEe" secondAttribute="centerX" id="7uf-kn-Gl1"/>
                             <constraint firstItem="7az-ZH-489" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="DhY-Uu-1rd"/>
                             <constraint firstItem="6dM-UU-1Cs" firstAttribute="trailing" secondItem="pYK-VT-FEI" secondAttribute="trailing" id="FBJ-v5-e2t"/>
-                            <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="9ep-KU-O3Q" secondAttribute="bottom" constant="30" id="Lp9-18-aJ3"/>
+                            <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="9ep-KU-O3Q" secondAttribute="bottom" constant="10" id="Lp9-18-aJ3"/>
                             <constraint firstItem="6dM-UU-1Cs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="MbE-ci-zFN"/>
                             <constraint firstItem="pYK-VT-FEI" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" id="QQo-pY-exH"/>
                             <constraint firstItem="pYK-VT-FEI" firstAttribute="top" secondItem="6dM-UU-1Cs" secondAttribute="bottom" constant="10" id="RUH-6V-iTk"/>
                             <constraint firstItem="7az-ZH-489" firstAttribute="top" secondItem="pYK-VT-FEI" secondAttribute="bottom" constant="10" id="SKa-6e-qgR"/>
+                            <constraint firstItem="UpO-lG-qN3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="XUW-Yb-qnm"/>
+                            <constraint firstItem="UpO-lG-qN3" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" id="gaW-HK-dae"/>
                             <constraint firstItem="9ep-KU-O3Q" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Pb-WM-QEe" secondAttribute="leading" id="kv5-rq-ifm"/>
                             <constraint firstItem="pYK-VT-FEI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="o47-Eh-wfc"/>
+                            <constraint firstItem="UpO-lG-qN3" firstAttribute="top" secondItem="6Pb-WM-QEe" secondAttribute="top" id="rYn-9R-giT"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="7az-ZH-489" secondAttribute="bottom" constant="10" id="sLo-0y-vwu"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Pb-WM-QEe"/>
@@ -76,6 +114,46 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yku-gU-S6c" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="808.79999999999995" y="21.428571428571431"/>
+        </scene>
+        <!--Edit Animations View Controller-->
+        <scene sceneID="Yrr-aQ-ie3">
+            <objects>
+                <viewController storyboardIdentifier="EditAnimationsViewController" id="cVf-u5-qGL" customClass="EditAnimationsViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="zvh-M6-sDD">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="wZX-2p-qG3">
+                                <rect key="frame" x="63" y="64" width="249" height="29"/>
+                                <segments>
+                                    <segment title="Passive Animation"/>
+                                    <segment title="Poke Animation"/>
+                                </segments>
+                            </segmentedControl>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="BWo-gz-RWo">
+                                <rect key="frame" x="10" y="112" width="355" height="646"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="BWo-gz-RWo" firstAttribute="leading" secondItem="jdc-UY-LP0" secondAttribute="leading" constant="10" id="6eh-n4-4y7"/>
+                            <constraint firstItem="wZX-2p-qG3" firstAttribute="top" secondItem="jdc-UY-LP0" secondAttribute="top" constant="20" id="NI9-A7-orh"/>
+                            <constraint firstItem="jdc-UY-LP0" firstAttribute="trailing" secondItem="BWo-gz-RWo" secondAttribute="trailing" constant="10" id="QKu-aC-wZ5"/>
+                            <constraint firstItem="jdc-UY-LP0" firstAttribute="bottom" secondItem="BWo-gz-RWo" secondAttribute="bottom" constant="20" id="gZt-mj-Hrf"/>
+                            <constraint firstItem="wZX-2p-qG3" firstAttribute="centerX" secondItem="jdc-UY-LP0" secondAttribute="centerX" id="hv1-9S-NRy"/>
+                            <constraint firstItem="BWo-gz-RWo" firstAttribute="top" secondItem="wZX-2p-qG3" secondAttribute="bottom" constant="20" id="tLV-ve-cdU"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="jdc-UY-LP0"/>
+                    </view>
+                    <connections>
+                        <outlet property="animationTypePicker" destination="wZX-2p-qG3" id="PD4-Th-jby"/>
+                        <outlet property="tableView" destination="BWo-gz-RWo" id="OdC-gi-TjJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yAd-Ez-9id" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2201" y="21"/>
         </scene>
     </scenes>
 </document>

@@ -3,4 +3,5 @@ enum ARtyError: Error {
     case invalidAnimationName(String)
     case invalidModelName(String)
     case resourceNotFound(String)
+    case invalidDataFromServer([String: Any]?)
 }

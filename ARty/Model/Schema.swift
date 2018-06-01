@@ -4,6 +4,7 @@ struct Schema {
     let arties: [String: ARtySchema]
     let animationRepeatCounts: [String: Float]
     let walkAnimations: [String]
+    let fallAnimations: [String]
 
     // init from json/file path
 
@@ -22,6 +23,12 @@ struct Schema {
             animations[$0] = try Schema.animation(model, animation: $0)
         }
         return animations
+    }
+
+    func pickableAnimations(_ model: String) throws -> [String] {
+        return try animationNames(model).filter {
+            return !$0.isWalkAnimation && !$0.isFallAnimation
+        }
     }
 
     func idleScene(_ model: String) throws -> SCNScene {

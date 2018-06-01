@@ -3,16 +3,21 @@ import CoreLocation
 
 class ARty: SCNNode {
     let uid: String
+
     let model: String
+
     let positionAdjustment: Float
+
     let animations: [String: CAAnimation]
 
     private(set) var passiveAnimation = ""
+
     private(set) var pokeAnimation = ""
 
     private let walkAnimation: String
 
     private var currentAnimation = ""
+
     private var lastLocation = CLLocation()
 
     weak var label: UILabel?
@@ -26,15 +31,21 @@ class ARty: SCNNode {
         positionAdjustment = try schema.positionAdjustment(model)
         animations = try schema.animations(model)
         walkAnimation = try schema.walkAnimation(model)
-
         super.init()
-
         name = uid
         scale = try schema.scale(model)
         try loadIdleScene()
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
         loopPassiveAnimation()
+    }
+
+    var dictionary: [String: String] {
+        return [
+            "model": model,
+            "passiveAnimation": passiveAnimation,
+            "pokeAnimation": pokeAnimation
+        ]
     }
 
     func setPassiveAnimation(_ animation: String) throws {

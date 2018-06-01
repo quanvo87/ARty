@@ -4,7 +4,8 @@ var schema = Schema(
         mutant.model: mutant
     ],
     animationRepeatCounts: animationRepeatCounts,
-    walkAnimations: walkAnimations
+    walkAnimations: walkAnimations,
+    fallAnimations: fallAnimations
 )
 
 let elvira = ARtySchema(
@@ -48,4 +49,8 @@ let animationRepeatCounts: [String: Float] = [
 let walkAnimations = [
     "elvira_walk",
     "mutant_walk"
+]
+
+let fallAnimations = [
+    "mutant_fall"
 ]

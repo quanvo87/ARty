@@ -9,6 +9,8 @@ class MainViewController: UIViewController {
 
     private let authListener = AuthListener()
 
+    private let defaults = UserDefaults.standard
+
     private let locationManager = CLLocationManager()
 
     private var lastLocation = CLLocation()
@@ -44,21 +46,11 @@ class MainViewController: UIViewController {
         authListener.listen { [weak self] user in
             if let user = user {
                 let uid = user.uid
-                Database.setUser(uid) { _ in }
                 self?.uid = uid
-                // get value from user defaults
-                // load
-                // then check network for latest user config
-                // load updated model if necessary
-                // update user defaults
-                let arty = try! ARty(uid: uid, model: "mutant")
-                self?.addARtyToScene(arty)
+                self?.loadUserDefaults(uid: uid)
                 self?.nearbyUsers(uid: uid)
             } else {
-                let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                let loginViewController = storyboard.instantiateViewController(withIdentifier: String(describing: LoginViewController.self))
-                let navigationController = UINavigationController(rootViewController: loginViewController)
-                self?.present(navigationController, animated: true)
+                self?.showLoginViewController()
             }
         }
     }
@@ -89,87 +81,6 @@ class MainViewController: UIViewController {
                 return
         }
         try? arty.playAnimation(arty.pokeAnimation)
-    }
-
-    @IBAction func didTapHoldPositionButton(_ sender: Any) {
-    }
-
-    @IBAction func didTapEditAnimationsButton(_ sender: Any) {
-    }
-    
-    @IBAction func didTapEditARtyButton(_ sender: Any) {
-        let controller = EditARtyViewController(delegate: self)
-        let navigationController = UINavigationController(rootViewController: controller)
-        present(navigationController, animated: true)
-    }
-
-    @IBAction func didTapLogOutButton(_ sender: Any) {
-        try? Auth.auth().signOut()
-    }
-}
-
-private extension MainViewController {
-    func startUpdatingLocation() {
-        locationManager.startUpdatingLocation()
-        startDate = Date()
-    }
-
-    func nearbyUsers(uid: String) {
-        MainViewController.mockNetworkNearbyUsers(uid: uid) { [weak self] users in
-            self?.processNearbyUsers(users)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                // check if app in foreground
-                self?.nearbyUsers(uid: uid)
-            }
-        }
-    }
-
-    static func mockNetworkNearbyUsers(uid: String, completion: ([User]) -> Void) {
-        // get json from backend
-        // use codable to make array of users
-    }
-
-    func processNearbyUsers(_ users: [User]) {
-        users.forEach {
-            if arties[$0.uid] != nil {
-                updateARty(for: $0)
-            } else {
-                let arty = try! ARty(
-                    uid: $0.uid,
-                    model: $0.model,
-                    passiveAnimation: $0.passiveAnimation,
-                    pokeAnimation: $0.pokeAnimation
-                )
-                addARtyToScene(arty)
-            }
-        }
-        removeStaleUsers(users)
-    }
-
-    func updateARty(for user: User) {
-        // if model != arty.model,
-        // make new arty
-        // add to scene
-        // else update mutable properties
-        // animate movement to x, z
-    }
-
-    func addARtyToScene(_ arty: ARty) {
-        arty.position = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment) // extract
-        sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
-        sceneView.scene.rootNode.addChildNode(arty)
-        arties[arty.uid] = arty
-        arty.label = label
-    }
-
-    func removeStaleUsers(_ users: [User]) {
-        let uids = users.map { return $0.uid }
-        arties.keys
-            .filter { return !uids.contains($0) }
-            .forEach {
-                sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
-                self.arties.removeValue(forKey: $0)
-        }
     }
 }
 
@@ -217,9 +128,152 @@ extension MainViewController: EditARtyViewControllerDelegate {
         if arty != self.arty?.model {
             let arty = try! ARty(uid: uid, model: arty)
             addARtyToScene(arty)
-            // get saved recent animations from UD for model and set them
-            // update in user defaults
-            // update in database
+            setRecentAnimations(arty: arty)
         }
+    }
+}
+
+private extension MainViewController {
+    @IBAction func didTapHoldPositionButton(_ sender: Any) {
+    }
+
+    @IBAction func didTapEditAnimationsButton(_ sender: Any) {
+    }
+
+    @IBAction func didTapEditARtyButton(_ sender: Any) {
+        showEditARtyViewController()
+    }
+
+    @IBAction func didTapLogOutButton(_ sender: Any) {
+        try? Auth.auth().signOut()
+    }
+
+    func loadUserDefaults(uid: String) {
+        if let savedARty = defaults.object(forKey: "arty") as? [String: String],
+            let model = savedARty["model"],
+            let passiveAnimation = savedARty["passiveAnimation"],
+            let pokeAnimation = savedARty["pokeAnimation"] {
+            let arty = try! ARty(
+                uid: uid,
+                model: model,
+                passiveAnimation: passiveAnimation,
+                pokeAnimation: pokeAnimation
+            )
+            addARtyToScene(arty)
+        } else {
+            showEditARtyViewController()
+        }
+    }
+
+    func addARtyToScene(_ arty: ARty) {
+        arty.position = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment) // extract
+        sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
+        sceneView.scene.rootNode.addChildNode(arty)
+        arties[arty.uid] = arty
+        arty.label = label
+    }
+    
+    func showLoginViewController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let loginViewController = storyboard.instantiateViewController(withIdentifier: String(describing: LoginViewController.self))
+        let navigationController = UINavigationController(rootViewController: loginViewController)
+        present(navigationController, animated: true)
+    }
+
+    func showEditARtyViewController() {
+        let controller = EditARtyViewController(delegate: self)
+        let navigationController = UINavigationController(rootViewController: controller)
+        present(navigationController, animated: true)
+    }
+
+    func startUpdatingLocation() {
+        locationManager.startUpdatingLocation()
+        startDate = Date()
+    }
+
+    func nearbyUsers(uid: String) {
+        MainViewController.mockNetworkNearbyUsers(uid: uid) { [weak self] users in
+            self?.processNearbyUsers(users)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                // check if app in foreground
+                self?.nearbyUsers(uid: uid)
+            }
+        }
+    }
+
+    static func mockNetworkNearbyUsers(uid: String, completion: ([User]) -> Void) {
+        // get json from backend
+        // convert to array of users
+    }
+
+    func processNearbyUsers(_ users: [User]) {
+        users.forEach {
+            if arties[$0.uid] != nil {
+                updateARty(for: $0)
+            } else {
+                let arty = try! ARty(
+                    uid: $0.uid,
+                    model: $0.model,
+                    passiveAnimation: $0.passiveAnimation,
+                    pokeAnimation: $0.pokeAnimation
+                )
+                addARtyToScene(arty)
+            }
+        }
+        removeStaleUsers(users)
+    }
+
+    func updateARty(for user: User) {
+        // if model != arty.model,
+        // make new arty
+        // add to scene
+        // else update mutable properties
+        // animate movement to x, z
+    }
+
+    func removeStaleUsers(_ users: [User]) {
+        let uids = users.map { return $0.uid }
+        arties.keys
+            .filter { return !uids.contains($0) }
+            .forEach {
+                sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
+                self.arties.removeValue(forKey: $0)
+        }
+    }
+
+    func setRecentAnimations(arty: ARty) {
+        Database.user(arty.uid) { [weak self] result in
+            switch result {
+            case .success(let user):
+                if let passiveAnimation = user.recentPassiveAnimations[arty.model] {
+                    self?.setPassiveAnimation(passiveAnimation)
+                    try? arty.setPassiveAnimation(passiveAnimation)
+                }
+                if let pokeAnimation = user.recentPokeAnimations[arty.model] {
+                    self?.setPokeAnimation(pokeAnimation)
+                    try? arty.setPokeAnimation(pokeAnimation)
+                }
+            case .fail(let error):
+                print(error)
+            }
+            self?.defaults.set(arty.dictionary, forKey: "arty")
+            Database.setARty(arty) { _ in }
+        }
+    }
+
+    func setPassiveAnimation(_ passiveAnimation: String) {
+        guard let uid = uid else {
+            return
+        }
+        try? arty?.setPassiveAnimation(passiveAnimation)
+        Database.setPassiveAnimation(passiveAnimation, for: uid) { _ in }
+    }
+
+    func setPokeAnimation(_ pokeAnimation: String) {
+        guard let uid = uid else {
+            return
+        }
+        try? arty?.setPokeAnimation(pokeAnimation)
+        Database.setPokeAnimation(pokeAnimation, for: uid) { _ in }
     }
 }

@@ -3,7 +3,9 @@ import Firebase
 struct Database {
     private static let db: Firestore = {
         let db = Firestore.firestore()
-        db.settings.areTimestampsInSnapshotsEnabled = true
+        let settings = db.settings
+        settings.areTimestampsInSnapshotsEnabled = true
+        db.settings = settings
         return db
     }()
 
@@ -11,11 +13,18 @@ struct Database {
 
     private init() {}
 
-    static func setUser(_ uid: String, completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).setData([
-            "uid": uid
-        ], merge: true) { error in
-            completion(error)
+    static func user(_ uid: String, completion: @escaping (Result<User, Error>) -> Void) {
+        usersCollection.document(uid).getDocument { document, error in
+            if let error = error {
+                completion(.fail(error))
+            } else {
+                do {
+                    let user = try User(document?.data())
+                    completion(.success(user))
+                } catch {
+                    completion(.fail(error))
+                }
+            }
         }
     }
 
@@ -58,5 +67,12 @@ struct Database {
         ]) { error in
             completion(error)
         }
+    }
+}
+
+extension Database {
+    enum Result<T, Error> {
+        case success(T)
+        case fail(Error)
     }
 }

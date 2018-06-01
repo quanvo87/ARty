@@ -42,6 +42,14 @@ class ARty: SCNNode {
         loopPassiveAnimation()
     }
 
+    var dictionary: [String: String] {
+        return [
+            "model": model,
+            "passiveAnimation": passiveAnimation,
+            "pokeAnimation": pokeAnimation
+        ]
+    }
+
     func setPassiveAnimation(_ animation: String) throws {
         passiveAnimation = try schema.passiveAnimation(model, animation: animation)
     }

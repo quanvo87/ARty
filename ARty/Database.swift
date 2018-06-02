@@ -14,16 +14,25 @@ struct Database {
     private init() {}
 
     static func user(_ uid: String, completion: @escaping (Result<User, Error>) -> Void) {
-        usersCollection.document(uid).getDocument { document, error in
+        usersCollection.document(uid).getDocument { data, error in
             if let error = error {
                 completion(.fail(error))
             } else {
                 do {
-                    let user = try User(document?.data())
+                    let user = try User(data?.data())
                     completion(.success(user))
                 } catch {
                     completion(.fail(error))
                 }
+            }
+        }
+    }
+
+    static func users(completion: @escaping (Result<[User], Error>) -> Void) {
+        usersCollection.getDocuments { data, error in
+            if let error = error {
+                completion(.fail(error))
+            } else {
             }
         }
     }

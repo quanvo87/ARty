@@ -6,13 +6,15 @@ class ARty: SCNNode {
 
     let model: String
 
-    let positionAdjustment: Float
+    let positionAdjustment: SCNVector3
 
-    let animations: [String: CAAnimation]
+    let pickableAnimations: [String]
 
     private(set) var passiveAnimation = ""
 
     private(set) var pokeAnimation = ""
+
+    private let animations: [String: CAAnimation]
 
     private let walkAnimation: String
 
@@ -29,6 +31,7 @@ class ARty: SCNNode {
         self.uid = uid
         self.model = model
         positionAdjustment = try schema.positionAdjustment(model)
+        pickableAnimations = try schema.pickableAnimations(model)
         animations = try schema.animations(model)
         walkAnimation = try schema.walkAnimation(model)
         super.init()
@@ -56,20 +59,8 @@ class ARty: SCNNode {
         pokeAnimation = try schema.pokeAnimation(model, animation: animation)
     }
 
-    func playAnimation(_ animation: String) throws {
-        stopAnimation(currentAnimation)
-        let caAnimation = try self.animation(animation)
-        addAnimation(caAnimation, forKey: animation)
-        caAnimation.delegate = self
-        currentAnimation = animation
-    }
-
-    func stopAnimation(_ animation: String) {
-        removeAnimation(forKey: animation, blendOutDuration: 0.5)
-        if currentAnimation.isWalkAnimation {
-            faceCamera()
-        }
-        currentAnimation = ""
+    func playPokeAnimation() throws {
+        try playAnimation(pokeAnimation)
     }
 
     func playWalkAnimation(location: CLLocation) throws {
@@ -112,6 +103,12 @@ class ARty: SCNNode {
     }
 }
 
+extension ARty: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        currentAnimation = ""
+    }
+}
+
 private extension ARty {
     func loadIdleScene() throws {
         let scene = try schema.idleScene(model)
@@ -125,6 +122,22 @@ private extension ARty {
             throw ARtyError.invalidAnimationName(animation)
         }
         return caAnimation
+    }
+
+    func playAnimation(_ animation: String) throws {
+        stopAnimation(currentAnimation)
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
+        caAnimation.delegate = self
+        currentAnimation = animation
+    }
+
+    func stopAnimation(_ animation: String) {
+        removeAnimation(forKey: animation, blendOutDuration: 0.5)
+        if currentAnimation.isWalkAnimation {
+            faceCamera()
+        }
+        currentAnimation = ""
     }
 
     func loopPassiveAnimation() {
@@ -149,11 +162,5 @@ private extension ARty {
             usesShortestUnitArc: true
         )
         runAction(rotateAction)
-    }
-}
-
-extension ARty: CAAnimationDelegate {
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        currentAnimation = ""
     }
 }

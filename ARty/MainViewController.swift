@@ -1,6 +1,6 @@
+import FirebaseAuth
 import ARKit
 import CoreLocation
-import FirebaseAuth
 
 class MainViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
@@ -45,7 +45,7 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // only need to do this when app minimized (not every time user is on another screen within app)
-        // also add button to manually do this
+        // but also add button to manually do this
         let configuration = ARWorldTrackingConfiguration()
         configuration.worldAlignment = .gravityAndHeading
         sceneView.session.run(configuration, options: [.resetTracking])
@@ -65,7 +65,7 @@ class MainViewController: UIViewController {
             let arty = arties[uid] else {
                 return
         }
-        try? arty.playAnimation(arty.pokeAnimation)
+        try? arty.playPokeAnimation()
     }
 }
 
@@ -78,9 +78,7 @@ extension MainViewController: ARSessionDelegate {
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        let adjustment = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment)
-        let newVector = currentPosition + adjustment
-        arty.position = newVector
+        arty.position = currentPosition + arty.positionAdjustment
     }
 }
 
@@ -135,16 +133,10 @@ private extension MainViewController {
     }
 
     @IBAction func didTapEditAnimationsButton(_ sender: Any) {
-        guard let arty = arty,
-            let viewController = UIStoryboard(
-                name: "Main",
-                bundle: nil).instantiateViewController(
-                    withIdentifier: String(describing: EditAnimationsViewController.self)
-                ) as? EditAnimationsViewController else {
-                    return
+        guard let arty = arty else {
+            return
         }
-        viewController.setARty(arty)
-        viewController.delegate = self
+        let viewController = EditAnimationsViewController.make(arty: arty, delegate: self)
         let navigationController = UINavigationController(rootViewController: viewController)
         present(navigationController, animated: true)
     }
@@ -155,6 +147,19 @@ private extension MainViewController {
 
     @IBAction func didTapLogOutButton(_ sender: Any) {
         try? Auth.auth().signOut()
+    }
+
+    func showLoginViewController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let loginViewController = storyboard.instantiateViewController(withIdentifier: String(describing: LoginViewController.self))
+        let navigationController = UINavigationController(rootViewController: loginViewController)
+        present(navigationController, animated: true)
+    }
+
+    func showEditARtyViewController() {
+        let viewController = EditARtyViewController(delegate: self)
+        let navigationController = UINavigationController(rootViewController: viewController)
+        present(navigationController, animated: true)
     }
 
     func load() {
@@ -194,26 +199,13 @@ private extension MainViewController {
         }
     }
 
-    func showLoginViewController() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginViewController = storyboard.instantiateViewController(withIdentifier: String(describing: LoginViewController.self))
-        let navigationController = UINavigationController(rootViewController: loginViewController)
-        present(navigationController, animated: true)
-    }
-
-    func showEditARtyViewController() {
-        let viewController = EditARtyViewController(delegate: self)
-        let navigationController = UINavigationController(rootViewController: viewController)
-        present(navigationController, animated: true)
-    }
-
     func startUpdatingLocation() {
         locationManager.startUpdatingLocation()
         startDate = Date()
     }
 
     func addARtyToScene(_ arty: ARty) {
-        arty.position = SCNVector3(0, arty.positionAdjustment, arty.positionAdjustment) // extract
+        arty.position = arty.positionAdjustment
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty

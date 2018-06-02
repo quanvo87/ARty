@@ -9,7 +9,7 @@ class EditAnimationsViewController: UIViewController {
 
     private var animations = [String]()
 
-    var delegate: EditAnimationsViewControllerDelegate?
+    private var delegate: EditAnimationsViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,9 +31,18 @@ class EditAnimationsViewController: UIViewController {
         tableView.reloadData()
     }
 
-    func setARty(_ arty: ARty) {
-        self.arty = arty
-        animations = try! schema.pickableAnimations(arty.model)
+    static func make(arty: ARty, delegate: EditAnimationsViewControllerDelegate) -> EditAnimationsViewController {
+        guard let viewController = UIStoryboard(
+            name: "Main",
+            bundle: nil).instantiateViewController(
+                withIdentifier: String(describing: EditAnimationsViewController.self)
+            ) as? EditAnimationsViewController else {
+                return EditAnimationsViewController()
+        }
+        viewController.arty = arty
+        viewController.animations = arty.pickableAnimations
+        viewController.delegate = delegate
+        return viewController
     }
 }
 
@@ -46,7 +55,7 @@ extension EditAnimationsViewController: UITableViewDataSource {
         let animation = animations[indexPath.row]
 
         let cell = UITableViewCell()
-
+        cell.selectionStyle = .none
         cell.textLabel?.text = animation.animationDisplayName
 
         let currentAnimation = animationTypePicker.selectedSegmentIndex == 0 ? arty?.passiveAnimation : arty?.pokeAnimation
@@ -60,8 +69,6 @@ extension EditAnimationsViewController: UITableViewDataSource {
 
 extension EditAnimationsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-
         guard let arty = arty else {
             return
         }

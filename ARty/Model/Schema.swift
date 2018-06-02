@@ -13,8 +13,9 @@ struct Schema {
         return SCNVector3(scale, scale, scale)
     }
 
-    func positionAdjustment(_ model: String) throws -> Float {
-        return try Float(arty(model).positionAdjustment)
+    func positionAdjustment(_ model: String) throws -> SCNVector3 {
+        let adjustment = Float(try arty(model).positionAdjustment)
+        return SCNVector3(0, adjustment, adjustment)
     }
 
     func animations(_ model: String) throws -> [String: CAAnimation] {

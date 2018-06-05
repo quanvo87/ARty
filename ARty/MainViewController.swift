@@ -129,7 +129,7 @@ extension MainViewController: AuthManagerDelegate {
 
     private func loadRecentModel(for uid: String) {
         // todo: move to account creation
-        Database.setUid(uid) { [weak self] error in
+        Database.updateUid(uid) { [weak self] error in
             if let error = error {
                 print(error)
                 return
@@ -237,7 +237,7 @@ extension MainViewController: EditARtyViewControllerDelegate {
             case .fail(let error):
                 print(error)
             }
-            Database.setARty(arty) { _ in }
+            Database.updateARty(arty) { _ in }
         }
     }
 }
@@ -245,12 +245,12 @@ extension MainViewController: EditARtyViewControllerDelegate {
 extension MainViewController: EditAnimationsViewControllerDelegate {
     func setPassiveAnimation(to animation: String, for arty: ARty) {
         try? arty.setPassiveAnimation(animation)
-        Database.setPassiveAnimation(to: animation, for: arty) { _ in }
+        Database.updatePassiveAnimation(to: animation, for: arty) { _ in }
     }
 
     func setPokeAnimation(to animation: String, for arty: ARty) {
         try? arty.setPokeAnimation(animation)
-        Database.setPokeAnimation(to: animation, for: arty) { _ in }
+        Database.updatePokeAnimation(to: animation, for: arty) { _ in }
     }
 }
 

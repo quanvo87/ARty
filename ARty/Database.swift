@@ -1,6 +1,5 @@
 import FirebaseFirestore
 
-// todo: make these all use update instead of set
 struct Database {
     private static let db: Firestore = {
         let db = Firestore.firestore()
@@ -58,7 +57,7 @@ struct Database {
         }
     }
 
-    static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
+    static func updateUid(_ uid: String, completion: @escaping (Error?) -> Void) {
         usersCollection.document(uid).updateData([
             "uid" : uid
         ]) { error in
@@ -66,7 +65,7 @@ struct Database {
         }
     }
 
-    static func setARty(_ arty: ARty, completion: @escaping (Error?) -> Void) {
+    static func updateARty(_ arty: ARty, completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
             "model" : arty.model,
             "passiveAnimation" : arty.passiveAnimation,
@@ -76,24 +75,24 @@ struct Database {
         }
     }
 
-    static func setPassiveAnimation(to animation: String,
-                                    for arty: ARty,
-                                    completion: @escaping (Error?) -> Void) {
-        usersCollection.document(arty.uid).setData([
+    static func updatePassiveAnimation(to animation: String,
+                                       for arty: ARty,
+                                       completion: @escaping (Error?) -> Void) {
+        usersCollection.document(arty.uid).updateData([
             "passiveAnimation" : animation,
             "recentPassiveAnimations" : [arty.model: animation]
-        ], merge: true) { error in
+        ]) { error in
             completion(error)
         }
     }
 
-    static func setPokeAnimation(to animation: String,
-                                 for arty: ARty,
-                                 completion: @escaping (Error?) -> Void) {
-        usersCollection.document(arty.uid).setData([
+    static func updatePokeAnimation(to animation: String,
+                                    for arty: ARty,
+                                    completion: @escaping (Error?) -> Void) {
+        usersCollection.document(arty.uid).updateData([
             "pokeAnimation" : animation,
             "recentPokeAnimations" : [arty.model: animation]
-        ], merge: true) { error in
+        ]) { error in
             completion(error)
         }
     }
@@ -106,10 +105,10 @@ struct Database {
         }
     }
 
-    static func setLocation(latitude: Double,
-                            longitude: Double,
-                            uid: String,
-                            completion: @escaping (Error?) -> Void) {
+    static func updateLocation(latitude: Double,
+                               longitude: Double,
+                               uid: String,
+                               completion: @escaping (Error?) -> Void) {
         usersCollection.document(uid).updateData([
             "location" : GeoPoint(latitude: latitude, longitude: longitude)
         ]) { error in

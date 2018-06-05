@@ -34,7 +34,7 @@ class MainViewController: UIViewController {
         configuration.worldAlignment = .gravityAndHeading
         sceneView.session.run(configuration, options: [.resetTracking])
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         sceneView.session.pause()
@@ -106,7 +106,9 @@ extension MainViewController: AuthManagerDelegate {
     func userLoggedOut() {
         nearbyUsersPoller.stop()
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginViewController = storyboard.instantiateViewController(withIdentifier: String(describing: LoginViewController.self))
+        let loginViewController = storyboard.instantiateViewController(
+            withIdentifier: String(describing: LoginViewController.self)
+        )
         let navigationController = UINavigationController(rootViewController: loginViewController)
         present(navigationController, animated: true)
     }

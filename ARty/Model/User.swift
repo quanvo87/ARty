@@ -12,8 +12,8 @@ struct User {
     let longitude: Double
 
     init(_ snapshot: DocumentSnapshot?) throws {
-        guard let _snapshot = snapshot,
-            let data = _snapshot.data(),
+        guard let unwrappedSnapshot = snapshot,
+            let data = unwrappedSnapshot.data(),
             let uid = data["uid"] as? String else {
                 throw ARtyError.invalidDataFromServer(snapshot?.data())
         }

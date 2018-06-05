@@ -14,7 +14,7 @@ class EditAnimationsViewController: UIViewController {
 
     private var animations = [String]()
 
-    private var delegate: EditAnimationsViewControllerDelegate?
+    private weak var delegate: EditAnimationsViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,7 +63,9 @@ extension EditAnimationsViewController: UITableViewDataSource {
         cell.selectionStyle = .none
         cell.textLabel?.text = animation.animationDisplayName
 
-        let currentAnimation = animationTypePicker.selectedSegmentIndex == 0 ? arty?.passiveAnimation : arty?.pokeAnimation
+        let currentAnimation = animationTypePicker.selectedSegmentIndex == 0 ?
+            arty?.passiveAnimation :
+            arty?.pokeAnimation
         if animation == currentAnimation {
             cell.accessoryType = .checkmark
         }

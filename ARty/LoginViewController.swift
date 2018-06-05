@@ -12,7 +12,7 @@ class LoginViewController: UIViewController {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
-    
+
     @IBAction func didTapFacebookLoginButton(_ sender: Any) {
         LoginManager().logIn(readPermissions: [.publicProfile]) { [weak self] result in
             switch result {

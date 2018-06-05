@@ -27,13 +27,15 @@ struct Database {
         }
     }
 
-    static func nearbyUsers(uid: String, completion: @escaping (Result<[User], Error>) -> Void) {
+    static func nearbyUsers(latitude: Double,
+                            longitude: Double,
+                            completion: @escaping (Result<[User], Error>) -> Void) {
         usersCollection.getDocuments { snapshot, error in
             if let error = error {
                 completion(.fail(error))
             } else {
                 do {
-                    completion(.success(try snapshot.users(uid: uid)))
+                    completion(.success(try snapshot.users()))
                 } catch {
                     completion(.fail(ARtyError.invalidDataFromServer(snapshot)))
                 }
@@ -93,13 +95,12 @@ extension Database {
 }
 
 private extension Optional where Wrapped == QuerySnapshot {
-    func users(uid: String) throws -> [User] {
+    func users() throws -> [User] {
         guard let `self` = self else {
             throw ARtyError.invalidDataFromServer(nil)
         }
-        return try self.documents.compactMap {
-            let user = try User($0)
-            return user.uid != uid ? user : nil
+        return try self.documents.map {
+            return try .init($0)
         }
     }
 }

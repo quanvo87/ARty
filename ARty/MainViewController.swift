@@ -12,7 +12,7 @@ class MainViewController: UIViewController {
     private var uid: String?
     private var arties = [String: ARty]()
     private lazy var authManager = AuthManager(delegate: self)
-    private lazy var nearbyUsersManager = NearbyUsersManager(delegate: self)
+    private lazy var nearbyUsersPoller = NearbyUsersPoller(delegate: self)
 
     private var arty: ARty? {
         guard let uid = uid else {
@@ -82,6 +82,7 @@ extension MainViewController: CLLocationManagerDelegate {
         if newLocation.isValid(oldLocation: lastLocation, startDate: startDate) {
             try? arty?.playWalkAnimation(location: newLocation)
             arty?.turn(location: newLocation)
+            nearbyUsersPoller.coordinates = (newLocation.coordinate.latitude, newLocation.coordinate.longitude)
         }
         lastLocation = newLocation
     }
@@ -92,10 +93,11 @@ extension MainViewController: AuthManagerDelegate {
         load()
         self.uid = uid
         loadRecentModel(for: uid)
-        nearbyUsersManager.startPollingNearbyUsers(uid: uid)
+        nearbyUsersPoller.poll()
     }
 
     func userLoggedOut() {
+        nearbyUsersPoller.stop()
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let loginViewController = storyboard.instantiateViewController(withIdentifier: String(describing: LoginViewController.self))
         let navigationController = UINavigationController(rootViewController: loginViewController)
@@ -134,33 +136,28 @@ extension MainViewController: AuthManagerDelegate {
     }
 }
 
-extension MainViewController: NearbyUsersManagerDelegate {
+extension MainViewController: NearbyUsersPollerDelegate {
     func processUser(_ user: User) {
-        if !arties.keys.contains(user.uid) {
-            observeUser(user)
-        } else {
-            updateUser(user)
+        if user.uid != uid && !arties.keys.contains(user.uid) {
+//            addARtyToScene(user: user, position: .random)
+            // observe user
         }
     }
 
-    private func observeUser(_ user: User) {
-        addARtyToScene(user: user, position: .random)
-    }
-
-    // don't need to update, this will be handled when we observe user
-    private func updateUser(_ user: User) {
-        guard let arty = arties[user.uid] else {
-            return
-        }
-        if user.model != arty.model {
-            addARtyToScene(user: user, position: .random)
-        } else {
-            try? arty.setPassiveAnimation(user.passiveAnimation)
-            try? arty.setPokeAnimation(user.pokeAnimation)
-            // check poke animation timestamp
-            // check new location
-        }
-    }
+    // don't need this here, this will be handled when we observe user
+//    private func updateUser(_ user: User) {
+//        guard let arty = arties[user.uid] else {
+//            return
+//        }
+//        if user.model != arty.model {
+//            addARtyToScene(user: user, position: .random)
+//        } else {
+//            try? arty.setPassiveAnimation(user.passiveAnimation)
+//            try? arty.setPokeAnimation(user.pokeAnimation)
+//            // check poke animation timestamp
+//            // check new location
+//        }
+//    }
 
     func removeStaleUsers(_ users: [User]) {
         users

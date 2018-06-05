@@ -50,6 +50,13 @@ class MainViewController: UIViewController {
                 return
         }
         try? arty.playPokeAnimation()
+        updatePokeTimestamp(uid)
+    }
+
+    private func updatePokeTimestamp(_ uid: String) {
+        if uid == self.uid {
+            Database.updatePokeTimestamp(for: uid) { _ in }
+        }
     }
 }
 
@@ -121,21 +128,28 @@ extension MainViewController: AuthManagerDelegate {
     }
 
     private func loadRecentModel(for uid: String) {
-        Database.user(uid) { [weak self] result in
-            switch result {
-            case .success(let user):
-                if user.model != "" {
-                    do {
-                        let arty = try ARty(user: user, delegate: nil)
-                        self?.addARtyToScene(arty, position: .init())
-                    } catch {
-                        print(error)
-                    }
-                } else {
-                    self?.showEditARtyViewController()
-                }
-            case .fail(let error):
+        // todo: move to account creation
+        Database.setUid(uid) { [weak self] error in
+            if let error = error {
                 print(error)
+                return
+            }
+            Database.user(uid) { result in
+                switch result {
+                case .success(let user):
+                    if user.model != "" {
+                        do {
+                            let arty = try ARty(user: user, delegate: nil)
+                            self?.addARtyToScene(arty, position: .init())
+                        } catch {
+                            print(error)
+                        }
+                    } else {
+                        self?.showEditARtyViewController()
+                    }
+                case .fail(let error):
+                    print(error)
+                }
             }
         }
     }
@@ -180,9 +194,17 @@ extension MainViewController: ARtyDelegate {
         } else {
             try? arty.setPassiveAnimation(user.passiveAnimation)
             try? arty.setPokeAnimation(user.pokeAnimation)
-            // check poke animation timestamp
+            checkPokeTimestamp(arty: arty, user: user)
             // check new location
         }
+    }
+
+    // todo: test
+    private func checkPokeTimestamp(arty: ARty, user: User) {
+        if arty.pokeTimestamp != user.pokeTimestamp {
+            try? arty.playPokeAnimation()
+        }
+        arty.pokeTimestamp = user.pokeTimestamp
     }
 }
 

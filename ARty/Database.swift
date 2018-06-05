@@ -1,5 +1,6 @@
 import FirebaseFirestore
 
+// todo: make these all use update instead of set
 struct Database {
     private static let db: Firestore = {
         let db = Firestore.firestore()
@@ -37,7 +38,7 @@ struct Database {
                 do {
                     completion(.success(try snapshot.users()))
                 } catch {
-                    completion(.fail(ARtyError.invalidDataFromServer(snapshot)))
+                    completion(.fail(ARtyError.invalidDataFromServer(snapshot?.documents)))
                 }
             }
         }
@@ -52,16 +53,24 @@ struct Database {
             do {
                 callback(try .init(snapshot))
             } catch {
-                print(ARtyError.invalidDataFromServer(snapshot))
+                print(ARtyError.invalidDataFromServer(snapshot?.data()))
             }
+        }
+    }
+
+    static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
+        usersCollection.document(uid).updateData([
+            "uid" : uid
+        ]) { error in
+            completion(error)
         }
     }
 
     static func setARty(_ arty: ARty, completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
-            "model": arty.model,
-            "passiveAnimation": arty.passiveAnimation,
-            "pokeAnimation": arty.pokeAnimation
+            "model" : arty.model,
+            "passiveAnimation" : arty.passiveAnimation,
+            "pokeAnimation" : arty.pokeAnimation
         ]) { error in
             completion(error)
         }
@@ -72,7 +81,7 @@ struct Database {
                                     completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).setData([
             "passiveAnimation" : animation,
-            "recentPassiveAnimations": [arty.model: animation]
+            "recentPassiveAnimations" : [arty.model: animation]
         ], merge: true) { error in
             completion(error)
         }
@@ -83,8 +92,16 @@ struct Database {
                                  completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).setData([
             "pokeAnimation" : animation,
-            "recentPokeAnimations": [arty.model: animation]
+            "recentPokeAnimations" : [arty.model: animation]
         ], merge: true) { error in
+            completion(error)
+        }
+    }
+
+    static func updatePokeTimestamp(for uid: String, completion: @escaping (Error?) -> Void) {
+        usersCollection.document(uid).updateData([
+            "pokeTimestamp" : Date()
+        ]) { error in
             completion(error)
         }
     }

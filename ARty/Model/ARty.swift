@@ -11,6 +11,7 @@ class ARty: SCNNode {
     let model: String
     let positionAdjustment: SCNVector3
     let pickableAnimations: [String]
+    var pokeTimestamp: Date?
     private(set) var passiveAnimation = ""
     private(set) var pokeAnimation = ""
     private let animations: [String: CAAnimation]

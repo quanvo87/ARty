@@ -14,13 +14,12 @@ struct Database {
     private init() {}
 
     static func user(_ uid: String, completion: @escaping (Result<User, Error>) -> Void) {
-        usersCollection.document(uid).getDocument { data, error in
+        usersCollection.document(uid).getDocument { snapshot, error in
             if let error = error {
                 completion(.fail(error))
             } else {
                 do {
-                    let user = try User(data?.data())
-                    completion(.success(user))
+                    completion(.success(try .init(snapshot)))
                 } catch {
                     completion(.fail(error))
                 }
@@ -28,11 +27,16 @@ struct Database {
         }
     }
 
-    static func users(completion: @escaping (Result<[User], Error>) -> Void) {
-        usersCollection.getDocuments { data, error in
+    static func nearbyUsers(uid: String, completion: @escaping (Result<[User], Error>) -> Void) {
+        usersCollection.getDocuments { snapshot, error in
             if let error = error {
                 completion(.fail(error))
             } else {
+                do {
+                    completion(.success(try snapshot.users(uid: uid)))
+                } catch {
+                    completion(.fail(ARtyError.invalidDataFromServer(snapshot)))
+                }
             }
         }
     }
@@ -85,5 +89,17 @@ extension Database {
     enum Result<T, Error> {
         case success(T)
         case fail(Error)
+    }
+}
+
+private extension Optional where Wrapped == QuerySnapshot {
+    func users(uid: String) throws -> [User] {
+        guard let `self` = self else {
+            throw ARtyError.invalidDataFromServer(nil)
+        }
+        return try self.documents.compactMap {
+            let user = try User($0)
+            return user.uid != uid ? user : nil
+        }
     }
 }

@@ -1,5 +1,10 @@
 import UIKit
 
+protocol EditAnimationsViewControllerDelegate: class {
+    func setPassiveAnimation(to animation: String, for arty: ARty)
+    func setPokeAnimation(to animation: String, for arty: ARty)
+}
+
 class EditAnimationsViewController: UIViewController {
     @IBOutlet weak var animationTypePicker: UISegmentedControl!
 

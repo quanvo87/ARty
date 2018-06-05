@@ -1,5 +1,9 @@
 import UIKit
 
+protocol EditARtyViewControllerDelegate: class {
+    func didChangeARty(to arty: String)
+}
+
 class EditARtyViewController: UIViewController {
     private let tableView = UITableView(frame: .zero)
 

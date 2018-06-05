@@ -3,26 +3,15 @@ import CoreLocation
 
 class ARty: SCNNode {
     let uid: String
-
     let model: String
-
     let positionAdjustment: SCNVector3
-
     let pickableAnimations: [String]
-
     private(set) var passiveAnimation = ""
-
     private(set) var pokeAnimation = ""
-
     private let animations: [String: CAAnimation]
-
     private let walkAnimation: String
-
     private var currentAnimation = ""
-
     private var lastLocation = CLLocation()
-
-    weak var label: UILabel?
 
     init(uid: String,
          model: String,

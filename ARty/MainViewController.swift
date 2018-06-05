@@ -125,7 +125,12 @@ extension MainViewController: AuthManagerDelegate {
             switch result {
             case .success(let user):
                 if user.model != "" {
-                    self?.addARtyToScene(user: user)
+                    do {
+                        let arty = try ARty(user: user, delegate: nil)
+                        self?.addARtyToScene(arty, position: .init())
+                    } catch {
+                        print(error)
+                    }
                 } else {
                     self?.showEditARtyViewController()
                 }
@@ -137,27 +142,16 @@ extension MainViewController: AuthManagerDelegate {
 }
 
 extension MainViewController: NearbyUsersPollerDelegate {
-    func processUser(_ user: User) {
+    func observeUser(_ user: User) {
         if user.uid != uid && !arties.keys.contains(user.uid) {
-//            addARtyToScene(user: user, position: .random)
-            // observe user
+            do {
+                let arty = try ARty(user: user, delegate: self)
+                addARtyToScene(arty, position: .random)
+            } catch {
+                print(error)
+            }
         }
     }
-
-    // don't need this here, this will be handled when we observe user
-//    private func updateUser(_ user: User) {
-//        guard let arty = arties[user.uid] else {
-//            return
-//        }
-//        if user.model != arty.model {
-//            addARtyToScene(user: user, position: .random)
-//        } else {
-//            try? arty.setPassiveAnimation(user.passiveAnimation)
-//            try? arty.setPokeAnimation(user.pokeAnimation)
-//            // check poke animation timestamp
-//            // check new location
-//        }
-//    }
 
     func removeStaleUsers(_ users: [User]) {
         users
@@ -171,15 +165,36 @@ extension MainViewController: NearbyUsersPollerDelegate {
     }
 }
 
+extension MainViewController: ARtyDelegate {
+    func updateUser(_ user: User) {
+        guard let arty = arties[user.uid] else {
+            return
+        }
+        if user.model != arty.model {
+            do {
+                let arty = try ARty(user: user, delegate: self)
+                addARtyToScene(arty, position: .random)
+            } catch {
+                print(error)
+            }
+        } else {
+            try? arty.setPassiveAnimation(user.passiveAnimation)
+            try? arty.setPokeAnimation(user.pokeAnimation)
+            // check poke animation timestamp
+            // check new location
+        }
+    }
+}
+
 extension MainViewController: EditARtyViewControllerDelegate {
-    func didChangeARty(to arty: String) {
+    func didChangeARty(to model: String) {
         guard let uid = uid else {
             return
         }
-        if arty != self.arty?.model {
+        if model != self.arty?.model {
             do {
-                let arty = try ARty(uid: uid, model: arty)
-                addARtyToScene(arty)
+                let arty = try ARty(uid: uid, model: model, delegate: nil)
+                addARtyToScene(arty, position: .init())
                 setAnimationsFromBackend(for: arty)
             } catch {
                 print(error)
@@ -249,24 +264,10 @@ private extension MainViewController {
         startDate = Date()
     }
 
-    func addARtyToScene(_ arty: ARty, position: SCNVector3 = .init(0, 0, 0)) {
+    func addARtyToScene(_ arty: ARty, position: SCNVector3) {
         arty.position = arty.positionAdjustment + position
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty
-    }
-
-    func addARtyToScene(user: User, position: SCNVector3 = .init(0, 0, 0)) {
-        do {
-            let arty = try ARty(
-                uid: user.uid,
-                model: user.model,
-                passiveAnimation: user.passiveAnimation,
-                pokeAnimation: user.pokeAnimation
-            )
-            addARtyToScene(arty, position: position)
-        } catch {
-            print(error)
-        }
     }
 }

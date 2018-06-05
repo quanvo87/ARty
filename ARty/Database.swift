@@ -1,4 +1,4 @@
-import Firebase
+import FirebaseFirestore
 
 struct Database {
     private static let db: Firestore = {
@@ -39,6 +39,20 @@ struct Database {
                 } catch {
                     completion(.fail(ARtyError.invalidDataFromServer(snapshot)))
                 }
+            }
+        }
+    }
+
+    static func userListener(_ uid: String, callback: @escaping (User) -> Void) -> ListenerRegistration {
+        return usersCollection.document(uid).addSnapshotListener { snapshot, error in
+            if let error = error {
+                print(error)
+                return
+            }
+            do {
+                callback(try .init(snapshot))
+            } catch {
+                print(ARtyError.invalidDataFromServer(snapshot))
             }
         }
     }

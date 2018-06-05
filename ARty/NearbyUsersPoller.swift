@@ -1,7 +1,7 @@
 import Foundation
 
 protocol NearbyUsersPollerDelegate: class {
-    func processUser(_ user: User)
+    func observeUser(_ user: User)
     func removeStaleUsers(_ user: [User])
 }
 
@@ -31,7 +31,7 @@ class NearbyUsersPoller {
         guard coordinates != nil, timer == nil else {
             return
         }
-        timer = .init(timeInterval: timeInterval, repeats: true) { [weak self] _ in
+        timer = .scheduledTimer(withTimeInterval: timeInterval, repeats: true) { [weak self] _ in
             guard let coordinates = self?.coordinates else {
                 return
             }
@@ -41,12 +41,13 @@ class NearbyUsersPoller {
                     print(error)
                 case .success(let users):
                     users.forEach {
-                        self?.delegate?.processUser($0)
+                        self?.delegate?.observeUser($0)
                     }
                     self?.delegate?.removeStaleUsers(users)
                 }
             }
         }
+        timer?.fire()
     }
 
     func stop() {

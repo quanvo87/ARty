@@ -1,7 +1,7 @@
 import UIKit
 
 protocol EditARtyViewControllerDelegate: class {
-    func didChangeARty(to arty: String)
+    func didChangeARty(to model: String)
 }
 
 class EditARtyViewController: UIViewController {

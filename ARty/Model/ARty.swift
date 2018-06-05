@@ -1,5 +1,10 @@
 import SceneKit
 import CoreLocation
+import FirebaseFirestore
+
+protocol ARtyDelegate: class {
+    func updateUser(_ user: User)
+}
 
 class ARty: SCNNode {
     let uid: String
@@ -12,24 +17,46 @@ class ARty: SCNNode {
     private let walkAnimation: String
     private var currentAnimation = ""
     private var lastLocation = CLLocation()
+    private var userListener: ListenerRegistration?
+    private weak var delegate: ARtyDelegate?
 
     init(uid: String,
          model: String,
          passiveAnimation: String = "",
-         pokeAnimation: String = "") throws {
+         pokeAnimation: String = "",
+         delegate: ARtyDelegate?) throws {
         self.uid = uid
         self.model = model
         positionAdjustment = try schema.positionAdjustment(model)
         pickableAnimations = try schema.pickableAnimations(model)
         animations = try schema.animations(model)
         walkAnimation = try schema.walkAnimation(model)
+
         super.init()
+
         name = uid
         scale = try schema.scale(model)
         try loadIdleScene()
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
         loopPassiveAnimation()
+
+        if let delegate = delegate {
+            self.delegate = delegate
+            userListener = Database.userListener(uid) { [weak self] user in
+                self?.delegate?.updateUser(user)
+            }
+        }
+    }
+
+    convenience init(user: User, delegate: ARtyDelegate?) throws {
+        try self.init(
+            uid: user.uid,
+            model: user.model,
+            passiveAnimation: user.passiveAnimation,
+            pokeAnimation: user.pokeAnimation,
+            delegate: delegate
+        )
     }
 
     var dictionary: [String: String] {
@@ -85,6 +112,10 @@ class ARty: SCNNode {
             usesShortestUnitArc: true
         )
         runAction(rotateAction)
+    }
+
+    deinit {
+        userListener?.remove()  // does this work or does this have to be called before deinit
     }
 
     required init?(coder aDecoder: NSCoder) {

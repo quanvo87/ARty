@@ -110,20 +110,12 @@
 				5908372020C0C22D00A36103 /* GoogleService-Info.plist */,
 				59412B9720B5721400A2ED02 /* Info.plist */,
 				59412B8B20B5721300A2ED02 /* art.scnassets */,
-				59412B8920B5721300A2ED02 /* AppDelegate.swift */,
-				59E747FC20C629BD006217C4 /* AppStateObserver.swift */,
-				5908372720C0FD2100A36103 /* AuthManager.swift */,
-				5908371E20C0BE2E00A36103 /* Database.swift */,
-				59CAF1BE20C1B0BA0011C4F6 /* EditAnimationsViewController.swift */,
-				59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */,
-				59584BD920C79B98000F72D9 /* LocationManager.swift */,
-				5908372920C0FEB700A36103 /* LoginViewController.swift */,
-				59412B8D20B5721300A2ED02 /* MainViewController.swift */,
-				59CE245120C64ACB00BE4C77 /* NearbyUsersPoller.swift */,
 				59412B9220B5721400A2ED02 /* Assets.xcassets */,
+				5960AB3420C869BC00E61B79 /* Controller */,
 				59412B9420B5721400A2ED02 /* LaunchScreen.storyboard */,
 				59412B8F20B5721300A2ED02 /* Main.storyboard */,
 				59412B9D20B5929600A2ED02 /* Model */,
+				5960AB3520C869C800E61B79 /* Support */,
 				59412BA020B595E500A2ED02 /* Utility */,
 			);
 			path = ARty;
@@ -149,6 +141,30 @@
 				59E747FA20C61F4E006217C4 /* Temp.swift */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		5960AB3420C869BC00E61B79 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				59CAF1BE20C1B0BA0011C4F6 /* EditAnimationsViewController.swift */,
+				59B386EB20BF491D003BC2E5 /* EditARtyViewController.swift */,
+				5908372920C0FEB700A36103 /* LoginViewController.swift */,
+				59412B8D20B5721300A2ED02 /* MainViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		5960AB3520C869C800E61B79 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				59412B8920B5721300A2ED02 /* AppDelegate.swift */,
+				59E747FC20C629BD006217C4 /* AppStateObserver.swift */,
+				5908372720C0FD2100A36103 /* AuthManager.swift */,
+				5908371E20C0BE2E00A36103 /* Database.swift */,
+				59584BD920C79B98000F72D9 /* LocationManager.swift */,
+				59CE245120C64ACB00BE4C77 /* NearbyUsersPoller.swift */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		CDE1A8D79ED443C0D97CE536 /* Pods */ = {

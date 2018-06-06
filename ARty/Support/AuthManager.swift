@@ -6,7 +6,6 @@ protocol AuthManagerDelegate: class {
 }
 
 class AuthManager {
-    private static let auth = Auth.auth()
     private var handle: AuthStateDidChangeListenerHandle?
     private weak var delegate: AuthManagerDelegate?
 
@@ -16,7 +15,7 @@ class AuthManager {
 
     func listenForAuthState() {
         stopListening()
-        handle = AuthManager.auth.addStateDidChangeListener { [weak self] _, user in
+        handle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             guard let `self` = self else {
                 return
             }
@@ -29,12 +28,12 @@ class AuthManager {
     }
 
     func logout() {
-        try? AuthManager.auth.signOut()
+        try? Auth.auth().signOut()
     }
 
     private func stopListening() {
         if let handle = handle {
-            AuthManager.auth.removeStateDidChangeListener(handle)
+            Auth.auth().removeStateDidChangeListener(handle)
         }
     }
 

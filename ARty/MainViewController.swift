@@ -5,9 +5,7 @@ class MainViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var label: UILabel!
 
-    private let locationManager = CLLocationManager()
-    private var startDate = Date()
-    private var lastLocation = CLLocation()
+    private let locationManager = LocationManager()
     private var uid: String?
     private var arties = [String: ARty]()
     private lazy var appStateObserver = AppStateObserver(delegate: self)
@@ -70,7 +68,7 @@ extension MainViewController: ARSessionDelegate {
 extension MainViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
-            startUpdatingLocation() // if they only authorized when in use, ask again one more time
+            locationManager.startUpdatingLocation() // if they only authorized when in use, ask again one more time
         } else {
             // show alert
         }
@@ -80,12 +78,12 @@ extension MainViewController: CLLocationManagerDelegate {
         guard let newLocation = locations.last else {
             return
         }
-        if newLocation.isValid(oldLocation: lastLocation, startDate: startDate) {
+        if locationManager.locationIsValid(newLocation) {
             try? arty?.playWalkAnimation(location: newLocation)
             arty?.turn(location: newLocation)
             nearbyUsersPoller.coordinates = (newLocation.coordinate.latitude, newLocation.coordinate.longitude)
         }
-        lastLocation = newLocation
+        locationManager.lastLocation = newLocation
     }
 }
 
@@ -107,7 +105,7 @@ extension MainViewController: AuthManagerDelegate {
         runARSession()
         loadRecentARty(for: uid)
         locationManager.requestAlwaysAuthorization()
-        startUpdatingLocation()
+        locationManager.startUpdatingLocation()
         nearbyUsersPoller.poll()
     }
 
@@ -299,11 +297,6 @@ private extension MainViewController {
         let viewController = EditARtyViewController(delegate: self)
         let navigationController = UINavigationController(rootViewController: viewController)
         present(navigationController, animated: true)
-    }
-
-    func startUpdatingLocation() {
-        locationManager.startUpdatingLocation()
-        startDate = Date()
     }
 
     func addARtyToScene(_ arty: ARty, position: SCNVector3) {

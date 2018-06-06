@@ -103,3 +103,13 @@ private extension EditAnimationsViewController {
         tableView.reloadData()
     }
 }
+
+private extension String {
+    var animationDisplayName: String {
+        if let index = self.range(of: "_")?.upperBound {
+            return String(self.suffix(from: index)).capitalized
+        } else {
+            return self
+        }
+    }
+}

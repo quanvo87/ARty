@@ -65,13 +65,13 @@ class NearbyUsersPoller {
 }
 
 extension NearbyUsersPoller: AppStateObserverDelegate {
-    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {
+    func appStateObserverAppBecameActive(_ observer: AppStateObserver) {
         if shouldPoll {
             poll()
         }
     }
 
-    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
+    func appStateObserverAppEnteredBackground(_ observer: AppStateObserver) {
         stopTimer()
     }
 }

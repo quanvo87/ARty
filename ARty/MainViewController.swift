@@ -27,7 +27,6 @@ class MainViewController: UIViewController {
         sceneView.delegate = self
         sceneView.session.delegate = self
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
         runARSession()
         appStateObserver.load()
         authManager.listenForAuthState()
@@ -42,7 +41,7 @@ class MainViewController: UIViewController {
             let arty = arties[uid] else {
                 return
         }
-        try? arty.playPokeAnimation()
+        try? arty.playPokeAnimation()   // todo: turn to face user, turn to original spot after poke animation
         updatePokeTimestamp(uid)
     }
 
@@ -69,9 +68,10 @@ extension MainViewController: ARSessionDelegate {
 extension MainViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
-            locationManager.startUpdatingLocation() // if they only authorized when in use, ask again one more time
+            // todo: if they only authorized when in use, ask again one more time
+            locationManager.startUpdatingLocation()
         } else {
-            // show alert
+            // todo: show alert
         }
     }
 
@@ -79,7 +79,7 @@ extension MainViewController: CLLocationManagerDelegate {
         guard let newLocation = locations.last else {
             return
         }
-        if locationManager.locationIsValid(newLocation) {
+        if locationManager.isValidLocation(newLocation) {
             try? arty?.playWalkAnimation(location: newLocation)
             arty?.turn(location: newLocation)
             nearbyUsersPoller.coordinates = (newLocation.coordinate.latitude, newLocation.coordinate.longitude)
@@ -89,13 +89,13 @@ extension MainViewController: CLLocationManagerDelegate {
 }
 
 extension MainViewController: AppStateObserverDelegate {
-    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {
+    func appStateObserverAppBecameActive(_ observer: AppStateObserver) {
         if uid != nil {
             runARSession()
         }
     }
 
-    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
+    func appStateObserverAppEnteredBackground(_ observer: AppStateObserver) {
         pauseARSession()
     }
 }
@@ -112,6 +112,9 @@ extension MainViewController: AuthManagerDelegate {
 
     func authManagerUserLoggedOut(_ manager: AuthManager) {
         uid = nil
+        arties.removeAll()
+        let scene = SCNScene()
+        sceneView.scene = scene
         pauseARSession()
         locationManager.stopUpdatingLocation()
         nearbyUsersPoller.stop()
@@ -200,7 +203,6 @@ extension MainViewController: ARtyDelegate {
     }
 
     // todo: test
-    // tood: add email auth in order to help test
     private func checkPokeTimestamp(arty: ARty, user: User) {
         if arty.pokeTimestamp != user.pokeTimestamp {
             try? arty.playPokeAnimation()
@@ -305,5 +307,11 @@ private extension MainViewController {
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty
+    }
+}
+
+private extension SCNVector3 {
+    static func + (left: SCNVector3, right: SCNVector3) -> SCNVector3 {
+        return SCNVector3(left.x + right.x, left.y + right.y, left.z + right.z)
     }
 }

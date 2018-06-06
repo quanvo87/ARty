@@ -110,7 +110,7 @@ class ARty: SCNNode {
         }
         let rotateAction = SCNAction.rotateTo(
             x: 0,
-            y: location.course.toRadians,
+            y: location.course.radians,
             z: 0,
             duration: 1,
             usesShortestUnitArc: true
@@ -119,7 +119,7 @@ class ARty: SCNNode {
     }
 
     deinit {
-        userListener?.remove()  // does this work or does this have to be called before deinit
+        userListener?.remove()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -186,5 +186,12 @@ private extension ARty {
             usesShortestUnitArc: true
         )
         runAction(rotateAction)
+    }
+}
+
+private extension CLLocationDirection {
+    var radians: CGFloat {
+        let adjusted = Float((450 - self).remainder(dividingBy: 360)) + 90  // todo: reduce
+        return CGFloat(GLKMathDegreesToRadians(adjusted))
     }
 }

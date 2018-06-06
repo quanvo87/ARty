@@ -6,8 +6,6 @@ struct Schema {
     let walkAnimations: [String]
     let fallAnimations: [String]
 
-    // init from json/file path
-
     func scale(_ model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
         return SCNVector3(scale, scale, scale)
@@ -123,5 +121,9 @@ private extension String {
             return .infinity
         }
         return schema.animationRepeatCounts[self] ?? 1
+    }
+
+    var isFallAnimation: Bool {
+        return schema.fallAnimations.contains(self)
     }
 }

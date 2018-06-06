@@ -1,9 +1,8 @@
 import UIKit
 
-// todo
 protocol AppStateObserverDelegate: class {
-    func appDidBecomeActive()
-    func appDidEnterBackground()
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver)
+    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver)
 }
 
 class AppStateObserver {
@@ -18,14 +17,20 @@ class AppStateObserver {
             forName: .UIApplicationDidBecomeActive,
             object: nil,
             queue: .main) { [weak self] _ in
-                self?.delegate?.appDidBecomeActive()
+                guard let `self` = self else {
+                    return
+                }
+                self.delegate?.appStateObserverAppDidBecomeActive(self)
         }
 
         appDidEnterBackgroundObserver = NotificationCenter.default.addObserver(
             forName: .UIApplicationDidEnterBackground,
             object: nil,
             queue: .main) { [weak self] _ in
-                self?.delegate?.appDidEnterBackground()
+                guard let `self` = self else {
+                    return
+                }
+                self.delegate?.appStateObserverAppDidEnterBackground(self)
         }
     }
 

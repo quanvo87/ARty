@@ -29,6 +29,7 @@ class MainViewController: UIViewController {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         runARSession()
+        appStateObserver.load()
         authManager.listenForAuthState()
     }
 
@@ -88,13 +89,13 @@ extension MainViewController: CLLocationManagerDelegate {
 }
 
 extension MainViewController: AppStateObserverDelegate {
-    func appDidBecomeActive() {
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {
         if uid != nil {
             runARSession()
         }
     }
 
-    func appDidEnterBackground() {
+    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
         pauseARSession()
     }
 }

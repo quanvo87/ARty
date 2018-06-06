@@ -3,7 +3,7 @@ import CoreLocation
 import FirebaseFirestore
 
 protocol ARtyDelegate: class {
-    func updateUser(_ user: User)
+    func arty(_ arty: ARty, updateUser user: User)
 }
 
 class ARty: SCNNode {
@@ -45,7 +45,10 @@ class ARty: SCNNode {
         if let delegate = delegate {
             self.delegate = delegate
             userListener = Database.userListener(uid) { [weak self] user in
-                self?.delegate?.updateUser(user)
+                guard let `self` = self else {
+                    return
+                }
+                self.delegate?.arty(self, updateUser: user)
             }
         }
     }

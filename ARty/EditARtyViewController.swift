@@ -1,14 +1,12 @@
 import UIKit
 
 protocol EditARtyViewControllerDelegate: class {
-    func didChangeARty(to model: String)
+    func editARtyViewController(_ controller: EditARtyViewController, changeARtyTo model: String)
 }
 
 class EditARtyViewController: UIViewController {
     private let tableView = UITableView(frame: .zero)
-
     private let arties = Array(schema.arties.keys)
-
     private weak var delegate: EditARtyViewControllerDelegate?
 
     init(delegate: EditARtyViewControllerDelegate) {
@@ -17,7 +15,6 @@ class EditARtyViewController: UIViewController {
         self.delegate = delegate
 
         navigationItem.title = "Edit ARty"
-
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Close",
             style: .plain,
@@ -54,7 +51,7 @@ extension EditARtyViewController: UITableViewDataSource {
 extension EditARtyViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let arty = arties[indexPath.row]
-        delegate?.didChangeARty(to: arty)
+        delegate?.editARtyViewController(self, changeARtyTo: arty)
         close()
     }
 }

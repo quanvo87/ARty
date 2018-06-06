@@ -1,8 +1,8 @@
 import Foundation
 
 protocol NearbyUsersPollerDelegate: class {
-    func observeUser(_ user: User)
-    func removeStaleUsers(_ user: [User])
+    func nearbyUsersPoller(_ poller: NearbyUsersPoller, observeUser user: User)
+    func nearbyUsersPoller(_ poller: NearbyUsersPoller, removeStaleUsers users: [User])
 }
 
 class NearbyUsersPoller {
@@ -36,14 +36,17 @@ class NearbyUsersPoller {
                 return
             }
             Database.nearbyUsers(latitude: coordinates.latitude, longitude: coordinates.longitude) { result in
+                guard let `self` = self else {
+                    return
+                }
                 switch result {
                 case .fail(let error):
                     print(error)
                 case .success(let users):
                     users.forEach {
-                        self?.delegate?.observeUser($0)
+                        self.delegate?.nearbyUsersPoller(self, observeUser: $0)
                     }
-                    self?.delegate?.removeStaleUsers(users)
+                    self.delegate?.nearbyUsersPoller(self, removeStaleUsers: users)
                 }
             }
         }

@@ -96,14 +96,14 @@ extension MainViewController: CLLocationManagerDelegate {
 }
 
 extension MainViewController: AuthManagerDelegate {
-    func userLoggedIn(_ uid: String) {
+    func authManager(_ manager: AuthManager, userLoggedIn uid: String) {
         load()
         self.uid = uid
-        loadRecentModel(for: uid)
+        loadRecentARty(for: uid)
         nearbyUsersPoller.poll()
     }
 
-    func userLoggedOut() {
+    func authManagerUserLoggedOut(_ manager: AuthManager) {
         nearbyUsersPoller.stop()
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let loginViewController = storyboard.instantiateViewController(
@@ -129,7 +129,7 @@ extension MainViewController: AuthManagerDelegate {
         isLoaded = true
     }
 
-    private func loadRecentModel(for uid: String) {
+    private func loadRecentARty(for uid: String) {
         // todo: move to account creation
         Database.updateUid(uid) { [weak self] error in
             if let error = error {
@@ -158,7 +158,7 @@ extension MainViewController: AuthManagerDelegate {
 }
 
 extension MainViewController: NearbyUsersPollerDelegate {
-    func observeUser(_ user: User) {
+    func nearbyUsersPoller(_ poller: NearbyUsersPoller, observeUser user: User) {
         if user.uid != uid && !arties.keys.contains(user.uid) {
             do {
                 let arty = try ARty(user: user, delegate: self)
@@ -169,7 +169,7 @@ extension MainViewController: NearbyUsersPollerDelegate {
         }
     }
 
-    func removeStaleUsers(_ users: [User]) {
+    func nearbyUsersPoller(_ poller: NearbyUsersPoller, removeStaleUsers users: [User]) {
         users
             .filter {
                 return !arties.keys.contains($0.uid)
@@ -182,7 +182,7 @@ extension MainViewController: NearbyUsersPollerDelegate {
 }
 
 extension MainViewController: ARtyDelegate {
-    func updateUser(_ user: User) {
+    func arty(_ arty: ARty, updateUser user: User) {
         guard let arty = arties[user.uid] else {
             return
         }
@@ -202,6 +202,7 @@ extension MainViewController: ARtyDelegate {
     }
 
     // todo: test
+    // tood: add email auth in order to help test
     private func checkPokeTimestamp(arty: ARty, user: User) {
         if arty.pokeTimestamp != user.pokeTimestamp {
             try? arty.playPokeAnimation()
@@ -211,7 +212,7 @@ extension MainViewController: ARtyDelegate {
 }
 
 extension MainViewController: EditARtyViewControllerDelegate {
-    func didChangeARty(to model: String) {
+    func editARtyViewController(_ controller: EditARtyViewController, changeARtyTo model: String) {
         guard let uid = uid else {
             return
         }
@@ -245,12 +246,16 @@ extension MainViewController: EditARtyViewControllerDelegate {
 }
 
 extension MainViewController: EditAnimationsViewControllerDelegate {
-    func setPassiveAnimation(to animation: String, for arty: ARty) {
+    func editAnimationsViewController(_ controller: EditAnimationsViewController,
+                                      setPassiveAnimationTo animation: String,
+                                      for arty: ARty) {
         try? arty.setPassiveAnimation(animation)
         Database.updatePassiveAnimation(to: animation, for: arty) { _ in }
     }
 
-    func setPokeAnimation(to animation: String, for arty: ARty) {
+    func editAnimationsViewController(_ controller: EditAnimationsViewController,
+                                      setPokeAnimationTo animation: String,
+                                      for arty: ARty) {
         try? arty.setPokeAnimation(animation)
         Database.updatePokeAnimation(to: animation, for: arty) { _ in }
     }

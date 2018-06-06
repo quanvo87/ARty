@@ -1,26 +1,25 @@
 import UIKit
 
 protocol EditAnimationsViewControllerDelegate: class {
-    func setPassiveAnimation(to animation: String, for arty: ARty)
-    func setPokeAnimation(to animation: String, for arty: ARty)
+    func editAnimationsViewController(_ controller: EditAnimationsViewController,
+                                      setPassiveAnimationTo animation: String,
+                                      for arty: ARty)
+    func editAnimationsViewController(_ controller: EditAnimationsViewController,
+                                      setPokeAnimationTo animation: String,
+                                      for arty: ARty)
 }
 
 class EditAnimationsViewController: UIViewController {
     @IBOutlet weak var animationTypePicker: UISegmentedControl!
-
     @IBOutlet weak var tableView: UITableView!
-
     private var arty: ARty?
-
     private var animations = [String]()
-
     private weak var delegate: EditAnimationsViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.title = "Edit Animations"
-
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Close",
             style: .plain,
@@ -84,9 +83,9 @@ extension EditAnimationsViewController: UITableViewDelegate {
 
         switch animationTypePicker.selectedSegmentIndex {
         case 0:
-            delegate?.setPassiveAnimation(to: animation, for: arty)
+            delegate?.editAnimationsViewController(self, setPassiveAnimationTo: animation, for: arty)
         case 1:
-            delegate?.setPokeAnimation(to: animation, for: arty)
+            delegate?.editAnimationsViewController(self, setPokeAnimationTo: animation, for: arty)
         default:
             break
         }

@@ -1,8 +1,8 @@
 import FirebaseAuth
 
 protocol AuthManagerDelegate: class {
-    func userLoggedIn(_ uid: String)
-    func userLoggedOut()
+    func authManager(_ manager: AuthManager, userLoggedIn uid: String)
+    func authManagerUserLoggedOut(_ manager: AuthManager)
 }
 
 class AuthManager {
@@ -17,10 +17,13 @@ class AuthManager {
     func listenForAuthState() {
         stopListening()
         handle = AuthManager.auth.addStateDidChangeListener { [weak self] _, user in
+            guard let `self` = self else {
+                return
+            }
             if let uid = user?.uid {
-                self?.delegate?.userLoggedIn(uid)
+                self.delegate?.authManager(self, userLoggedIn: uid)
             } else {
-                self?.delegate?.userLoggedOut()
+                self.delegate?.authManagerUserLoggedOut(self)
             }
         }
     }

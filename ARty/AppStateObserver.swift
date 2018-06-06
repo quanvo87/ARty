@@ -1,11 +1,11 @@
 import UIKit
 
+// todo
 protocol AppStateObserverDelegate: class {
     func appDidBecomeActive()
     func appDidEnterBackground()
 }
 
-// todo: instead of delegate, make this send notifications, since multiple classes need this info
 class AppStateObserver {
     private var appDidBecomeActiveObserver: NSObjectProtocol?
     private var appDidEnterBackgroundObserver: NSObjectProtocol?

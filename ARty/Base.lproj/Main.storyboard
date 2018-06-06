@@ -50,12 +50,19 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </arscnView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ep-KU-O3Q">
-                                <rect key="frame" x="183" y="747" width="8" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ep-KU-O3Q">
+                                <rect key="frame" x="187" y="768" width="0.0" height="0.0"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7az-ZH-489">
+                                <rect key="frame" x="301" y="738" width="64" height="30"/>
+                                <state key="normal" title="Edit ARty"/>
+                                <connections>
+                                    <action selector="didTapEditARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYK-VT-FEI">
                                 <rect key="frame" x="258" y="698" width="107" height="30"/>
                                 <state key="normal" title="Edit Animations"/>
@@ -70,11 +77,11 @@
                                     <action selector="didTapHoldPositionButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="e0D-ad-vrI"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7az-ZH-489">
-                                <rect key="frame" x="301" y="738" width="64" height="30"/>
-                                <state key="normal" title="Edit ARty"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uT0-tf-TfT">
+                                <rect key="frame" x="318" y="84" width="47" height="30"/>
+                                <state key="normal" title="Reload"/>
                                 <connections>
-                                    <action selector="didTapEditARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
+                                    <action selector="didTapReloadButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="GDb-l5-QXq"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UpO-lG-qN3">
@@ -87,17 +94,20 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="uT0-tf-TfT" firstAttribute="top" secondItem="UpO-lG-qN3" secondAttribute="bottom" constant="10" id="2Wq-SH-ttr"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="9ep-KU-O3Q" secondAttribute="trailing" id="4jH-BV-uXQ"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" constant="10" id="5jr-bJ-WSv"/>
                             <constraint firstItem="9ep-KU-O3Q" firstAttribute="centerX" secondItem="6Pb-WM-QEe" secondAttribute="centerX" id="7uf-kn-Gl1"/>
                             <constraint firstItem="7az-ZH-489" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="DhY-Uu-1rd"/>
                             <constraint firstItem="6dM-UU-1Cs" firstAttribute="trailing" secondItem="pYK-VT-FEI" secondAttribute="trailing" id="FBJ-v5-e2t"/>
+                            <constraint firstItem="uT0-tf-TfT" firstAttribute="trailing" secondItem="UpO-lG-qN3" secondAttribute="trailing" id="KIU-kV-kB3"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="9ep-KU-O3Q" secondAttribute="bottom" constant="10" id="Lp9-18-aJ3"/>
                             <constraint firstItem="6dM-UU-1Cs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="MbE-ci-zFN"/>
                             <constraint firstItem="pYK-VT-FEI" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" id="QQo-pY-exH"/>
                             <constraint firstItem="pYK-VT-FEI" firstAttribute="top" secondItem="6dM-UU-1Cs" secondAttribute="bottom" constant="10" id="RUH-6V-iTk"/>
                             <constraint firstItem="7az-ZH-489" firstAttribute="top" secondItem="pYK-VT-FEI" secondAttribute="bottom" constant="10" id="SKa-6e-qgR"/>
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="XUW-Yb-qnm"/>
+                            <constraint firstItem="uT0-tf-TfT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="exD-5z-Iv0"/>
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" id="gaW-HK-dae"/>
                             <constraint firstItem="9ep-KU-O3Q" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Pb-WM-QEe" secondAttribute="leading" id="kv5-rq-ifm"/>
                             <constraint firstItem="pYK-VT-FEI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="o47-Eh-wfc"/>

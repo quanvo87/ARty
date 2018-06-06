@@ -6,11 +6,11 @@ class MainViewController: UIViewController {
     @IBOutlet weak var label: UILabel!
 
     private let locationManager = CLLocationManager()
-    private var isLoaded = false
     private var startDate = Date()
     private var lastLocation = CLLocation()
     private var uid: String?
     private var arties = [String: ARty]()
+    private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var nearbyUsersPoller = NearbyUsersPoller(delegate: self)
 
@@ -23,21 +23,15 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        UIApplication.shared.isIdleTimerDisabled = true
+        let scene = SCNScene()
+        sceneView.scene = scene
+        sceneView.delegate = self
+        sceneView.session.delegate = self
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        runARSession()
         authManager.listenForAuthState()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // only need to do this when app minimized (not every time user is on another screen within app)
-        // but also add button to manually do this
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.worldAlignment = .gravityAndHeading
-        sceneView.session.run(configuration, options: [.resetTracking])
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        sceneView.session.pause()
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -95,38 +89,34 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 }
 
+extension MainViewController: AppStateObserverDelegate {
+    func appDidBecomeActive() {
+        if uid != nil {
+            runARSession()
+        }
+    }
+
+    func appDidEnterBackground() {
+        pauseARSession()
+    }
+}
+
 extension MainViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userLoggedIn uid: String) {
-        load()
         self.uid = uid
+        runARSession()
         loadRecentARty(for: uid)
+        locationManager.requestAlwaysAuthorization()
+        startUpdatingLocation()
         nearbyUsersPoller.poll()
     }
 
     func authManagerUserLoggedOut(_ manager: AuthManager) {
+        uid = nil
+        pauseARSession()
+        locationManager.stopUpdatingLocation()
         nearbyUsersPoller.stop()
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginViewController = storyboard.instantiateViewController(
-            withIdentifier: String(describing: LoginViewController.self)
-        )
-        let navigationController = UINavigationController(rootViewController: loginViewController)
-        present(navigationController, animated: true)
-    }
-
-    private func load() {
-        guard !isLoaded else {
-            return
-        }
-        UIApplication.shared.isIdleTimerDisabled = true
-        let scene = SCNScene()
-        sceneView.scene = scene
-        sceneView.delegate = self
-        sceneView.session.delegate = self
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestAlwaysAuthorization()
-        startUpdatingLocation()
-        isLoaded = true
+        showLoginViewController()
     }
 
     private func loadRecentARty(for uid: String) {
@@ -154,6 +144,15 @@ extension MainViewController: AuthManagerDelegate {
                 }
             }
         }
+    }
+
+    private func showLoginViewController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let loginViewController = storyboard.instantiateViewController(
+            withIdentifier: String(describing: LoginViewController.self)
+        )
+        let navigationController = UINavigationController(rootViewController: loginViewController)
+        present(navigationController, animated: true)
     }
 }
 
@@ -197,7 +196,7 @@ extension MainViewController: ARtyDelegate {
             try? arty.setPassiveAnimation(user.passiveAnimation)
             try? arty.setPokeAnimation(user.pokeAnimation)
             checkPokeTimestamp(arty: arty, user: user)
-            // check new location
+            // todo: walk to new location if necessary
         }
     }
 
@@ -278,8 +277,22 @@ private extension MainViewController {
         showEditARtyViewController()
     }
 
+    @IBAction func didTapReloadButton(_ sender: Any) {
+        runARSession()
+    }
+
     @IBAction func didTapLogOutButton(_ sender: Any) {
         authManager.logout()
+    }
+
+    func runARSession() {
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.worldAlignment = .gravityAndHeading
+        sceneView.session.run(configuration, options: [.resetTracking])
+    }
+
+    func pauseARSession() {
+        sceneView.session.pause()
     }
 
     func showEditARtyViewController() {

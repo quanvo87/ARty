@@ -1,43 +1,66 @@
 import SceneKit
 import CoreLocation
+import FirebaseFirestore
+
+protocol ARtyDelegate: class {
+    func arty(_ arty: ARty, updateUser user: User)
+}
 
 class ARty: SCNNode {
     let uid: String
-
     let model: String
-
-    let positionAdjustment: Float
-
-    let animations: [String: CAAnimation]
-
+    let positionAdjustment: SCNVector3
+    let pickableAnimations: [String]
+    var pokeTimestamp: Date?
     private(set) var passiveAnimation = ""
-
     private(set) var pokeAnimation = ""
-
+    private let animations: [String: CAAnimation]
     private let walkAnimation: String
-
     private var currentAnimation = ""
-
     private var lastLocation = CLLocation()
-
-    weak var label: UILabel?
+    private var userListener: ListenerRegistration?
+    private weak var delegate: ARtyDelegate?
 
     init(uid: String,
          model: String,
          passiveAnimation: String = "",
-         pokeAnimation: String = "") throws {
+         pokeAnimation: String = "",
+         delegate: ARtyDelegate?) throws {
         self.uid = uid
         self.model = model
         positionAdjustment = try schema.positionAdjustment(model)
+        pickableAnimations = try schema.pickableAnimations(model)
         animations = try schema.animations(model)
         walkAnimation = try schema.walkAnimation(model)
+
         super.init()
+
         name = uid
         scale = try schema.scale(model)
         try loadIdleScene()
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
         loopPassiveAnimation()
+
+        if let delegate = delegate {
+            self.delegate = delegate
+            userListener = Database.userListener(uid) { [weak self] user in
+                guard let `self` = self else {
+                    return
+                }
+                self.delegate?.arty(self, updateUser: user)
+            }
+        }
+    }
+
+    convenience init(user: User, delegate: ARtyDelegate?) throws {
+        try self.init(
+            uid: user.uid,
+            model: user.model,
+            passiveAnimation: user.passiveAnimation,
+            pokeAnimation: user.pokeAnimation,
+            delegate: delegate
+        )
     }
 
     var dictionary: [String: String] {
@@ -56,20 +79,8 @@ class ARty: SCNNode {
         pokeAnimation = try schema.pokeAnimation(model, animation: animation)
     }
 
-    func playAnimation(_ animation: String) throws {
-        stopAnimation(currentAnimation)
-        let caAnimation = try self.animation(animation)
-        addAnimation(caAnimation, forKey: animation)
-        caAnimation.delegate = self
-        currentAnimation = animation
-    }
-
-    func stopAnimation(_ animation: String) {
-        removeAnimation(forKey: animation, blendOutDuration: 0.5)
-        if currentAnimation.isWalkAnimation {
-            faceCamera()
-        }
-        currentAnimation = ""
+    func playPokeAnimation() throws {
+        try playAnimation(pokeAnimation)
     }
 
     func playWalkAnimation(location: CLLocation) throws {
@@ -99,7 +110,7 @@ class ARty: SCNNode {
         }
         let rotateAction = SCNAction.rotateTo(
             x: 0,
-            y: location.course.toRadians,
+            y: location.course.radians,
             z: 0,
             duration: 1,
             usesShortestUnitArc: true
@@ -107,8 +118,18 @@ class ARty: SCNNode {
         runAction(rotateAction)
     }
 
+    deinit {
+        userListener?.remove()
+    }
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension ARty: CAAnimationDelegate {
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        currentAnimation = ""
     }
 }
 
@@ -125,6 +146,22 @@ private extension ARty {
             throw ARtyError.invalidAnimationName(animation)
         }
         return caAnimation
+    }
+
+    func playAnimation(_ animation: String) throws {
+        stopAnimation(currentAnimation)
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
+        caAnimation.delegate = self
+        currentAnimation = animation
+    }
+
+    func stopAnimation(_ animation: String) {
+        removeAnimation(forKey: animation, blendOutDuration: 0.5)
+        if currentAnimation.isWalkAnimation {
+            faceCamera()
+        }
+        currentAnimation = ""
     }
 
     func loopPassiveAnimation() {
@@ -152,8 +189,9 @@ private extension ARty {
     }
 }
 
-extension ARty: CAAnimationDelegate {
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        currentAnimation = ""
+private extension CLLocationDirection {
+    var radians: CGFloat {
+        let adjusted = Float((450 - self).remainder(dividingBy: 360)) + 90  // todo: reduce
+        return CGFloat(GLKMathDegreesToRadians(adjusted))
     }
 }

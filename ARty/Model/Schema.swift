@@ -6,15 +6,14 @@ struct Schema {
     let walkAnimations: [String]
     let fallAnimations: [String]
 
-    // init from json/file path
-
     func scale(_ model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
         return SCNVector3(scale, scale, scale)
     }
 
-    func positionAdjustment(_ model: String) throws -> Float {
-        return try Float(arty(model).positionAdjustment)
+    func positionAdjustment(_ model: String) throws -> SCNVector3 {
+        let adjustment = Float(try arty(model).positionAdjustment)
+        return SCNVector3(0, adjustment, adjustment)
     }
 
     func animations(_ model: String) throws -> [String: CAAnimation] {
@@ -122,5 +121,9 @@ private extension String {
             return .infinity
         }
         return schema.animationRepeatCounts[self] ?? 1
+    }
+
+    var isFallAnimation: Bool {
+        return schema.fallAnimations.contains(self)
     }
 }

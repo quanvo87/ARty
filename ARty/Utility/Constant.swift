@@ -1,7 +1,8 @@
 var schema = Schema(
     arties: [
         elvira.model: elvira,
-        mutant.model: mutant
+        mutant.model: mutant,
+        paladin.model: paladin
     ],
     animationRepeatCounts: animationRepeatCounts,
     walkAnimations: walkAnimations,
@@ -42,15 +43,35 @@ let mutant = ARtySchema(
     pokeAnimation: "mutant_battlecry"
 )
 
+let paladin = ARtySchema(
+    model: "paladin",
+    scale: 0.015,
+    positionAdjustment: -2,
+    animations: [
+        "paladin_fall",
+        "paladin_fierce_attack",
+        "paladin_slide_dance",
+        "paladin_sword_combo",
+        "paladin_walk",
+        "paladin_wave"
+    ],
+    idleAnimation: "paladin_idle",
+    walkAnimation: "paladin_walk",
+    passiveAnimation: "paladin_wave",
+    pokeAnimation: "paladin_fierce_attack"
+)
+
 let animationRepeatCounts: [String: Float] = [
     "elvira_wave": 4
 ]
 
 let walkAnimations = [
     "elvira_walk",
-    "mutant_walk"
+    "mutant_walk",
+    "paladin_walk"
 ]
 
 let fallAnimations = [
-    "mutant_fall"
+    "mutant_fall",
+    "paladin_fall"
 ]

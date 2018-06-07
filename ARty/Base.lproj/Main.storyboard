@@ -96,25 +96,17 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </arscnView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7az-ZH-489">
-                                <rect key="frame" x="301" y="738" width="64" height="30"/>
-                                <state key="normal" title="Edit ARty"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="info" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ep-KU-O3Q">
+                                <rect key="frame" x="10" y="123.99999999999999" width="355" height="20.333333333333329"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UpO-lG-qN3">
+                                <rect key="frame" x="310" y="44" width="55" height="30"/>
+                                <state key="normal" title="Log Out"/>
                                 <connections>
-                                    <action selector="didTapEditARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYK-VT-FEI">
-                                <rect key="frame" x="258" y="698" width="107" height="30"/>
-                                <state key="normal" title="Edit Animations"/>
-                                <connections>
-                                    <action selector="didTapEditAnimationsButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="txw-Wn-IKP"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6dM-UU-1Cs">
-                                <rect key="frame" x="274" y="658" width="91" height="30"/>
-                                <state key="normal" title="Hold Position"/>
-                                <connections>
-                                    <action selector="didTapHoldPositionButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="e0D-ad-vrI"/>
+                                    <action selector="didTapLogOutButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="LhO-9w-q2n"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uT0-tf-TfT">
@@ -124,19 +116,27 @@
                                     <action selector="didTapReloadButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="GDb-l5-QXq"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UpO-lG-qN3">
-                                <rect key="frame" x="310" y="44" width="55" height="30"/>
-                                <state key="normal" title="Log Out"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6dM-UU-1Cs">
+                                <rect key="frame" x="274" y="658" width="91" height="30"/>
+                                <state key="normal" title="Hold Position"/>
                                 <connections>
-                                    <action selector="didTapLogOutButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="LhO-9w-q2n"/>
+                                    <action selector="didTapHoldPositionButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="e0D-ad-vrI"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="info" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ep-KU-O3Q">
-                                <rect key="frame" x="10" y="123.99999999999999" width="355" height="20.333333333333329"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYK-VT-FEI">
+                                <rect key="frame" x="258" y="698" width="107" height="30"/>
+                                <state key="normal" title="Edit Animations"/>
+                                <connections>
+                                    <action selector="didTapEditAnimationsButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="txw-Wn-IKP"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7az-ZH-489">
+                                <rect key="frame" x="301" y="738" width="64" height="30"/>
+                                <state key="normal" title="Edit ARty"/>
+                                <connections>
+                                    <action selector="didTapEditARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>

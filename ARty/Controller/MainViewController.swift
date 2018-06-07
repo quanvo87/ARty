@@ -123,7 +123,6 @@ extension MainViewController: AuthManagerDelegate {
     }
 
     private func loadRecentARty(for uid: String) {
-        // todo: move to account creation
         Database.setUid(uid) { [weak self] error in
             if let error = error {
                 print(error)
@@ -203,7 +202,6 @@ extension MainViewController: ARtyDelegate {
         }
     }
 
-    // todo: test
     private func checkPokeTimestamp(arty: ARty, user: User) {
         if arty.pokeTimestamp != user.pokeTimestamp {
             try? arty.playPokeAnimation()

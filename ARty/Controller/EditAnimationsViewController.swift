@@ -44,7 +44,7 @@ class EditAnimationsViewController: UIViewController {
                 return EditAnimationsViewController()
         }
         viewController.arty = arty
-        viewController.animations = arty.pickableAnimations
+        viewController.animations = arty.pickableAnimations.sorted()
         viewController.delegate = delegate
         return viewController
     }
@@ -107,7 +107,7 @@ private extension EditAnimationsViewController {
 private extension String {
     var animationDisplayName: String {
         if let index = self.range(of: "_")?.upperBound {
-            return String(self.suffix(from: index)).capitalized
+            return String(self.suffix(from: index)).capitalized.replacingOccurrences(of: "_", with: " ")
         } else {
             return self
         }

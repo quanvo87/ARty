@@ -80,6 +80,7 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
+            label.text = String(describing: newLocation)
             try? arty?.playWalkAnimation(location: newLocation)
             arty?.turn(location: newLocation)
             nearbyUsersPoller.coordinates = (newLocation.coordinate.latitude, newLocation.coordinate.longitude)
@@ -123,7 +124,7 @@ extension MainViewController: AuthManagerDelegate {
 
     private func loadRecentARty(for uid: String) {
         // todo: move to account creation
-        Database.updateUid(uid) { [weak self] error in
+        Database.setUid(uid) { [weak self] error in
             if let error = error {
                 print(error)
                 return
@@ -303,7 +304,7 @@ private extension MainViewController {
     }
 
     func addARtyToScene(_ arty: ARty, position: SCNVector3) {
-        arty.position = arty.positionAdjustment + position
+        arty.position = arty.positionAdjustment + position  // todo: user anchors
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty

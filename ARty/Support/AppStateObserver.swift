@@ -12,7 +12,9 @@ class AppStateObserver {
 
     init(delegate: AppStateObserverDelegate) {
         self.delegate = delegate
+    }
 
+    func start() {
         appDidBecomeActiveObserver = NotificationCenter.default.addObserver(
             forName: .UIApplicationDidBecomeActive,
             object: nil,
@@ -34,14 +36,16 @@ class AppStateObserver {
         }
     }
 
-    func load() {}
-
-    deinit {
+    func stop() {
         if let appDidBecomeActiveObserver = appDidBecomeActiveObserver {
             NotificationCenter.default.removeObserver(appDidBecomeActiveObserver)
         }
         if let appDidEnterBackgroundObserver = appDidEnterBackgroundObserver {
             NotificationCenter.default.removeObserver(appDidEnterBackgroundObserver)
         }
+    }
+
+    deinit {
+        stop()
     }
 }

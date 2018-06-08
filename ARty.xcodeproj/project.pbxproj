@@ -116,7 +116,6 @@
 				59412B8F20B5721300A2ED02 /* Main.storyboard */,
 				59412B9D20B5929600A2ED02 /* Model */,
 				5960AB3520C869C800E61B79 /* Support */,
-				59412BA020B595E500A2ED02 /* Utility */,
 			);
 			path = ARty;
 			sourceTree = "<group>";
@@ -130,17 +129,6 @@
 				5993889420C046750060A37E /* User.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		59412BA020B595E500A2ED02 /* Utility */ = {
-			isa = PBXGroup;
-			children = (
-				59389A1420B6313D00F7FA67 /* ARtyError.swift */,
-				59298B1120C02D82003D1D98 /* Constant.swift */,
-				59298B0420BF9373003D1D98 /* Extension.swift */,
-				59E747FA20C61F4E006217C4 /* Temp.swift */,
-			);
-			path = Utility;
 			sourceTree = "<group>";
 		};
 		5960AB3420C869BC00E61B79 /* Controller */ = {
@@ -159,10 +147,14 @@
 			children = (
 				59412B8920B5721300A2ED02 /* AppDelegate.swift */,
 				59E747FC20C629BD006217C4 /* AppStateObserver.swift */,
+				59389A1420B6313D00F7FA67 /* ARtyError.swift */,
 				5908372720C0FD2100A36103 /* AuthManager.swift */,
+				59298B1120C02D82003D1D98 /* Constant.swift */,
 				5908371E20C0BE2E00A36103 /* Database.swift */,
+				59298B0420BF9373003D1D98 /* Extension.swift */,
 				59584BD920C79B98000F72D9 /* LocationManager.swift */,
 				59CE245120C64ACB00BE4C77 /* NearbyUsersPoller.swift */,
+				59E747FA20C61F4E006217C4 /* Temp.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";

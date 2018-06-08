@@ -45,8 +45,8 @@ let mutant = ARtySchema(
 
 let paladin = ARtySchema(
     model: "paladin",
-    scale: 0.015,
-    positionAdjustment: -2,
+    scale: 0.03,
+    positionAdjustment: -4,
     animations: [
         "paladin_fall",
         "paladin_fierce_attack",
@@ -62,7 +62,8 @@ let paladin = ARtySchema(
 )
 
 let animationRepeatCounts: [String: Float] = [
-    "elvira_wave": 4
+    "elvira_wave": 4,
+    "paladin_wave": 4
 ]
 
 let walkAnimations = [

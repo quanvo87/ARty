@@ -4,6 +4,7 @@ import FirebaseFirestore
 
 protocol ARtyDelegate: class {
     func arty(_ arty: ARty, updateUser user: User)
+    func arty(_ arty: ARty, latitude: Double, longitude: Double)
 }
 
 class ARty: SCNNode {
@@ -19,6 +20,7 @@ class ARty: SCNNode {
     private var currentAnimation = ""
     private var lastLocation = CLLocation()
     private var userListener: ListenerRegistration?
+    private var locationListener: ListenerRegistration?
     private weak var delegate: ARtyDelegate?
 
     init(uid: String,
@@ -41,16 +43,7 @@ class ARty: SCNNode {
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
         loopPassiveAnimation()
-
-        if let delegate = delegate {
-            self.delegate = delegate
-            userListener = Database.userListener(uid) { [weak self] user in
-                guard let `self` = self else {
-                    return
-                }
-                self.delegate?.arty(self, updateUser: user)
-            }
-        }
+        setupListeners(delegate: delegate)
     }
 
     convenience init(user: User, delegate: ARtyDelegate?) throws {
@@ -71,6 +64,12 @@ class ARty: SCNNode {
         ]
     }
 
+    func update(from user: User) {
+        try? setPassiveAnimation(user.passiveAnimation)
+        try? setPokeAnimation(user.pokeAnimation)
+        setPokeTimestamp(user.pokeTimestamp)
+    }
+
     func setPassiveAnimation(_ animation: String) throws {
         passiveAnimation = try schema.passiveAnimation(model, animation: animation)
     }
@@ -83,7 +82,7 @@ class ARty: SCNNode {
         try playAnimation(pokeAnimation)
     }
 
-    func playWalkAnimation(location: CLLocation) throws {
+    func walk(to location: CLLocation) throws {
         let speed = location.speed
         if speed > 0 {
             if speed < 0.5 {
@@ -102,24 +101,35 @@ class ARty: SCNNode {
                 stopAnimation(walkAnimation)
             }
         }
+        turn(to: location.course)
     }
 
-    func turn(location: CLLocation) {
-        guard currentAnimation.isWalkAnimation, location.course > -1 else {
-            return
+    func walk(to position: SCNVector3) throws {
+        if currentAnimation == "" {
+            try playAnimation(walkAnimation)
         }
-        let rotateAction = SCNAction.rotateTo(
-            x: 0,
-            y: location.course.radians,
-            z: 0,
+
+        let turnAction = SCNAction.rotateTo(
+            x: CGFloat(position.x),
+            y: CGFloat(position.y),
+            z: CGFloat(position.z),
             duration: 1,
             usesShortestUnitArc: true
         )
-        runAction(rotateAction)
+        runAction(turnAction)
+
+        let moveAction = SCNAction.move(to: position, duration: 5)
+        runAction(moveAction) { [weak self] in
+            guard let `self` = self else {
+                return
+            }
+            self.stopAnimation(self.walkAnimation)
+        }
     }
 
     deinit {
         userListener?.remove()
+        locationListener?.remove()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -175,6 +185,48 @@ private extension ARty {
             }
             self.loopPassiveAnimation()
         }
+    }
+
+    func setupListeners(delegate: ARtyDelegate?) {
+        guard let delegate = delegate else {
+            return
+        }
+        self.delegate = delegate
+
+        userListener = Database.userListener(uid) { [weak self] user in
+            guard let `self` = self else {
+                return
+            }
+            self.delegate?.arty(self, updateUser: user)
+        }
+
+        locationListener = Database.locationListener(uid: uid) { [weak self] (latitude, longitude) in
+            guard let `self` = self else {
+                return
+            }
+            self.delegate?.arty(self, latitude: latitude, longitude: longitude)
+        }
+    }
+
+    func setPokeTimestamp(_ pokeTimestamp: Date) {
+        if self.pokeTimestamp != pokeTimestamp {
+            try? playPokeAnimation()
+        }
+        self.pokeTimestamp = pokeTimestamp
+    }
+
+    func turn(to direction: CLLocationDirection) {
+        guard currentAnimation.isWalkAnimation, direction > -1 else {
+            return
+        }
+        let rotateAction = SCNAction.rotateTo(
+            x: 0,
+            y: direction.radians,
+            z: 0,
+            duration: 1,
+            usesShortestUnitArc: true
+        )
+        runAction(rotateAction)
     }
 
     func faceCamera() {

@@ -4,6 +4,7 @@ protocol EditARtyViewControllerDelegate: class {
     func editARtyViewController(_ controller: EditARtyViewController, changeARtyTo model: String)
 }
 
+// todo: change from edit to choose
 class EditARtyViewController: UIViewController {
     private let tableView = UITableView(frame: .zero)
     private let arties = Array(schema.arties.keys).sorted()
@@ -40,6 +41,7 @@ extension EditARtyViewController: UITableViewDataSource {
         return arties.count
     }
 
+    // todo: add selection indicator
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let arty = arties[indexPath.row]
         let cell = UITableViewCell()

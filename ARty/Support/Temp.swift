@@ -4,7 +4,7 @@ import SceneKit
 
 extension SCNVector3 {
     static var random: SCNVector3 {
-        return .init(10.random, 0, 10.random)
+        return .init(20.random, 0, 20.random)
     }
 }
 

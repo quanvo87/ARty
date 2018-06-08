@@ -27,7 +27,9 @@ struct Database {
         }
     }
 
-    static func nearbyUsers(latitude: Double,
+    // todo: change to separate locations db
+    static func nearbyUsers(uid: String,
+                            latitude: Double,
                             longitude: Double,
                             completion: @escaping (Result<[User], Error>) -> Void) {
         usersCollection.getDocuments { snapshot, error in
@@ -57,10 +59,35 @@ struct Database {
         }
     }
 
+    static func locationListener(uid: String, callback: @escaping (Double, Double) -> Void) -> ListenerRegistration {
+        return database.collection("locations").document(uid).addSnapshotListener { snapshot, error in
+            if let error = error {
+                print(error)
+                return
+            }
+            guard let data = snapshot?.data(),
+                let latitude = data["latitude"] as? Double,
+                let longitude = data["longitude"] as? Double else {
+                    print(ARtyError.invalidDataFromServer(snapshot?.data()))
+                    return
+            }
+            callback(latitude, longitude)
+        }
+    }
+
     static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
         usersCollection.document(uid).setData([
             "uid": uid
         ], merge: true) { error in
+            completion(error)
+        }
+    }
+
+    static func setLocation(uid: String, latitude: Double, longitude: Double, completion: @escaping (Error?) -> Void) {
+        database.collection("locations").document(uid).setData([
+            "latitude": latitude,
+            "longitude": longitude
+        ]) { error in
             completion(error)
         }
     }
@@ -100,17 +127,6 @@ struct Database {
     static func updatePokeTimestamp(for uid: String, completion: @escaping (Error?) -> Void) {
         usersCollection.document(uid).updateData([
             "pokeTimestamp": Date()
-        ]) { error in
-            completion(error)
-        }
-    }
-
-    static func updateLocation(latitude: Double,
-                               longitude: Double,
-                               uid: String,
-                               completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).updateData([
-            "location": GeoPoint(latitude: latitude, longitude: longitude)
         ]) { error in
             completion(error)
         }

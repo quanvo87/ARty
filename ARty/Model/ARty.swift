@@ -43,7 +43,7 @@ class ARty: SCNNode {
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
         loopPassiveAnimation()
-        setupListeners(delegate: delegate)
+        makeListeners(delegate: delegate)
     }
 
     convenience init(user: User, delegate: ARtyDelegate?) throws {
@@ -54,6 +54,22 @@ class ARty: SCNNode {
             pokeAnimation: user.pokeAnimation,
             delegate: delegate
         )
+    }
+
+    static func make(uid: String, delegate: ARtyDelegate,
+                     completion: @escaping (Database.Result<ARty, Error>) -> Void) {
+        Database.user(uid) { result in
+            switch result {
+            case .fail(let error):
+                completion(.fail(error))
+            case .success(let user):
+                do {
+                    completion(.success(try .init(user: user, delegate: delegate)))
+                } catch {
+                    completion(.fail(error))
+                }
+            }
+        }
     }
 
     var dictionary: [String: String] {
@@ -187,7 +203,7 @@ private extension ARty {
         }
     }
 
-    func setupListeners(delegate: ARtyDelegate?) {
+    func makeListeners(delegate: ARtyDelegate?) {
         guard let delegate = delegate else {
             return
         }

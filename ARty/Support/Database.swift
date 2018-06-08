@@ -27,19 +27,23 @@ struct Database {
         }
     }
 
-    // todo: change to separate locations db
+    // todo: change to use locations db
     static func nearbyUsers(uid: String,
                             latitude: Double,
                             longitude: Double,
-                            completion: @escaping (Result<[User], Error>) -> Void) {
+                            completion: @escaping (Result<[String], Error>) -> Void) {
         usersCollection.getDocuments { snapshot, error in
             if let error = error {
                 completion(.fail(error))
             } else {
-                do {
-                    completion(.success(try snapshot.users()))
-                } catch {
-                    completion(.fail(ARtyError.invalidDataFromServer(snapshot?.documents)))
+                var arr = [String]()
+                if let documents = snapshot?.documents {
+                    for document in documents {
+                        if let uid = document.data()["uid"] as? String {
+                            arr.append(uid)
+                        }
+                    }
+                    completion(.success(arr))
                 }
             }
         }
@@ -83,6 +87,7 @@ struct Database {
         }
     }
 
+    // todo: also write to location db
     static func setLocation(uid: String, latitude: Double, longitude: Double, completion: @escaping (Error?) -> Void) {
         database.collection("locations").document(uid).setData([
             "latitude": latitude,

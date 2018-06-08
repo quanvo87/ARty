@@ -176,11 +176,11 @@ extension MainViewController: ARtyDelegate {
     }
 
     func arty(_ arty: ARty, latitude: Double, longitude: Double) {
-        let location = CLLocation(latitude: latitude, longitude: longitude)
-        guard let position = arSessionManager.positionFromWorldOrigin(to: location) else {
-            return
-        }
-        try? arty.walk(to: position)
+//        let location = CLLocation(latitude: latitude, longitude: longitude)
+//        guard let position = arSessionManager.positionFromWorldOrigin(to: location) else {
+//            return
+//        }
+//        try? arty.walk(to: position)
     }
 }
 
@@ -277,36 +277,36 @@ private extension MainViewController {
             switch result {
             case .fail(let error):
                 print(error)
-            case .success(let users):
-                users.forEach {
+            case .success(let uids):
+                uids.forEach {
                     self?.observeUser($0)
                 }
-                self?.removeStaleUsers(users)
+                self?.removeStaleUsers(uids)
             }
         }
     }
 
-    // todo: have to use uid to observe user first, then make an arty out of them after first callback
-    func observeUser(_ user: User) {
-        if user.uid != uid && !arties.keys.contains(user.uid) {
-            do {
-                let arty = try ARty(user: user, delegate: self)
-                addARtyToScene(arty, position: .random)
-            } catch {
-                print(error)
+    func observeUser(_ uid: String) {
+        if uid != self.uid && !arties.keys.contains(uid) {
+            ARty.make(uid: uid, delegate: self) { [weak self] result in
+                switch result {
+                case .fail(let error):
+                    print(error)
+                case .success(let arty):
+                    self?.addARtyToScene(arty, position: .random)
+                }
             }
         }
     }
 
-    // todo: change to expect array of uids
-    func removeStaleUsers(_ users: [User]) {
-        users
+    func removeStaleUsers(_ uids: [String]) {
+        uids
             .filter {
-                return !arties.keys.contains($0.uid)
+                return !arties.keys.contains($0)
             }
             .forEach {
-                sceneView.scene.rootNode.childNode(withName: $0.uid, recursively: false)?.removeFromParentNode()
-                arties.removeValue(forKey: $0.uid)
+                sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
+                arties.removeValue(forKey: $0)
         }
     }
 }

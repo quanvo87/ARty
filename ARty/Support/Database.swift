@@ -57,10 +57,10 @@ struct Database {
         }
     }
 
-    static func updateUid(_ uid: String, completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).updateData([
+    static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
+        usersCollection.document(uid).setData([
             "uid": uid
-        ]) { error in
+        ], merge: true) { error in
             completion(error)
         }
     }

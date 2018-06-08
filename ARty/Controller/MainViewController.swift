@@ -19,16 +19,22 @@ class MainViewController: UIViewController {
         return arties[uid]
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        UIApplication.shared.isIdleTimerDisabled = true
+    private var scene: SCNScene {
         let scene = SCNScene()
         sceneView.scene = scene
         sceneView.delegate = self
         sceneView.session.delegate = self
+        sceneView.autoenablesDefaultLighting = true
+        return scene
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        UIApplication.shared.isIdleTimerDisabled = true
+        sceneView.scene = scene
         locationManager.delegate = self
         runARSession()
-        appStateObserver.load()
+        appStateObserver.start()
         authManager.listenForAuthState()
     }
 
@@ -76,7 +82,7 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let newLocation = locations.last else {
+        guard let newLocation = manager.location else {
             return
         }
         if locationManager.isValidLocation(newLocation) {
@@ -90,9 +96,7 @@ extension MainViewController: CLLocationManagerDelegate {
 
 extension MainViewController: AppStateObserverDelegate {
     func appStateObserverAppBecameActive(_ observer: AppStateObserver) {
-        if uid != nil {
-            runARSession()
-        }
+        runARSession()
     }
 
     func appStateObserverAppEnteredBackground(_ observer: AppStateObserver) {
@@ -104,26 +108,26 @@ extension MainViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userLoggedIn uid: String) {
         self.uid = uid
         runARSession()
-        loadRecentARty(for: uid)
+        appStateObserver.start()
+        loadUser(uid)
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
-        nearbyUsersPoller.poll()
+        nearbyUsersPoller.start()
     }
 
     func authManagerUserLoggedOut(_ manager: AuthManager) {
         uid = nil
         arties.removeAll()
-        let scene = SCNScene()
         sceneView.scene = scene
         pauseARSession()
+        appStateObserver.stop()
         locationManager.stopUpdatingLocation()
         nearbyUsersPoller.stop()
         showLoginViewController()
     }
 
-    private func loadRecentARty(for uid: String) {
-        // todo: move to account creation
-        Database.updateUid(uid) { [weak self] error in
+    private func loadUser(_ uid: String) {
+        Database.setUid(uid) { [weak self] error in
             if let error = error {
                 print(error)
                 return
@@ -195,15 +199,15 @@ extension MainViewController: ARtyDelegate {
                 print(error)
             }
         } else {
+            // todo: move to ARty?
             try? arty.setPassiveAnimation(user.passiveAnimation)
             try? arty.setPokeAnimation(user.pokeAnimation)
-            checkPokeTimestamp(arty: arty, user: user)
+            setPokeTimestamp(arty: arty, user: user)
             // todo: walk to new location if necessary
         }
     }
 
-    // todo: test
-    private func checkPokeTimestamp(arty: ARty, user: User) {
+    private func setPokeTimestamp(arty: ARty, user: User) {
         if arty.pokeTimestamp != user.pokeTimestamp {
             try? arty.playPokeAnimation()
         }
@@ -303,7 +307,7 @@ private extension MainViewController {
     }
 
     func addARtyToScene(_ arty: ARty, position: SCNVector3) {
-        arty.position = arty.positionAdjustment + position
+        arty.position = arty.positionAdjustment + position  // todo: user anchors
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty

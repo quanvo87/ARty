@@ -15,18 +15,18 @@ class NearbyUsersPoller {
     init(timeInterval: TimeInterval = 5, delegate: NearbyUsersPollerDelegate) {
         self.timeInterval = timeInterval
         self.delegate = delegate
-        appStateObserver.load()
     }
 
     var coordinates: (latitude: Double, longitude: Double)? {
         didSet {
             if shouldPoll {
-                poll()
+                start()
             }
         }
     }
 
-    func poll() {
+    func start() {
+        appStateObserver.start()
         shouldPoll = true
         guard coordinates != nil, timer == nil else {
             return
@@ -54,6 +54,7 @@ class NearbyUsersPoller {
     }
 
     func stop() {
+        appStateObserver.stop()
         shouldPoll = false
         stopTimer()
     }
@@ -66,9 +67,7 @@ class NearbyUsersPoller {
 
 extension NearbyUsersPoller: AppStateObserverDelegate {
     func appStateObserverAppBecameActive(_ observer: AppStateObserver) {
-        if shouldPoll {
-            poll()
-        }
+        start()
     }
 
     func appStateObserverAppEnteredBackground(_ observer: AppStateObserver) {

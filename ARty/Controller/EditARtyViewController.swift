@@ -6,7 +6,7 @@ protocol EditARtyViewControllerDelegate: class {
 
 class EditARtyViewController: UIViewController {
     private let tableView = UITableView(frame: .zero)
-    private let arties = Array(schema.arties.keys)
+    private let arties = Array(schema.arties.keys).sorted()
     private weak var delegate: EditARtyViewControllerDelegate?
 
     init(delegate: EditARtyViewControllerDelegate) {

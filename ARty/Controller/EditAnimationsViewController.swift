@@ -9,7 +9,6 @@ protocol EditAnimationsViewControllerDelegate: class {
                                       for arty: ARty)
 }
 
-// todo: make poke the first segmented control
 class EditAnimationsViewController: UIViewController {
     @IBOutlet weak var animationTypePicker: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
@@ -64,8 +63,9 @@ extension EditAnimationsViewController: UITableViewDataSource {
         cell.textLabel?.text = animation.animationDisplayName
 
         let currentAnimation = animationTypePicker.selectedSegmentIndex == 0 ?
-            arty?.passiveAnimation :
-            arty?.pokeAnimation
+            arty?.pokeAnimation :
+            arty?.passiveAnimation
+
         if animation == currentAnimation {
             cell.accessoryType = .checkmark
         }
@@ -84,9 +84,9 @@ extension EditAnimationsViewController: UITableViewDelegate {
 
         switch animationTypePicker.selectedSegmentIndex {
         case 0:
-            delegate?.editAnimationsViewController(self, setPassiveAnimationTo: animation, for: arty)
-        case 1:
             delegate?.editAnimationsViewController(self, setPokeAnimationTo: animation, for: arty)
+        case 1:
+            delegate?.editAnimationsViewController(self, setPassiveAnimationTo: animation, for: arty)
         default:
             break
         }

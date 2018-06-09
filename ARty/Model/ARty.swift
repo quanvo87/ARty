@@ -3,7 +3,7 @@ import CoreLocation
 import FirebaseFirestore
 
 protocol ARtyDelegate: class {
-    func arty(_ arty: ARty, updateUser user: User)
+    func arty(_ arty: ARty, userChangedModel user: User)
     func arty(_ arty: ARty, latitude: Double, longitude: Double)
 }
 
@@ -192,7 +192,11 @@ private extension ARty {
             guard let `self` = self else {
                 return
             }
-            self.delegate?.arty(self, updateUser: user)
+            if user.model == self.model {
+                self.update(from: user)
+            } else {
+                self.delegate?.arty(self, userChangedModel: user)
+            }
         }
 
         locationListener = Database.locationListener(uid: uid) { [weak self] (latitude, longitude) in

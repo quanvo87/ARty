@@ -9,6 +9,7 @@ protocol EditAnimationsViewControllerDelegate: class {
                                       for arty: ARty)
 }
 
+// todo: make poke the first segmented control
 class EditAnimationsViewController: UIViewController {
     @IBOutlet weak var animationTypePicker: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!

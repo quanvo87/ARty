@@ -160,19 +160,12 @@ extension MainViewController: AuthManagerDelegate {
 }
 
 extension MainViewController: ARtyDelegate {
-    func arty(_ arty: ARty, updateUser user: User) {
-        guard let arty = arties[user.uid] else {
-            return
-        }
-        if user.model != arty.model {
-            do {
-                let arty = try ARty(user: user, delegate: self)
-                addARtyToScene(arty, position: .random)
-            } catch {
-                print(error)
-            }
-        } else {
-            arty.update(from: user)
+    func arty(_ arty: ARty, userChangedModel user: User) {
+        do {
+            let arty = try ARty(user: user, delegate: self)
+            addARtyToScene(arty, position: .random)
+        } catch {
+            print(error)
         }
     }
 
@@ -267,7 +260,7 @@ private extension MainViewController {
     }
 
     func addARtyToScene(_ arty: ARty, position: SCNVector3) {
-        arty.position = arty.positionAdjustment + position  // todo: use anchors
+        arty.position = arty.positionAdjustment + position  // todo: use anchors?
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty

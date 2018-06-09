@@ -10,14 +10,13 @@ protocol ARtyDelegate: class {
 class ARty: SCNNode {
     let uid: String
     let model: String
-    let positionAdjustment: SCNVector3
-    let pickableAnimations: [String]
+    let positionAdjustment: SCNVector3  // todo: make adjustments to models instead of this
+    let pickableAnimationNames: [String]
     var pokeTimestamp: Date?
     private(set) var passiveAnimation = ""
     private(set) var pokeAnimation = ""
     private let animations: [String: CAAnimation]
     private let walkAnimation: String
-    private var currentAnimation = ""
     private var lastLocation = CLLocation()
     private var userListener: ListenerRegistration?
     private var locationListener: ListenerRegistration?
@@ -31,7 +30,7 @@ class ARty: SCNNode {
         self.uid = uid
         self.model = model
         positionAdjustment = try schema.positionAdjustment(model)
-        pickableAnimations = try schema.pickableAnimations(model)
+        pickableAnimationNames = try schema.animationNames(model, onlyPickableAnimations: true)
         animations = try schema.animations(model)
         walkAnimation = try schema.walkAnimation(model)
 
@@ -39,7 +38,7 @@ class ARty: SCNNode {
 
         name = uid
         scale = try schema.scale(model)
-        try loadIdleScene()
+        try addIdleScene()
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
         loopPassiveAnimation()
@@ -80,6 +79,10 @@ class ARty: SCNNode {
         ]
     }
 
+    var isIdle: Bool {
+        return animationKeys.isEmpty
+    }
+
     func update(from user: User) {
         try? setPassiveAnimation(user.passiveAnimation)
         try? setPokeAnimation(user.pokeAnimation)
@@ -87,41 +90,40 @@ class ARty: SCNNode {
     }
 
     func setPassiveAnimation(_ animation: String) throws {
-        passiveAnimation = try schema.passiveAnimation(model, animation: animation)
+        passiveAnimation = try schema.setPassiveAnimation(model, animation: animation)
     }
 
     func setPokeAnimation(_ animation: String) throws {
-        pokeAnimation = try schema.pokeAnimation(model, animation: animation)
-    }
-
-    func playPokeAnimation() throws {
-        try playAnimation(pokeAnimation)
+        pokeAnimation = try schema.setPokeAnimation(model, animation: animation)
     }
 
     func walk(to location: CLLocation) throws {
         let speed = location.speed
         if speed > 0 {
             if speed < 0.5 {
-                stopAnimation(walkAnimation)
-            } else if currentAnimation == "" {
+                removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
+                faceCamera()
+            } else if isIdle {
+                turn(to: location.course)
                 try playAnimation(walkAnimation)
             }
         } else {
             let distance = lastLocation.distance(from: location)
             if distance > 5 {
-                if currentAnimation == "" {
+                if isIdle {
+                    turn(to: location.course)
                     try playAnimation(walkAnimation)
                 }
                 lastLocation = location
             } else {
-                stopAnimation(walkAnimation)
+                removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
+                faceCamera()
             }
         }
-        turn(to: location.course)
     }
 
     func walk(to position: SCNVector3) throws {
-        if currentAnimation == "" {
+        if isIdle {
             try playAnimation(walkAnimation)
         }
 
@@ -139,8 +141,14 @@ class ARty: SCNNode {
             guard let `self` = self else {
                 return
             }
-            self.stopAnimation(self.walkAnimation)
+            self.removeAnimation(forKey: self.walkAnimation)
         }
+    }
+
+    func playAnimation(_ animation: String) throws {
+        removeAllAnimations()
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
     }
 
     deinit {
@@ -153,41 +161,12 @@ class ARty: SCNNode {
     }
 }
 
-extension ARty: CAAnimationDelegate {
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        currentAnimation = ""
-    }
-}
-
 private extension ARty {
-    func loadIdleScene() throws {
+    func addIdleScene() throws {
         let scene = try schema.idleScene(model)
         scene.rootNode.childNodes.forEach {
             addChildNode($0)
         }
-    }
-
-    func animation(_ animation: String) throws -> CAAnimation {
-        guard let caAnimation = animations[animation] else {
-            throw ARtyError.invalidAnimationName(animation)
-        }
-        return caAnimation
-    }
-
-    func playAnimation(_ animation: String) throws {
-        stopAnimation(currentAnimation)
-        let caAnimation = try self.animation(animation)
-        addAnimation(caAnimation, forKey: animation)
-        caAnimation.delegate = self
-        currentAnimation = animation
-    }
-
-    func stopAnimation(_ animation: String) {
-        removeAnimation(forKey: animation, blendOutDuration: 0.5)
-        if currentAnimation.isWalkAnimation {
-            faceCamera()
-        }
-        currentAnimation = ""
     }
 
     func loopPassiveAnimation() {
@@ -196,7 +175,7 @@ private extension ARty {
             guard let `self` = self else {
                 return
             }
-            if self.currentAnimation == "" {
+            if self.isIdle {
                 try? self.playAnimation(self.passiveAnimation)
             }
             self.loopPassiveAnimation()
@@ -226,13 +205,20 @@ private extension ARty {
 
     func setPokeTimestamp(_ pokeTimestamp: Date) {
         if self.pokeTimestamp != pokeTimestamp {
-            try? playPokeAnimation()
+            try? playAnimation(pokeAnimation)
         }
         self.pokeTimestamp = pokeTimestamp
     }
 
+    func animation(_ animation: String) throws -> CAAnimation {
+        guard let caAnimation = animations[animation] else {
+            throw ARtyError.invalidAnimationName(animation)
+        }
+        return caAnimation
+    }
+
     func turn(to direction: CLLocationDirection) {
-        guard currentAnimation.isWalkAnimation, direction > -1 else {
+        guard direction > -1 else {
             return
         }
         let rotateAction = SCNAction.rotateTo(

@@ -2,9 +2,7 @@ import SceneKit
 
 struct Schema {
     let arties: [String: ARtySchema]
-    let animationRepeatCounts: [String: Float]
-    let walkAnimations: [String]
-    let fallAnimations: [String]
+    let animationRepeatCounts: [String: Float]  // todo: move to ARtySchema
 
     func scale(_ model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
@@ -16,18 +14,31 @@ struct Schema {
         return SCNVector3(0, adjustment, adjustment)
     }
 
-    func animations(_ model: String) throws -> [String: CAAnimation] {
-        var animations = [String: CAAnimation]()
-        try self.animationNames(model).forEach {
-            animations[$0] = try Schema.animation(model, animation: $0)
+    func animationNames(_ model: String, onlyPickableAnimations: Bool) throws -> [String] {
+        var animations = try arty(model).pickableAnimationNames
+        if onlyPickableAnimations {
+            return animations
         }
+
+        let walkAnimation = try self.walkAnimation(model)
+        if walkAnimation != "" {
+            animations.append(walkAnimation)
+        }
+
+        let fallAnimation = try self.fallAnimation(model)
+        if fallAnimation != "" {
+            animations.append(fallAnimation)
+        }
+
         return animations
     }
 
-    func pickableAnimations(_ model: String) throws -> [String] {
-        return try animationNames(model).filter {
-            return !$0.isWalkAnimation && !$0.isFallAnimation
+    func animations(_ model: String) throws -> [String: CAAnimation] {
+        var animations = [String: CAAnimation]()
+        try self.animationNames(model, onlyPickableAnimations: false).forEach {
+            animations[$0] = try animation(model, animation: $0)
         }
+        return animations
     }
 
     func idleScene(_ model: String) throws -> SCNScene {
@@ -43,14 +54,18 @@ struct Schema {
         return try arty(model).walkAnimation
     }
 
-    func passiveAnimation(_ model: String, animation: String) throws -> String {
+    func fallAnimation(_ model: String) throws -> String {
+        return try arty(model).fallAnimation
+    }
+
+    func setPassiveAnimation(_ model: String, animation: String) throws -> String {
         if try isValidAnimation(model, animation: animation) {
             return animation
         }
         return try defaultPassiveAnimation(model)
     }
 
-    func pokeAnimation(_ model: String, animation: String) throws -> String {
+    func setPokeAnimation(_ model: String, animation: String) throws -> String {
         if try isValidAnimation(model, animation: animation) {
             return animation
         }
@@ -66,16 +81,7 @@ private extension Schema {
         return arty
     }
 
-    func animationNames(_ model: String) throws -> [String] {
-        return try arty(model).animations
-    }
-
-    func isValidAnimation(_ model: String, animation: String) throws -> Bool {
-        let animations = try self.animationNames(model)
-        return animations.contains(animation)
-    }
-
-    static func animation(_ model: String, animation: String) throws -> CAAnimation {
+    func animation(_ model: String, animation: String) throws -> CAAnimation {
         let resourcePath = model.asResourcePath + "/" + animation
         guard let url = Bundle.main.url(forResource: resourcePath, withExtension: "dae") else {
             throw ARtyError.resourceNotFound(resourcePath + ".dae")
@@ -86,22 +92,34 @@ private extension Schema {
             withClass: CAAnimation.self) else {
                 throw ARtyError.animationIdentifierNotFound(animation.withAnimationIdentifier)
         }
-        caAnimation.repeatCount = animation.animationRepeatCount
+        caAnimation.repeatCount = try animationRepeatCount(model, animation: animation)
         caAnimation.fadeInDuration = 1
         caAnimation.fadeOutDuration = 0.5
         return caAnimation
+    }
+
+    func animationRepeatCount(_ model: String, animation: String) throws -> Float {
+        if try walkAnimation(model) == animation {
+            return .infinity
+        }
+        return schema.animationRepeatCounts[animation] ?? 1
     }
 
     func idleAnimation(_ model: String) throws -> String {
         return try arty(model).idleAnimation
     }
 
+    func isValidAnimation(_ model: String, animation: String) throws -> Bool {
+        let animations = try self.animationNames(model, onlyPickableAnimations: true)
+        return animations.contains(animation)
+    }
+
     func defaultPassiveAnimation(_ model: String) throws -> String {
-        return try arty(model).passiveAnimation
+        return try arty(model).defaultPassiveAnimation
     }
 
     func defaultPokeAnimation(_ model: String) throws -> String {
-        return try arty(model).pokeAnimation
+        return try arty(model).defaultPokeAnimation
     }
 }
 
@@ -114,16 +132,5 @@ private extension String {
 
     var withAnimationIdentifier: String {
         return self + "-1"
-    }
-
-    var animationRepeatCount: Float {
-        if isWalkAnimation {
-            return .infinity
-        }
-        return schema.animationRepeatCounts[self] ?? 1
-    }
-
-    var isFallAnimation: Bool {
-        return schema.fallAnimations.contains(self)
     }
 }

@@ -44,7 +44,8 @@ class MainViewController: UIViewController {
             let arty = arties[uid] else {
                 return
         }
-        try? arty.playPokeAnimation()   // todo: turn to face user, turn to original spot after poke animation
+        // todo: turn to face user, turn to original spot after poke animation
+        try? arty.playAnimation(arty.pokeAnimation)
         updatePokeTimestamp(uid)
     }
 

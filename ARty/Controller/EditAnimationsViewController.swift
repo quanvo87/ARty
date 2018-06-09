@@ -44,7 +44,7 @@ class EditAnimationsViewController: UIViewController {
                 return EditAnimationsViewController()
         }
         viewController.arty = arty
-        viewController.animations = arty.pickableAnimations.sorted()
+        viewController.animations = arty.pickableAnimationNames.sorted()
         viewController.delegate = delegate
         return viewController
     }

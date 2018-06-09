@@ -2,7 +2,6 @@ import SceneKit
 
 struct Schema {
     let arties: [String: ARtySchema]
-    let animationRepeatCounts: [String: Float]  // todo: move to ARtySchema
 
     func scale(_ model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
@@ -102,7 +101,7 @@ private extension Schema {
         if try walkAnimation(model) == animation {
             return .infinity
         }
-        return schema.animationRepeatCounts[animation] ?? 1
+        return try arty(model).animationRepeatCounts[animation] ?? 1
     }
 
     func idleAnimation(_ model: String) throws -> String {

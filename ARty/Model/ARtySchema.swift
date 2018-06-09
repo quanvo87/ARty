@@ -8,4 +8,5 @@ struct ARtySchema {
     let fallAnimation: String
     let defaultPassiveAnimation: String
     let defaultPokeAnimation: String
+    let animationRepeatCounts: [String: Float]
 }

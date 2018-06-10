@@ -124,17 +124,17 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYK-VT-FEI">
-                                <rect key="frame" x="258" y="698" width="107" height="30"/>
-                                <state key="normal" title="Edit Animations"/>
+                                <rect key="frame" x="232" y="698" width="133" height="30"/>
+                                <state key="normal" title="Choose Animations"/>
                                 <connections>
-                                    <action selector="didTapEditAnimationsButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="txw-Wn-IKP"/>
+                                    <action selector="didTapChooseAnimationsButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="txw-Wn-IKP"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7az-ZH-489">
-                                <rect key="frame" x="301" y="738" width="64" height="30"/>
-                                <state key="normal" title="Edit ARty"/>
+                                <rect key="frame" x="275" y="738" width="90" height="30"/>
+                                <state key="normal" title="Choose ARty"/>
                                 <connections>
-                                    <action selector="didTapEditARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
+                                    <action selector="didTapChooseARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -170,10 +170,10 @@
             </objects>
             <point key="canvasLocation" x="808.79999999999995" y="21.428571428571431"/>
         </scene>
-        <!--Edit Animations View Controller-->
+        <!--Choose Animations View Controller-->
         <scene sceneID="Yrr-aQ-ie3">
             <objects>
-                <viewController storyboardIdentifier="EditAnimationsViewController" id="cVf-u5-qGL" customClass="EditAnimationsViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ChooseAnimationsViewController" id="cVf-u5-qGL" customClass="ChooseAnimationsViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="zvh-M6-sDD">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

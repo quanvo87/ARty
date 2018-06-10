@@ -140,7 +140,7 @@ extension MainViewController: AuthManagerDelegate {
                             print(error)
                         }
                     } else {
-                        self?.showEditARtyViewController()
+                        self?.showChooseARtyViewController()
                     }
                 case .fail(let error):
                     print(error)
@@ -178,8 +178,8 @@ extension MainViewController: ARtyDelegate {
     }
 }
 
-extension MainViewController: EditARtyViewControllerDelegate {
-    func editARtyViewController(_ controller: EditARtyViewController, changeARtyTo model: String) {
+extension MainViewController: ChooseARtyViewControllerDelegate {
+    func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String) {
         guard let uid = uid else {
             return
         }
@@ -212,17 +212,18 @@ extension MainViewController: EditARtyViewControllerDelegate {
     }
 }
 
-extension MainViewController: EditAnimationsViewControllerDelegate {
-    func editAnimationsViewController(_ controller: EditAnimationsViewController,
-                                      setPassiveAnimationTo animation: String,
-                                      for arty: ARty) {
+// todo: rethink this
+extension MainViewController: ChooseAnimationsViewControllerDelegate {
+    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
+                                        didChoosePassiveAnimation animation: String,
+                                        for arty: ARty) {
         try? arty.setPassiveAnimation(animation)
         Database.updatePassiveAnimation(to: animation, for: arty) { _ in }
     }
 
-    func editAnimationsViewController(_ controller: EditAnimationsViewController,
-                                      setPokeAnimationTo animation: String,
-                                      for arty: ARty) {
+    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
+                                        didChoosePokeAnimation animation: String,
+                                        for arty: ARty) {
         try? arty.setPokeAnimation(animation)
         Database.updatePokeAnimation(to: animation, for: arty) { _ in }
     }
@@ -232,17 +233,17 @@ private extension MainViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
     }
 
-    @IBAction func didTapEditAnimationsButton(_ sender: Any) {
+    @IBAction func didTapChooseAnimationsButton(_ sender: Any) {
         guard let arty = arty else {
             return
         }
-        let viewController = EditAnimationsViewController.make(arty: arty, delegate: self)
-        let navigationController = UINavigationController(rootViewController: viewController)
+        let controller = ChooseAnimationsViewController.make(arty: arty, delegate: self)
+        let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
 
-    @IBAction func didTapEditARtyButton(_ sender: Any) {
-        showEditARtyViewController()
+    @IBAction func didTapChooseARtyButton(_ sender: Any) {
+        showChooseARtyViewController()
     }
 
     @IBAction func didTapReloadButton(_ sender: Any) {
@@ -253,9 +254,9 @@ private extension MainViewController {
         authManager.logout()
     }
 
-    func showEditARtyViewController() {
-        let viewController = EditARtyViewController(delegate: self)
-        let navigationController = UINavigationController(rootViewController: viewController)
+    func showChooseARtyViewController() {
+        let controller = ChooseARtyViewController(delegate: self)
+        let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
 

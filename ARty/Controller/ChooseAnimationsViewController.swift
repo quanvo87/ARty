@@ -1,25 +1,25 @@
 import UIKit
 
-protocol EditAnimationsViewControllerDelegate: class {
-    func editAnimationsViewController(_ controller: EditAnimationsViewController,
-                                      setPassiveAnimationTo animation: String,
-                                      for arty: ARty)
-    func editAnimationsViewController(_ controller: EditAnimationsViewController,
-                                      setPokeAnimationTo animation: String,
-                                      for arty: ARty)
+protocol ChooseAnimationsViewControllerDelegate: class {
+    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
+                                        didChoosePassiveAnimation animation: String,
+                                        for arty: ARty)
+    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
+                                        didChoosePokeAnimation animation: String,
+                                        for arty: ARty)
 }
 
-class EditAnimationsViewController: UIViewController {
+class ChooseAnimationsViewController: UIViewController {
     @IBOutlet weak var animationTypePicker: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
     private var arty: ARty?
     private var animations = [String]()
-    private weak var delegate: EditAnimationsViewControllerDelegate?
+    private weak var delegate: ChooseAnimationsViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.title = "Edit Animations"
+        navigationItem.title = "Choose Animations"
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Close",
             style: .plain,
@@ -27,7 +27,7 @@ class EditAnimationsViewController: UIViewController {
             action: #selector(close)
         )
 
-        animationTypePicker.addTarget(self, action: #selector(didPickAnimationType), for: .valueChanged)
+        animationTypePicker.addTarget(self, action: #selector(didSelectAnimationType), for: .valueChanged)
 
         tableView.dataSource = self
         tableView.delegate = self
@@ -35,22 +35,22 @@ class EditAnimationsViewController: UIViewController {
         tableView.reloadData()
     }
 
-    static func make(arty: ARty, delegate: EditAnimationsViewControllerDelegate) -> EditAnimationsViewController {
-        guard let viewController = UIStoryboard(
+    static func make(arty: ARty, delegate: ChooseAnimationsViewControllerDelegate) -> ChooseAnimationsViewController {
+        guard let controller = UIStoryboard(
             name: "Main",
             bundle: nil).instantiateViewController(
-                withIdentifier: String(describing: EditAnimationsViewController.self)
-            ) as? EditAnimationsViewController else {
-                return EditAnimationsViewController()
+                withIdentifier: String(describing: ChooseAnimationsViewController.self)
+            ) as? ChooseAnimationsViewController else {
+                return ChooseAnimationsViewController()
         }
-        viewController.arty = arty
-        viewController.animations = arty.pickableAnimationNames.sorted()
-        viewController.delegate = delegate
-        return viewController
+        controller.arty = arty
+        controller.animations = arty.pickableAnimationNames.sorted()
+        controller.delegate = delegate
+        return controller
     }
 }
 
-extension EditAnimationsViewController: UITableViewDataSource {
+extension ChooseAnimationsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return animations.count
     }
@@ -74,7 +74,7 @@ extension EditAnimationsViewController: UITableViewDataSource {
     }
 }
 
-extension EditAnimationsViewController: UITableViewDelegate {
+extension ChooseAnimationsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let arty = arty else {
             return
@@ -84,9 +84,9 @@ extension EditAnimationsViewController: UITableViewDelegate {
 
         switch animationTypePicker.selectedSegmentIndex {
         case 0:
-            delegate?.editAnimationsViewController(self, setPokeAnimationTo: animation, for: arty)
+            delegate?.chooseAnimationsViewController(self, didChoosePokeAnimation: animation, for: arty)
         case 1:
-            delegate?.editAnimationsViewController(self, setPassiveAnimationTo: animation, for: arty)
+            delegate?.chooseAnimationsViewController(self, didChoosePassiveAnimation: animation, for: arty)
         default:
             break
         }
@@ -95,12 +95,12 @@ extension EditAnimationsViewController: UITableViewDelegate {
     }
 }
 
-private extension EditAnimationsViewController {
+private extension ChooseAnimationsViewController {
     @objc func close() {
         dismiss(animated: true)
     }
 
-    @objc func didPickAnimationType() {
+    @objc func didSelectAnimationType() {
         tableView.reloadData()
     }
 }

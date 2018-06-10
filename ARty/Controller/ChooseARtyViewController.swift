@@ -1,21 +1,20 @@
 import UIKit
 
-protocol EditARtyViewControllerDelegate: class {
-    func editARtyViewController(_ controller: EditARtyViewController, changeARtyTo model: String)
+protocol ChooseARtyViewControllerDelegate: class {
+    func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String)
 }
 
-// todo: change from edit to choose
-class EditARtyViewController: UIViewController {
+class ChooseARtyViewController: UIViewController {
     private let tableView = UITableView(frame: .zero)
     private let arties = Array(schema.arties.keys).sorted()
-    private weak var delegate: EditARtyViewControllerDelegate?
+    private weak var delegate: ChooseARtyViewControllerDelegate?
 
-    init(delegate: EditARtyViewControllerDelegate) {
+    init(delegate: ChooseARtyViewControllerDelegate) {
         super.init(nibName: nil, bundle: nil)
 
         self.delegate = delegate
 
-        navigationItem.title = "Edit ARty"
+        navigationItem.title = "Choose ARty"
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Close",
             style: .plain,
@@ -36,7 +35,7 @@ class EditARtyViewController: UIViewController {
     }
 }
 
-extension EditARtyViewController: UITableViewDataSource {
+extension ChooseARtyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return arties.count
     }
@@ -50,15 +49,15 @@ extension EditARtyViewController: UITableViewDataSource {
     }
 }
 
-extension EditARtyViewController: UITableViewDelegate {
+extension ChooseARtyViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let arty = arties[indexPath.row]
-        delegate?.editARtyViewController(self, changeARtyTo: arty)
+        delegate?.chooseARtyViewController(self, didChooseARty: arty)
         close()
     }
 }
 
-private extension EditARtyViewController {
+private extension ChooseARtyViewController {
     @objc func close() {
         dismiss(animated: true)
     }

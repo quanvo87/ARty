@@ -212,23 +212,6 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
     }
 }
 
-// todo: rethink this
-extension MainViewController: ChooseAnimationsViewControllerDelegate {
-    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
-                                        didChoosePassiveAnimation animation: String,
-                                        for arty: ARty) {
-        try? arty.setPassiveAnimation(animation)
-        Database.updatePassiveAnimation(to: animation, for: arty) { _ in }
-    }
-
-    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
-                                        didChoosePokeAnimation animation: String,
-                                        for arty: ARty) {
-        try? arty.setPokeAnimation(animation)
-        Database.updatePokeAnimation(to: animation, for: arty) { _ in }
-    }
-}
-
 private extension MainViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
     }
@@ -237,7 +220,7 @@ private extension MainViewController {
         guard let arty = arty else {
             return
         }
-        let controller = ChooseAnimationsViewController.make(arty: arty, delegate: self)
+        let controller = ChooseAnimationsViewController.make(arty: arty)
         let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }

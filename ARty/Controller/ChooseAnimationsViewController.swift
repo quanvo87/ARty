@@ -1,20 +1,10 @@
 import UIKit
 
-protocol ChooseAnimationsViewControllerDelegate: class {
-    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
-                                        didChoosePassiveAnimation animation: String,
-                                        for arty: ARty)
-    func chooseAnimationsViewController(_ controller: ChooseAnimationsViewController,
-                                        didChoosePokeAnimation animation: String,
-                                        for arty: ARty)
-}
-
 class ChooseAnimationsViewController: UIViewController {
     @IBOutlet weak var animationTypePicker: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
     private var arty: ARty?
     private var animations = [String]()
-    private weak var delegate: ChooseAnimationsViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +25,7 @@ class ChooseAnimationsViewController: UIViewController {
         tableView.reloadData()
     }
 
-    static func make(arty: ARty, delegate: ChooseAnimationsViewControllerDelegate) -> ChooseAnimationsViewController {
+    static func make(arty: ARty) -> ChooseAnimationsViewController {
         guard let controller = UIStoryboard(
             name: "Main",
             bundle: nil).instantiateViewController(
@@ -45,7 +35,6 @@ class ChooseAnimationsViewController: UIViewController {
         }
         controller.arty = arty
         controller.animations = arty.pickableAnimationNames.sorted()
-        controller.delegate = delegate
         return controller
     }
 }
@@ -84,9 +73,11 @@ extension ChooseAnimationsViewController: UITableViewDelegate {
 
         switch animationTypePicker.selectedSegmentIndex {
         case 0:
-            delegate?.chooseAnimationsViewController(self, didChoosePokeAnimation: animation, for: arty)
+            try? arty.setPokeAnimation(animation)
+            Database.updatePokeAnimation(to: animation, for: arty) { _ in }
         case 1:
-            delegate?.chooseAnimationsViewController(self, didChoosePassiveAnimation: animation, for: arty)
+            try? arty.setPassiveAnimation(animation)
+            Database.updatePassiveAnimation(to: animation, for: arty) { _ in }
         default:
             break
         }

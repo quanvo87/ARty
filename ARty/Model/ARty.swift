@@ -39,8 +39,8 @@ class ARty: SCNNode {
         name = uid
         scale = try schema.scale(for: model)
         try addIdleScene()
-        try setPassiveAnimation(passiveAnimation)
-        try setPokeAnimation(pokeAnimation)
+        try setPassiveAnimation(to: passiveAnimation)
+        try setPokeAnimation(to: pokeAnimation)
         loopPassiveAnimation()
         makeListeners(delegate: delegate)
     }
@@ -55,7 +55,8 @@ class ARty: SCNNode {
         )
     }
 
-    static func make(uid: String, delegate: ARtyDelegate,
+    static func make(uid: String,
+                     delegate: ARtyDelegate,
                      completion: @escaping (Database.Result<ARty, Error>) -> Void) {
         Database.user(uid) { result in
             switch result {
@@ -83,11 +84,11 @@ class ARty: SCNNode {
         return animationKeys.isEmpty
     }
 
-    func setPassiveAnimation(_ animation: String) throws {
+    func setPassiveAnimation(to animation: String) throws {
         passiveAnimation = try schema.setPassiveAnimation(for: model, to: animation)
     }
 
-    func setPokeAnimation(_ animation: String) throws {
+    func setPokeAnimation(to animation: String) throws {
         pokeAnimation = try schema.setPokeAnimation(for: model, to: animation)
     }
 
@@ -202,12 +203,12 @@ private extension ARty {
     }
 
     func update(from user: User) {
-        try? setPassiveAnimation(user.passiveAnimation(for: user.model))
-        try? setPokeAnimation(user.pokeAnimation(for: user.model))
-        setPokeTimestamp(user.pokeTimestamp)
+        try? setPassiveAnimation(to: user.passiveAnimation(for: user.model))
+        try? setPokeAnimation(to: user.pokeAnimation(for: user.model))
+        setPokeTimestamp(to: user.pokeTimestamp)
     }
 
-    func setPokeTimestamp(_ pokeTimestamp: Date) {
+    func setPokeTimestamp(to pokeTimestamp: Date) {
         if self.pokeTimestamp != pokeTimestamp {
             try? playAnimation(pokeAnimation)
         }

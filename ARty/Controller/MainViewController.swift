@@ -200,10 +200,10 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
             switch result {
             case .success(let user):
                 if let passiveAnimation = user.passiveAnimations[arty.model] {
-                    try? arty.setPassiveAnimation(passiveAnimation)
+                    try? arty.setPassiveAnimation(to: passiveAnimation)
                 }
                 if let pokeAnimation = user.pokeAnimations[arty.model] {
-                    try? arty.setPokeAnimation(pokeAnimation)
+                    try? arty.setPokeAnimation(to: pokeAnimation)
                 }
             case .fail(let error):
                 print(error)

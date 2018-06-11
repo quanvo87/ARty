@@ -73,10 +73,10 @@ extension ChooseAnimationsViewController: UITableViewDelegate {
 
         switch animationTypePicker.selectedSegmentIndex {
         case 0:
-            try? arty.setPokeAnimation(animation)
+            try? arty.setPokeAnimation(to: animation)
             Database.updatePokeAnimation(to: animation, for: arty) { _ in }
         case 1:
-            try? arty.setPassiveAnimation(animation)
+            try? arty.setPassiveAnimation(to: animation)
             Database.updatePassiveAnimation(to: animation, for: arty) { _ in }
         default:
             break

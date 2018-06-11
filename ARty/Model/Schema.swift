@@ -3,28 +3,28 @@ import SceneKit
 struct Schema {
     let arties: [String: ARtySchema]
 
-    func scale(_ model: String) throws -> SCNVector3 {
+    func scale(for model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
         return SCNVector3(scale, scale, scale)
     }
 
-    func positionAdjustment(_ model: String) throws -> SCNVector3 {
+    func positionAdjustment(for model: String) throws -> SCNVector3 {
         let adjustment = Float(try arty(model).positionAdjustment)
         return SCNVector3(0, adjustment, adjustment)
     }
 
-    func animationNames(_ model: String, onlyPickableAnimations: Bool) throws -> [String] {
+    func animationNames(for model: String, onlyPickableAnimations: Bool) throws -> [String] {
         var animations = try arty(model).pickableAnimationNames
         if onlyPickableAnimations {
             return animations
         }
 
-        let walkAnimation = try self.walkAnimation(model)
+        let walkAnimation = try self.walkAnimation(for: model)
         if walkAnimation != "" {
             animations.append(walkAnimation)
         }
 
-        let fallAnimation = try self.fallAnimation(model)
+        let fallAnimation = try self.fallAnimation(for: model)
         if fallAnimation != "" {
             animations.append(fallAnimation)
         }
@@ -32,50 +32,50 @@ struct Schema {
         return animations
     }
 
-    func animations(_ model: String) throws -> [String: CAAnimation] {
+    func animations(for model: String) throws -> [String: CAAnimation] {
         var animations = [String: CAAnimation]()
-        try self.animationNames(model, onlyPickableAnimations: false).forEach {
-            animations[$0] = try animation(model, animation: $0)
+        try self.animationNames(for: model, onlyPickableAnimations: false).forEach {
+            animations[$0] = try animation(model: model, animation: $0)
         }
         return animations
     }
 
-    func idleScene(_ model: String) throws -> SCNScene {
-        let idleAnimation = try self.idleAnimation(model)
-        let resourcePath = model.asResourcePath + "/" + idleAnimation
+    func idleScene(for model: String) throws -> SCNScene {
+        let idleAnimation = try self.idleAnimation(for: model)
+        let resourcePath = model.resourcePath + "/" + idleAnimation
         guard let scene = SCNScene(named: resourcePath) else {
             throw ARtyError.resourceNotFound(resourcePath)
         }
         return scene
     }
 
-    func walkAnimation(_ model: String) throws -> String {
+    func walkAnimation(for model: String) throws -> String {
         return try arty(model).walkAnimation
     }
 
-    func fallAnimation(_ model: String) throws -> String {
+    func fallAnimation(for model: String) throws -> String {
         return try arty(model).fallAnimation
     }
 
-    func setPassiveAnimation(_ model: String, animation: String) throws -> String {
-        if try isValidAnimation(model, animation: animation) {
+    func setPassiveAnimation(for model: String, to animation: String) throws -> String {
+        if try isValidAnimation(model: model, animation: animation) {
             return animation
         }
-        return try defaultPassiveAnimation(model)
+        return try defaultPassiveAnimation(for: model)
     }
 
-    func setPokeAnimation(_ model: String, animation: String) throws -> String {
-        if try isValidAnimation(model, animation: animation) {
+    func setPokeAnimation(for model: String, to animation: String) throws -> String {
+        if try isValidAnimation(model: model, animation: animation) {
             return animation
         }
-        return try defaultPokeAnimation(model)
+        return try defaultPokeAnimation(for: model)
     }
 
-    func defaultPassiveAnimation(_ model: String) throws -> String {
+    func defaultPassiveAnimation(for model: String) throws -> String {
         return try arty(model).defaultPassiveAnimation
     }
 
-    func defaultPokeAnimation(_ model: String) throws -> String {
+    func defaultPokeAnimation(for model: String) throws -> String {
         return try arty(model).defaultPokeAnimation
     }
 }
@@ -88,8 +88,8 @@ private extension Schema {
         return arty
     }
 
-    func animation(_ model: String, animation: String) throws -> CAAnimation {
-        let resourcePath = model.asResourcePath + "/" + animation
+    func animation(model: String, animation: String) throws -> CAAnimation {
+        let resourcePath = model.resourcePath + "/" + animation
         guard let url = Bundle.main.url(forResource: resourcePath, withExtension: "dae") else {
             throw ARtyError.resourceNotFound(resourcePath + ".dae")
         }
@@ -99,33 +99,33 @@ private extension Schema {
             withClass: CAAnimation.self) else {
                 throw ARtyError.animationIdentifierNotFound(animation.withAnimationIdentifier)
         }
-        caAnimation.repeatCount = try animationRepeatCount(model, animation: animation)
+        caAnimation.repeatCount = try animationRepeatCount(model: model, animation: animation)
         caAnimation.fadeInDuration = 1
         caAnimation.fadeOutDuration = 0.5
         return caAnimation
     }
 
-    func animationRepeatCount(_ model: String, animation: String) throws -> Float {
-        if try walkAnimation(model) == animation {
+    func animationRepeatCount(model: String, animation: String) throws -> Float {
+        if try animation == walkAnimation(for: model) {
             return .infinity
         }
         return try arty(model).animationRepeatCounts[animation] ?? 1
     }
 
-    func idleAnimation(_ model: String) throws -> String {
+    func idleAnimation(for model: String) throws -> String {
         return try arty(model).idleAnimation
     }
 
-    func isValidAnimation(_ model: String, animation: String) throws -> Bool {
-        let animations = try self.animationNames(model, onlyPickableAnimations: true)
-        return animations.contains(animation)
+    func isValidAnimation(model: String, animation: String) throws -> Bool {
+        let animationNames = try self.animationNames(for: model, onlyPickableAnimations: true)
+        return animationNames.contains(animation)
     }
 }
 
 private extension String {
     static let artFolder = "art.scnassets"
 
-    var asResourcePath: String {
+    var resourcePath: String {
         return String.artFolder + "/" + self
     }
 

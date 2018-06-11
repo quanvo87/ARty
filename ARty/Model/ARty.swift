@@ -29,15 +29,15 @@ class ARty: SCNNode {
          delegate: ARtyDelegate?) throws {
         self.uid = uid
         self.model = model
-        positionAdjustment = try schema.positionAdjustment(model)
-        pickableAnimationNames = try schema.animationNames(model, onlyPickableAnimations: true)
-        animations = try schema.animations(model)
-        walkAnimation = try schema.walkAnimation(model)
+        positionAdjustment = try schema.positionAdjustment(for: model)
+        pickableAnimationNames = try schema.animationNames(for: model, onlyPickableAnimations: true)
+        animations = try schema.animations(for: model)
+        walkAnimation = try schema.walkAnimation(for: model)
 
         super.init()
 
         name = uid
-        scale = try schema.scale(model)
+        scale = try schema.scale(for: model)
         try addIdleScene()
         try setPassiveAnimation(passiveAnimation)
         try setPokeAnimation(pokeAnimation)
@@ -84,11 +84,11 @@ class ARty: SCNNode {
     }
 
     func setPassiveAnimation(_ animation: String) throws {
-        passiveAnimation = try schema.setPassiveAnimation(model, animation: animation)
+        passiveAnimation = try schema.setPassiveAnimation(for: model, to: animation)
     }
 
     func setPokeAnimation(_ animation: String) throws {
-        pokeAnimation = try schema.setPokeAnimation(model, animation: animation)
+        pokeAnimation = try schema.setPokeAnimation(for: model, to: animation)
     }
 
     func walk(to location: CLLocation) throws {
@@ -157,7 +157,7 @@ class ARty: SCNNode {
 
 private extension ARty {
     func addIdleScene() throws {
-        let scene = try schema.idleScene(model)
+        let scene = try schema.idleScene(for: model)
         scene.rootNode.childNodes.forEach {
             addChildNode($0)
         }

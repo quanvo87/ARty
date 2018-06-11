@@ -21,10 +21,10 @@ struct User {
     }
 
     func passiveAnimation(for model: String) throws -> String {
-        return try passiveAnimations[model] ?? schema.defaultPassiveAnimation(model)
+        return try passiveAnimations[model] ?? schema.defaultPassiveAnimation(for: model)
     }
 
     func pokeAnimation(for model: String) throws -> String {
-        return try pokeAnimations[model] ?? schema.defaultPokeAnimation(model)
+        return try pokeAnimations[model] ?? schema.defaultPokeAnimation(for: model)
     }
 }

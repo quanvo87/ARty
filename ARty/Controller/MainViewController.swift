@@ -45,7 +45,7 @@ class MainViewController: UIViewController {
                 return
         }
         // todo: turn to face user, turn to original spot after poke animation
-        try? arty.playAnimation(arty.pokeAnimation)
+        try? arty.playPokeEmote()
         updatePokeTimestamp(uid)
     }
 
@@ -106,7 +106,7 @@ extension MainViewController: CLLocationManagerDelegate {
 }
 
 extension MainViewController: AuthManagerDelegate {
-    func authManager(_ manager: AuthManager, userLoggedIn uid: String) {
+    func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
         self.uid = uid
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
@@ -114,7 +114,7 @@ extension MainViewController: AuthManagerDelegate {
         loadUser(uid)
     }
 
-    func authManagerUserLoggedOut(_ manager: AuthManager) {
+    func authManagerUserDidLogOut(_ manager: AuthManager) {
         uid = nil
         arties.removeAll()
         locationManager.stopUpdatingLocation()
@@ -187,7 +187,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
             do {
                 let arty = try ARty(uid: uid, model: model, delegate: nil)
                 addARtyToScene(arty, position: .init())
-                setAnimationsFromBackend(for: arty)
+                setRecentEmotes(for: arty)
                 Database.updateModel(arty: arty) { _ in }
             } catch {
                 print(error)
@@ -195,15 +195,15 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         }
     }
 
-    private func setAnimationsFromBackend(for arty: ARty) {
+    private func setRecentEmotes(for arty: ARty) {
         Database.user(arty.uid) { result in
             switch result {
             case .success(let user):
-                if let passiveAnimation = user.passiveAnimations[arty.model] {
-                    try? arty.setPassiveAnimation(to: passiveAnimation)
+                if let passiveEmote = user.passiveEmotes[arty.model] {
+                    try? arty.setPassiveEmote(to: passiveEmote)
                 }
-                if let pokeAnimation = user.pokeAnimations[arty.model] {
-                    try? arty.setPokeAnimation(to: pokeAnimation)
+                if let pokeEmote = user.pokeEmotes[arty.model] {
+                    try? arty.setPokeEmote(to: pokeEmote)
                 }
             case .fail(let error):
                 print(error)
@@ -216,11 +216,11 @@ private extension MainViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
     }
 
-    @IBAction func didTapChooseAnimationsButton(_ sender: Any) {
+    @IBAction func didTapChooseEmotesButton(_ sender: Any) {
         guard let arty = arty else {
             return
         }
-        let controller = ChooseAnimationsViewController.make(arty: arty)
+        let controller = ChooseEmotesViewController.make(arty: arty)
         let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
@@ -238,7 +238,10 @@ private extension MainViewController {
     }
 
     func showChooseARtyViewController() {
-        let controller = ChooseARtyViewController(delegate: self)
+        guard let arty = arty else {
+            return
+        }
+        let controller = ChooseARtyViewController(currentARty: arty.model, delegate: self)
         let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }

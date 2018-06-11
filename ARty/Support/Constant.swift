@@ -10,7 +10,7 @@ let elvira = ARtySchema(
     model: "elvira",
     scale: 0.075,
     positionAdjustment: -2,
-    pickableAnimationNames: [
+    emotes: [
         "elvira_twerk",
         "elvira_buttslap",
         "elvira_wave"
@@ -18,8 +18,8 @@ let elvira = ARtySchema(
     idleAnimation: "elvira_idle",
     walkAnimation: "elvira_walk",
     fallAnimation: "",
-    defaultPassiveAnimation: "elvira_wave",
-    defaultPokeAnimation: "elvira_buttslap",
+    defaultPassiveEmote: "elvira_wave",
+    defaultPokeEmote: "elvira_buttslap",
     animationRepeatCounts: ["elvira_wave": 4]
 )
 
@@ -27,7 +27,7 @@ let mutant = ARtySchema(
     model: "mutant",
     scale: 0.065,
     positionAdjustment: -10,
-    pickableAnimationNames: [
+    emotes: [
         "mutant_battlecry",
         "mutant_chestthump",
         "mutant_thriller",
@@ -36,8 +36,8 @@ let mutant = ARtySchema(
     idleAnimation: "mutant_idle",
     walkAnimation: "mutant_walk",
     fallAnimation: "mutant_fall",
-    defaultPassiveAnimation: "mutant_chestthump",
-    defaultPokeAnimation: "mutant_battlecry",
+    defaultPassiveEmote: "mutant_chestthump",
+    defaultPokeEmote: "mutant_battlecry",
     animationRepeatCounts: [:]
 )
 
@@ -45,7 +45,7 @@ let paladin = ARtySchema(
     model: "paladin",
     scale: 0.03,
     positionAdjustment: -4,
-    pickableAnimationNames: [
+    emotes: [
         "paladin_fierce_attack",
         "paladin_slide_dance",
         "paladin_sword_combo",
@@ -54,7 +54,7 @@ let paladin = ARtySchema(
     idleAnimation: "paladin_idle",
     walkAnimation: "paladin_walk",
     fallAnimation: "paladin_fall",
-    defaultPassiveAnimation: "paladin_wave",
-    defaultPokeAnimation: "paladin_fierce_attack",
+    defaultPassiveEmote: "paladin_wave",
+    defaultPokeEmote: "paladin_fierce_attack",
     animationRepeatCounts: ["paladin_wave": 4]
 )

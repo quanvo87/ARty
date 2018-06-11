@@ -7,9 +7,12 @@ protocol ChooseARtyViewControllerDelegate: class {
 class ChooseARtyViewController: UIViewController {
     private let tableView = UITableView(frame: .zero)
     private let arties = Array(schema.arties.keys).sorted()
+    private let currentARty: String
     private weak var delegate: ChooseARtyViewControllerDelegate?
 
-    init(delegate: ChooseARtyViewControllerDelegate) {
+    init(currentARty: String, delegate: ChooseARtyViewControllerDelegate) {
+        self.currentARty = currentARty
+
         super.init(nibName: nil, bundle: nil)
 
         self.delegate = delegate
@@ -40,11 +43,13 @@ extension ChooseARtyViewController: UITableViewDataSource {
         return arties.count
     }
 
-    // todo: add selection indicator
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let arty = arties[indexPath.row]
+
         let cell = UITableViewCell()
         cell.textLabel?.text = arty.capitalized
+        cell.accessoryType = arty == currentARty ? .checkmark : .none
+
         return cell
     }
 }

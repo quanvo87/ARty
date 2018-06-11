@@ -62,9 +62,9 @@ class ARSessionManager {
 }
 
 extension ARSessionManager: AppStateObserverDelegate {
-    func appStateObserverAppBecameActive(_ observer: AppStateObserver) {}
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {}
 
-    func appStateObserverAppEnteredBackground(_ observer: AppStateObserver) {
+    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
         clearARSession()
     }
 }

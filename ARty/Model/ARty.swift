@@ -11,10 +11,10 @@ class ARty: SCNNode {
     let uid: String
     let model: String
     let positionAdjustment: SCNVector3  // todo: make adjustments to models instead of this
-    let pickableAnimationNames: [String]
+    let emotes: [String]
     var pokeTimestamp: Date?
-    private(set) var passiveAnimation = ""
-    private(set) var pokeAnimation = ""
+    private(set) var passiveEmote = ""
+    private(set) var pokeEmote = ""
     private let animations: [String: CAAnimation]
     private let walkAnimation: String
     private var lastLocation = CLLocation()
@@ -24,13 +24,13 @@ class ARty: SCNNode {
 
     init(uid: String,
          model: String,
-         passiveAnimation: String = "",
-         pokeAnimation: String = "",
+         passiveEmote: String = "",
+         pokeEmote: String = "",
          delegate: ARtyDelegate?) throws {
         self.uid = uid
         self.model = model
         positionAdjustment = try schema.positionAdjustment(for: model)
-        pickableAnimationNames = try schema.animationNames(for: model, onlyPickableAnimations: true)
+        emotes = try schema.emotes(for: model)
         animations = try schema.animations(for: model)
         walkAnimation = try schema.walkAnimation(for: model)
 
@@ -39,9 +39,9 @@ class ARty: SCNNode {
         name = uid
         scale = try schema.scale(for: model)
         try addIdleScene()
-        try setPassiveAnimation(to: passiveAnimation)
-        try setPokeAnimation(to: pokeAnimation)
-        loopPassiveAnimation()
+        try setPassiveEmote(to: passiveEmote)
+        try setPokeEmote(to: pokeEmote)
+        loopPassiveEmote()
         makeListeners(delegate: delegate)
     }
 
@@ -49,8 +49,8 @@ class ARty: SCNNode {
         try self.init(
             uid: user.uid,
             model: user.model,
-            passiveAnimation: user.passiveAnimation(for: user.model),
-            pokeAnimation: user.pokeAnimation(for: user.model),
+            passiveEmote: user.passiveEmote(for: user.model),
+            pokeEmote: user.pokeEmote(for: user.model),
             delegate: delegate
         )
     }
@@ -72,24 +72,20 @@ class ARty: SCNNode {
         }
     }
 
-    var dictionary: [String: String] {
-        return [
-            "model": model,
-            "passiveAnimation": passiveAnimation,
-            "pokeAnimation": pokeAnimation
-        ]
-    }
-
     var isIdle: Bool {
         return animationKeys.isEmpty
     }
 
-    func setPassiveAnimation(to animation: String) throws {
-        passiveAnimation = try schema.setPassiveAnimation(for: model, to: animation)
+    func setPassiveEmote(to emote: String) throws {
+        passiveEmote = try schema.setPassiveEmote(for: model, to: emote)
     }
 
-    func setPokeAnimation(to animation: String) throws {
-        pokeAnimation = try schema.setPokeAnimation(for: model, to: animation)
+    func setPokeEmote(to emote: String) throws {
+        pokeEmote = try schema.setPokeEmote(for: model, to: emote)
+    }
+
+    func playPokeEmote() throws {
+        try playAnimation(pokeEmote)
     }
 
     func walk(to location: CLLocation) throws {
@@ -140,12 +136,6 @@ class ARty: SCNNode {
         }
     }
 
-    func playAnimation(_ animation: String) throws {
-        removeAllAnimations()
-        let caAnimation = try self.animation(animation)
-        addAnimation(caAnimation, forKey: animation)
-    }
-
     deinit {
         userListener?.remove()
         locationListener?.remove()
@@ -164,16 +154,16 @@ private extension ARty {
         }
     }
 
-    func loopPassiveAnimation() {
+    func loopPassiveEmote() {
         let random = Double(arc4random_uniform(10) + 10)
         DispatchQueue.main.asyncAfter(deadline: .now() + random) { [weak self] in
             guard let `self` = self else {
                 return
             }
             if self.isIdle {
-                try? self.playAnimation(self.passiveAnimation)
+                try? self.playAnimation(self.passiveEmote)
             }
-            self.loopPassiveAnimation()
+            self.loopPassiveEmote()
         }
     }
 
@@ -203,14 +193,14 @@ private extension ARty {
     }
 
     func update(from user: User) {
-        try? setPassiveAnimation(to: user.passiveAnimation(for: user.model))
-        try? setPokeAnimation(to: user.pokeAnimation(for: user.model))
+        try? setPassiveEmote(to: user.passiveEmote(for: user.model))
+        try? setPokeEmote(to: user.pokeEmote(for: user.model))
         setPokeTimestamp(to: user.pokeTimestamp)
     }
 
     func setPokeTimestamp(to pokeTimestamp: Date) {
         if self.pokeTimestamp != pokeTimestamp {
-            try? playAnimation(pokeAnimation)
+            try? playPokeEmote()
         }
         self.pokeTimestamp = pokeTimestamp
     }
@@ -220,6 +210,12 @@ private extension ARty {
             throw ARtyError.invalidAnimationName(animation)
         }
         return caAnimation
+    }
+
+    func playAnimation(_ animation: String) throws {
+        removeAllAnimations()
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
     }
 
     func turn(to direction: CLLocationDirection) {

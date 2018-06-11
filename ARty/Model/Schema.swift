@@ -13,28 +13,13 @@ struct Schema {
         return SCNVector3(0, adjustment, adjustment)
     }
 
-    func animationNames(for model: String, onlyPickableAnimations: Bool) throws -> [String] {
-        var animations = try arty(model).pickableAnimationNames
-        if onlyPickableAnimations {
-            return animations
-        }
-
-        let walkAnimation = try self.walkAnimation(for: model)
-        if walkAnimation != "" {
-            animations.append(walkAnimation)
-        }
-
-        let fallAnimation = try self.fallAnimation(for: model)
-        if fallAnimation != "" {
-            animations.append(fallAnimation)
-        }
-
-        return animations
+    func emotes(for model: String) throws -> [String] {
+        return try arty(model).emotes
     }
 
     func animations(for model: String) throws -> [String: CAAnimation] {
         var animations = [String: CAAnimation]()
-        try self.animationNames(for: model, onlyPickableAnimations: false).forEach {
+        try animationNames(for: model).forEach {
             animations[$0] = try animation(model: model, animation: $0)
         }
         return animations
@@ -57,26 +42,24 @@ struct Schema {
         return try arty(model).fallAnimation
     }
 
-    func setPassiveAnimation(for model: String, to animation: String) throws -> String {
-        if try isValidAnimation(model: model, animation: animation) {
-            return animation
-        }
-        return try defaultPassiveAnimation(for: model)
+    func setPassiveEmote(for model: String, to emote: String) throws -> String {
+        return try isValidEmote(model: model, emote: emote) ?
+            emote :
+            defaultPassiveEmote(for: model)
     }
 
-    func setPokeAnimation(for model: String, to animation: String) throws -> String {
-        if try isValidAnimation(model: model, animation: animation) {
-            return animation
-        }
-        return try defaultPokeAnimation(for: model)
+    func setPokeEmote(for model: String, to emote: String) throws -> String {
+        return try isValidEmote(model: model, emote: emote) ?
+            emote :
+            defaultPokeEmote(for: model)
     }
 
-    func defaultPassiveAnimation(for model: String) throws -> String {
-        return try arty(model).defaultPassiveAnimation
+    func defaultPassiveEmote(for model: String) throws -> String {
+        return try arty(model).defaultPassiveEmote
     }
 
-    func defaultPokeAnimation(for model: String) throws -> String {
-        return try arty(model).defaultPokeAnimation
+    func defaultPokeEmote(for model: String) throws -> String {
+        return try arty(model).defaultPokeEmote
     }
 }
 
@@ -86,6 +69,22 @@ private extension Schema {
             throw ARtyError.invalidModelName(model)
         }
         return arty
+    }
+
+    func animationNames(for model: String) throws -> [String] {
+        var names = try emotes(for: model)
+
+        let walkAnimation = try self.walkAnimation(for: model)
+        if walkAnimation != "" {
+            names.append(walkAnimation)
+        }
+
+        let fallAnimation = try self.fallAnimation(for: model)
+        if fallAnimation != "" {
+            names.append(fallAnimation)
+        }
+
+        return names
     }
 
     func animation(model: String, animation: String) throws -> CAAnimation {
@@ -116,9 +115,9 @@ private extension Schema {
         return try arty(model).idleAnimation
     }
 
-    func isValidAnimation(model: String, animation: String) throws -> Bool {
-        let animationNames = try self.animationNames(for: model, onlyPickableAnimations: true)
-        return animationNames.contains(animation)
+    func isValidEmote(model: String, emote: String) throws -> Bool {
+        let emotes = try self.emotes(for: model)
+        return emotes.contains(emote)
     }
 }
 

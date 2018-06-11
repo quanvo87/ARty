@@ -3,13 +3,9 @@ import FirebaseFirestore
 struct User {
     let uid: String
     let model: String
-    let passiveAnimation: String
-    let pokeAnimation: String
-    let recentPassiveAnimations: [String: String]
-    let recentPokeAnimations: [String: String]
+    let passiveAnimations: [String: String]
+    let pokeAnimations: [String: String]
     let pokeTimestamp: Date
-    let latitude: Double
-    let longitude: Double
 
     init(_ snapshot: DocumentSnapshot?) throws {
         guard let unwrappedSnapshot = snapshot,
@@ -19,17 +15,16 @@ struct User {
         }
         self.uid = uid
         model = data["model"] as? String ?? ""
-        passiveAnimation = data["passiveAnimation"] as? String ?? ""
-        pokeAnimation = data["pokeAnimation"] as? String ?? ""
-        recentPassiveAnimations = data["recentPassiveAnimations"] as? [String: String] ?? [:]
-        recentPokeAnimations = data["recentPokeAnimations"] as? [String: String] ?? [:]
+        passiveAnimations = data["passiveAnimations"] as? [String: String] ?? [:]
+        pokeAnimations = data["pokeAnimations"] as? [String: String] ?? [:]
         pokeTimestamp = (data["pokeTimestamp"] as? Timestamp)?.dateValue() ?? Date()
-        if let location = data["location"] as? GeoPoint {
-            latitude = location.latitude
-            longitude = location.longitude
-        } else {
-            latitude = .leastNormalMagnitude
-            longitude = .leastNormalMagnitude
-        }
+    }
+
+    func passiveAnimation(for model: String) throws -> String {
+        return try passiveAnimations[model] ?? schema.defaultPassiveAnimation(model)
+    }
+
+    func pokeAnimation(for model: String) throws -> String {
+        return try pokeAnimations[model] ?? schema.defaultPokeAnimation(model)
     }
 }

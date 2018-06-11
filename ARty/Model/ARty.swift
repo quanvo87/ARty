@@ -49,8 +49,8 @@ class ARty: SCNNode {
         try self.init(
             uid: user.uid,
             model: user.model,
-            passiveAnimation: user.passiveAnimation,
-            pokeAnimation: user.pokeAnimation,
+            passiveAnimation: user.passiveAnimation(for: user.model),
+            pokeAnimation: user.pokeAnimation(for: user.model),
             delegate: delegate
         )
     }
@@ -81,12 +81,6 @@ class ARty: SCNNode {
 
     var isIdle: Bool {
         return animationKeys.isEmpty
-    }
-
-    func update(from user: User) {
-        try? setPassiveAnimation(user.passiveAnimation)
-        try? setPokeAnimation(user.pokeAnimation)
-        setPokeTimestamp(user.pokeTimestamp)
     }
 
     func setPassiveAnimation(_ animation: String) throws {
@@ -205,6 +199,12 @@ private extension ARty {
             }
             self.delegate?.arty(self, latitude: latitude, longitude: longitude)
         }
+    }
+
+    func update(from user: User) {
+        try? setPassiveAnimation(user.passiveAnimation(for: user.model))
+        try? setPokeAnimation(user.pokeAnimation(for: user.model))
+        setPokeTimestamp(user.pokeTimestamp)
     }
 
     func setPokeTimestamp(_ pokeTimestamp: Date) {

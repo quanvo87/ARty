@@ -188,6 +188,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
                 let arty = try ARty(uid: uid, model: model, delegate: nil)
                 addARtyToScene(arty, position: .init())
                 setAnimationsFromBackend(for: arty)
+                Database.updateModel(arty: arty) { _ in }
             } catch {
                 print(error)
             }
@@ -198,16 +199,15 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         Database.user(arty.uid) { result in
             switch result {
             case .success(let user):
-                if let passiveAnimation = user.recentPassiveAnimations[arty.model] {
+                if let passiveAnimation = user.passiveAnimations[arty.model] {
                     try? arty.setPassiveAnimation(passiveAnimation)
                 }
-                if let pokeAnimation = user.recentPokeAnimations[arty.model] {
+                if let pokeAnimation = user.pokeAnimations[arty.model] {
                     try? arty.setPokeAnimation(pokeAnimation)
                 }
             case .fail(let error):
                 print(error)
             }
-            Database.updateARty(arty) { _ in }
         }
     }
 }

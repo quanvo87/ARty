@@ -97,11 +97,10 @@ struct Database {
         }
     }
 
-    static func updateARty(_ arty: ARty, completion: @escaping (Error?) -> Void) {
+    // todo: use set?
+    static func updateModel(arty: ARty, completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
-            "model": arty.model,
-            "passiveAnimation": arty.passiveAnimation,
-            "pokeAnimation": arty.pokeAnimation
+            "model": arty.model
         ]) { error in
             completion(error)
         }
@@ -111,8 +110,7 @@ struct Database {
                                        for arty: ARty,
                                        completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
-            "passiveAnimation": animation,
-            "recentPassiveAnimations": [arty.model: animation]
+            "passiveAnimations.\(arty.model)": animation
         ]) { error in
             completion(error)
         }
@@ -122,8 +120,7 @@ struct Database {
                                     for arty: ARty,
                                     completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
-            "pokeAnimation": animation,
-            "recentPokeAnimations": [arty.model: animation]
+            "pokeAnimations.\(arty.model)": animation
         ]) { error in
             completion(error)
         }

@@ -70,6 +70,14 @@ struct Schema {
         }
         return try defaultPokeAnimation(model)
     }
+
+    func defaultPassiveAnimation(_ model: String) throws -> String {
+        return try arty(model).defaultPassiveAnimation
+    }
+
+    func defaultPokeAnimation(_ model: String) throws -> String {
+        return try arty(model).defaultPokeAnimation
+    }
 }
 
 private extension Schema {
@@ -111,14 +119,6 @@ private extension Schema {
     func isValidAnimation(_ model: String, animation: String) throws -> Bool {
         let animations = try self.animationNames(model, onlyPickableAnimations: true)
         return animations.contains(animation)
-    }
-
-    func defaultPassiveAnimation(_ model: String) throws -> String {
-        return try arty(model).defaultPassiveAnimation
-    }
-
-    func defaultPokeAnimation(_ model: String) throws -> String {
-        return try arty(model).defaultPokeAnimation
     }
 }
 

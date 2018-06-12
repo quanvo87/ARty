@@ -24,6 +24,7 @@ class MainViewController: UIViewController {
         sceneView.delegate = self
         sceneView.session.delegate = self
         sceneView.autoenablesDefaultLighting = true
+        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
         return scene
     }
 
@@ -51,7 +52,11 @@ class MainViewController: UIViewController {
 
     private func updatePokeTimestamp(_ uid: String) {
         if uid == self.uid {
-            Database.updatePokeTimestamp(for: uid) { _ in }
+            Database.updatePokeTimestamp(for: uid) { error in
+                if let error = error {
+                    print(error)
+                }
+            }
         }
     }
 }
@@ -93,8 +98,11 @@ extension MainViewController: CLLocationManagerDelegate {
             Database.setLocation(
                 uid: uid,
                 latitude: coordinate.latitude,
-                longitude: coordinate.longitude
-            ) { _ in }
+                longitude: coordinate.longitude) { error in
+                    if let error = error {
+                        print(error)
+                    }
+            }
 
             nearbyUsers(
                 uid: uid,
@@ -188,7 +196,11 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
                 let arty = try ARty(uid: uid, model: model, delegate: nil)
                 addARtyToScene(arty, position: .init())
                 setRecentEmotes(for: arty)
-                Database.updateModel(arty: arty) { _ in }
+                Database.updateModel(arty: arty) { error in
+                    if let error = error {
+                        print(error)
+                    }
+                }
             } catch {
                 print(error)
             }

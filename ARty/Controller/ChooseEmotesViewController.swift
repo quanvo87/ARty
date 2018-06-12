@@ -71,10 +71,18 @@ extension ChooseEmotesViewController: UITableViewDelegate {
         switch emoteTypePicker.selectedSegmentIndex {
         case 0:
             try? arty.setPokeEmote(to: emote)
-            Database.updatePokeEmote(to: emote, for: arty) { _ in }
+            Database.updatePokeEmote(to: emote, for: arty) { error in
+                if let error = error {
+                    print(error)
+                }
+            }
         case 1:
             try? arty.setPassiveEmote(to: emote)
-            Database.updatePassiveEmote(to: emote, for: arty) { _ in }
+            Database.updatePassiveEmote(to: emote, for: arty) { error in
+                if let error = error {
+                    print(error)
+                }
+            }
         default:
             break
         }

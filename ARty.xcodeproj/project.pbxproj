@@ -23,6 +23,7 @@
 		59412B9320B5721400A2ED02 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 59412B9220B5721400A2ED02 /* Assets.xcassets */; };
 		59412B9620B5721400A2ED02 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 59412B9420B5721400A2ED02 /* LaunchScreen.storyboard */; };
 		59584BDA20C79B98000F72D9 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59584BD920C79B98000F72D9 /* LocationManager.swift */; };
+		5992347B20CEF890008F4762 /* LocationDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5992347A20CEF890008F4762 /* LocationDatabase.swift */; };
 		5993889520C046750060A37E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5993889420C046750060A37E /* User.swift */; };
 		5999737E20CA6BA3004DE3F9 /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5999737D20CA6BA3004DE3F9 /* ARSessionManager.swift */; };
 		59B386EC20BF491D003BC2E5 /* ChooseARtyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */; };
@@ -53,6 +54,7 @@
 		59412B9520B5721400A2ED02 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		59412B9720B5721400A2ED02 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		59584BD920C79B98000F72D9 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		5992347A20CEF890008F4762 /* LocationDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDatabase.swift; sourceTree = "<group>"; };
 		5993889420C046750060A37E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		5999737D20CA6BA3004DE3F9 /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 		59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseARtyViewController.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				5908372720C0FD2100A36103 /* AuthManager.swift */,
 				59298B1120C02D82003D1D98 /* Constant.swift */,
 				5908371E20C0BE2E00A36103 /* Database.swift */,
+				5992347A20CEF890008F4762 /* LocationDatabase.swift */,
 				59584BD920C79B98000F72D9 /* LocationManager.swift */,
 				59E747FA20C61F4E006217C4 /* Temp.swift */,
 			);
@@ -283,6 +286,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-ARty/Pods-ARty-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
@@ -301,6 +305,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
@@ -344,6 +349,7 @@
 				59412B8A20B5721300A2ED02 /* AppDelegate.swift in Sources */,
 				5999737E20CA6BA3004DE3F9 /* ARSessionManager.swift in Sources */,
 				59584BDA20C79B98000F72D9 /* LocationManager.swift in Sources */,
+				5992347B20CEF890008F4762 /* LocationDatabase.swift in Sources */,
 				59CAF1BF20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift in Sources */,
 				59389A1520B6313D00F7FA67 /* ARtyError.swift in Sources */,
 			);

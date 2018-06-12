@@ -1,4 +1,5 @@
 PODS:
+  - Alamofire (4.7.2)
   - Bolts (1.9.0):
     - Bolts/AppLinks (= 1.9.0)
     - Bolts/Tasks (= 1.9.0)
@@ -90,6 +91,7 @@ PODS:
   - SwiftLint (0.25.1)
 
 DEPENDENCIES:
+  - Alamofire
   - FacebookCore
   - FacebookLogin
   - Firebase/Auth
@@ -99,6 +101,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - Alamofire
     - Bolts
     - BoringSSL
     - FacebookCore
@@ -123,6 +126,7 @@ SPEC REPOS:
     - SwiftLint
 
 SPEC CHECKSUMS:
+  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   BoringSSL: 60dd24df4af296bf41d78e5841dbb95d75f88c0d
   FacebookCore: 3ffa190a3f1f96cec0e44d3fc221bc322c595ffa
@@ -146,6 +150,6 @@ SPEC CHECKSUMS:
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
   SwiftLint: ce933681be10c3266e82576dad676fa815a602e9
 
-PODFILE CHECKSUM: 597dae90d35438acd9ca09d81abda0eb12eee988
+PODFILE CHECKSUM: 5581262028a3b7ebf75c687d7bbc800d8b162d1f
 
 COCOAPODS: 1.5.2

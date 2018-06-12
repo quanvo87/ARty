@@ -238,10 +238,7 @@ private extension MainViewController {
     }
 
     func showChooseARtyViewController() {
-        guard let arty = arty else {
-            return
-        }
-        let controller = ChooseARtyViewController(currentARty: arty.model, delegate: self)
+        let controller = ChooseARtyViewController(currentARty: arty?.model ?? "", delegate: self)
         let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
@@ -254,7 +251,7 @@ private extension MainViewController {
     }
 
     func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
-        Database.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
+        LocationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
             switch result {
             case .fail(let error):
                 print(error)

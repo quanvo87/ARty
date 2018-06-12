@@ -1,5 +1,6 @@
 import UIKit
 
+// todo: change to just give the new arty
 protocol ChooseARtyViewControllerDelegate: class {
     func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String)
 }

@@ -13,6 +13,35 @@ struct Database {
 
     private init() {}
 
+    static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
+        usersCollection.document(uid).setData([
+            "uid": uid
+        ], merge: true) { error in
+            if let error = error {
+                completion(error)
+                return
+            }
+            LocationDatabase.setUid(uid) { error in
+                completion(error)
+            }
+        }
+    }
+
+    static func setLocation(uid: String, latitude: Double, longitude: Double, completion: @escaping (Error?) -> Void) {
+        database.collection("locations").document(uid).setData([
+            "latitude": latitude,
+            "longitude": longitude
+        ]) { error in
+            if let error = error {
+                completion(error)
+                return
+            }
+            LocationDatabase.setLocation(uid: uid, latitude: latitude, longitude: longitude) { error in
+                completion(error)
+            }
+        }
+    }
+
     static func user(_ uid: String, completion: @escaping (Result<User, Error>) -> Void) {
         usersCollection.document(uid).getDocument { snapshot, error in
             if let error = error {
@@ -22,28 +51,6 @@ struct Database {
                     completion(.success(try .init(snapshot)))
                 } catch {
                     completion(.fail(error))
-                }
-            }
-        }
-    }
-
-    // todo: change to use locations db
-    static func nearbyUsers(uid: String,
-                            latitude: Double,
-                            longitude: Double,
-                            completion: @escaping (Result<[String], Error>) -> Void) {
-        usersCollection.getDocuments { snapshot, error in
-            if let error = error {
-                completion(.fail(error))
-            } else {
-                var arr = [String]()
-                if let documents = snapshot?.documents {
-                    for document in documents {
-                        if let uid = document.data()["uid"] as? String {
-                            arr.append(uid)
-                        }
-                    }
-                    completion(.success(arr))
                 }
             }
         }
@@ -76,24 +83,6 @@ struct Database {
                     return
             }
             callback(latitude, longitude)
-        }
-    }
-
-    static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).setData([
-            "uid": uid
-        ], merge: true) { error in
-            completion(error)
-        }
-    }
-
-    // todo: also write to location db
-    static func setLocation(uid: String, latitude: Double, longitude: Double, completion: @escaping (Error?) -> Void) {
-        database.collection("locations").document(uid).setData([
-            "latitude": latitude,
-            "longitude": longitude
-        ]) { error in
-            completion(error)
         }
     }
 

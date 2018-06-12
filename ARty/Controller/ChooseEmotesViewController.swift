@@ -17,7 +17,7 @@ class ChooseEmotesViewController: UIViewController {
             action: #selector(close)
         )
 
-        emoteTypePicker.addTarget(self, action: #selector(didSelectEmoteType), for: .valueChanged)
+        emoteTypePicker.addTarget(self, action: #selector(didPickEmoteType), for: .valueChanged)
 
         tableView.dataSource = self
         tableView.delegate = self
@@ -54,7 +54,6 @@ extension ChooseEmotesViewController: UITableViewDataSource {
         let currentEmote = emoteTypePicker.selectedSegmentIndex == 0 ?
             arty?.pokeEmote :
             arty?.passiveEmote
-
         cell.accessoryType = emote == currentEmote ? .checkmark : .none
 
         return cell
@@ -89,7 +88,7 @@ private extension ChooseEmotesViewController {
         dismiss(animated: true)
     }
 
-    @objc func didSelectEmoteType() {
+    @objc func didPickEmoteType() {
         tableView.reloadData()
     }
 }
@@ -97,7 +96,7 @@ private extension ChooseEmotesViewController {
 private extension String {
     var emoteDisplayName: String {
         if let index = self.range(of: "_")?.upperBound {
-            return String(self.suffix(from: index)).capitalized.replacingOccurrences(of: "_", with: " ")
+            return String(self.suffix(from: index)).replacingOccurrences(of: "_", with: " ").capitalized
         } else {
             return self
         }

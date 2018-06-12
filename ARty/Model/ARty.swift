@@ -198,11 +198,11 @@ private extension ARty {
         setPokeTimestamp(to: user.pokeTimestamp)
     }
 
-    func setPokeTimestamp(to pokeTimestamp: Date) {
-        if self.pokeTimestamp != pokeTimestamp {
+    func setPokeTimestamp(to date: Date) {
+        if self.pokeTimestamp != date {
             try? playPokeEmote()
         }
-        self.pokeTimestamp = pokeTimestamp
+        self.pokeTimestamp = date
     }
 
     func animation(_ animation: String) throws -> CAAnimation {

@@ -10,7 +10,7 @@ protocol ARtyDelegate: class {
 class ARty: SCNNode {
     let uid: String
     let model: String
-    let positionAdjustment: SCNVector3  // todo: make adjustments to models instead of this
+    let positionAdjustment: SCNVector3  // todo: change to only a y adjustment
     let emotes: [String]
     var pokeTimestamp: Date?
     private(set) var passiveEmote = ""
@@ -42,6 +42,7 @@ class ARty: SCNNode {
         try setPassiveEmote(to: passiveEmote)
         try setPokeEmote(to: pokeEmote)
         loopPassiveEmote()
+        centerPivot()
         makeListeners(delegate: delegate)
     }
 
@@ -88,6 +89,18 @@ class ARty: SCNNode {
         try playAnimation(pokeEmote)
     }
 
+    func playWalkAnimation() throws {
+        guard isIdle else {
+            return
+        }
+        try playAnimation(walkAnimation)
+    }
+
+    func stopWalkAnimation() {
+        removeAnimation(forKey: walkAnimation)
+    }
+
+    // todo: rename
     func walk(to location: CLLocation) throws {
         let speed = location.speed
         if speed > 0 {
@@ -110,29 +123,6 @@ class ARty: SCNNode {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
             }
-        }
-    }
-
-    func walk(to position: SCNVector3) throws {
-        if isIdle {
-            try playAnimation(walkAnimation)
-        }
-
-        let turnAction = SCNAction.rotateTo(
-            x: CGFloat(position.x),
-            y: CGFloat(position.y),
-            z: CGFloat(position.z),
-            duration: 1,
-            usesShortestUnitArc: true
-        )
-        runAction(turnAction)
-
-        let moveAction = SCNAction.move(to: position, duration: 5)
-        runAction(moveAction) { [weak self] in
-            guard let `self` = self else {
-                return
-            }
-            self.removeAnimation(forKey: self.walkAnimation)
         }
     }
 
@@ -165,6 +155,11 @@ private extension ARty {
             }
             self.loopPassiveEmote()
         }
+    }
+
+    func centerPivot() {
+        let (minBox, maxBox) = boundingBox
+        pivot = SCNMatrix4MakeTranslation(0, (maxBox.y - minBox.y)/2, 0)
     }
 
     func makeListeners(delegate: ARtyDelegate?) {
@@ -218,6 +213,8 @@ private extension ARty {
         addAnimation(caAnimation, forKey: animation)
     }
 
+    // todo: use ARtyMover rotate()?
+    // todo: use heading if course not avail
     func turn(to direction: CLLocationDirection) {
         guard direction > -1 else {
             return

@@ -42,22 +42,16 @@ class ARSessionManager {
         }
     }
 
-    func positionFromWorldOrigin(to location: CLLocation) -> SCNVector3? {
-//        guard let worldOrigin = worldOrigin else {
-//            return nil
-//        }
-        return .init()
-    }
-
-    private func runARSession() {
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.worldAlignment = .gravityAndHeading
-        session.run(configuration, options: [.resetTracking])
-    }
-
-    private func clearARSession() {
-        worldOrigin = nil
-        session.pause()
+    func moveARty(_ arty: ARty, location: CLLocation, heading: CLHeading) {
+        guard let worldOrigin = worldOrigin else {
+            return
+        }
+        ARtyMover.move(
+            arty,
+            location: location,
+            heading: heading,
+            worldOrigin: worldOrigin
+        )
     }
 }
 
@@ -66,5 +60,18 @@ extension ARSessionManager: AppStateObserverDelegate {
 
     func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
         clearARSession()
+    }
+}
+
+private extension ARSessionManager {
+    func runARSession() {
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.worldAlignment = .gravityAndHeading
+        session.run(configuration, options: [.resetTracking])
+    }
+
+    func clearARSession() {
+        worldOrigin = nil
+        session.pause()
     }
 }

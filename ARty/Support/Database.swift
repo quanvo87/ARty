@@ -27,6 +27,7 @@ struct Database {
         }
     }
 
+    // todo: add course and heading
     static func setLocation(uid: String, latitude: Double, longitude: Double, completion: @escaping (Error?) -> Void) {
         database.collection("locations").document(uid).setData([
             "latitude": latitude,

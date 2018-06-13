@@ -30,7 +30,6 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        UIApplication.shared.isIdleTimerDisabled = true
         sceneView.scene = scene
         sceneView.session.run(ARWorldTrackingConfiguration())
         authManager.listenForAuthState()
@@ -45,8 +44,8 @@ class MainViewController: UIViewController {
             let arty = arties[uid] else {
                 return
         }
-        // todo: turn to face user, turn to original spot after poke animation
-        try? arty.playPokeEmote()
+        // todo: turn to face user
+        try? arty.playAnimation(arty.pokeEmote)
         updatePokeTimestamp(uid)
     }
 
@@ -79,6 +78,7 @@ extension MainViewController: CLLocationManagerDelegate {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
             // todo: if they only authorized when in use, ask again one more time
             locationManager.startUpdatingLocation()
+            locationManager.startUpdatingHeading()
         } else {
             // todo: show alert
         }
@@ -89,25 +89,16 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
-            try? arty?.walk(to: newLocation)
+            try? arty?.walk(location: newLocation)
 
             arSessionManager.setWorldOrigin(newLocation)
 
-            let coordinate = newLocation.coordinate
-
-            Database.setLocation(
-                uid: uid,
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude) { error in
-                    if let error = error {
-                        print(error)
-                    }
-            }
+            locationManager.setLocationInDatabase(uid: uid)
 
             nearbyUsers(
                 uid: uid,
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude
+                latitude: newLocation.coordinate.latitude,
+                longitude: newLocation.coordinate.longitude
             )
         }
     }
@@ -115,17 +106,21 @@ extension MainViewController: CLLocationManagerDelegate {
 
 extension MainViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
+        UIApplication.shared.isIdleTimerDisabled = true
         self.uid = uid
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
+        locationManager.startUpdatingHeading()
         arSessionManager.start()
         loadUser(uid)
     }
 
     func authManagerUserDidLogOut(_ manager: AuthManager) {
+        UIApplication.shared.isIdleTimerDisabled = false
         uid = nil
         arties.removeAll()
         locationManager.stopUpdatingLocation()
+        locationManager.stopUpdatingHeading()
         sceneView.scene = scene
         arSessionManager.stop()
         showLoginViewController()
@@ -171,18 +166,20 @@ extension MainViewController: ARtyDelegate {
     func arty(_ arty: ARty, userChangedModel user: User) {
         do {
             let arty = try ARty(user: user, delegate: self)
-            addARtyToScene(arty, position: .random)
+            sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
+            arties[arty.uid] = arty
         } catch {
             print(error)
         }
     }
 
-    func arty(_ arty: ARty, latitude: Double, longitude: Double) {
-//        let location = CLLocation(latitude: latitude, longitude: longitude)
-//        guard let position = arSessionManager.positionFromWorldOrigin(to: location) else {
-//            return
-//        }
-//        try? arty.walk(to: position)
+    func arty(_ arty: ARty, didUpdateLocation location: Location) {
+        if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
+            sceneView.scene.rootNode.addChildNode(arty)
+            arSessionManager.positionARty(arty, location: location)
+        } else {
+            arSessionManager.moveARty(arty, location: location)
+        }
     }
 }
 
@@ -255,8 +252,9 @@ private extension MainViewController {
         present(navigationController, animated: true)
     }
 
+    // todo: only use this for your arty. other artys will be added by their location observer
     func addARtyToScene(_ arty: ARty, position: SCNVector3) {
-        arty.position = arty.positionAdjustment + position  // todo: use anchors?
+        arty.position = arty.positionAdjustment + position
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty
@@ -283,7 +281,7 @@ private extension MainViewController {
                 case .fail(let error):
                     print(error)
                 case .success(let arty):
-                    self?.addARtyToScene(arty, position: .random)
+                    self?.arties[arty.uid] = arty
                 }
             }
         }

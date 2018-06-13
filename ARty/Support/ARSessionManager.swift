@@ -11,7 +11,7 @@ class ARSessionManager {
 
     private var worldOrigin: CLLocation? {
         didSet {
-            restartARSession()
+            runARSession()
         }
     }
 
@@ -25,7 +25,7 @@ class ARSessionManager {
     }
 
     func restartARSession() {
-        if worldOrigin == nil {
+        guard worldOrigin != nil else {
             return
         }
         worldOrigin = nil
@@ -42,16 +42,18 @@ class ARSessionManager {
         }
     }
 
-    func moveARty(_ arty: ARty, location: CLLocation, heading: CLHeading) {
+    func positionARty(_ arty: ARty, location: Location) {
         guard let worldOrigin = worldOrigin else {
             return
         }
-        ARtyMover.move(
-            arty,
-            location: location,
-            heading: heading,
-            worldOrigin: worldOrigin
-        )
+        LocationCalculator.position(arty, location: location, worldOrigin: worldOrigin)
+    }
+
+    func moveARty(_ arty: ARty, location: Location) {
+        guard let worldOrigin = worldOrigin else {
+            return
+        }
+        LocationCalculator.move(arty, location: location, worldOrigin: worldOrigin)
     }
 }
 

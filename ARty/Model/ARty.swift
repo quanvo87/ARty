@@ -4,7 +4,7 @@ import FirebaseFirestore
 
 protocol ARtyDelegate: class {
     func arty(_ arty: ARty, userChangedModel user: User)
-    func arty(_ arty: ARty, latitude: Double, longitude: Double)
+    func arty(_ arty: ARty, didUpdateLocation location: Location)
 }
 
 class ARty: SCNNode {
@@ -12,12 +12,12 @@ class ARty: SCNNode {
     let model: String
     let positionAdjustment: SCNVector3  // todo: change to only a y adjustment
     let emotes: [String]
-    var pokeTimestamp: Date?
     private(set) var passiveEmote = ""
     private(set) var pokeEmote = ""
     private let animations: [String: CAAnimation]
     private let walkAnimation: String
     private var lastLocation = CLLocation()
+    private var pokeTimestamp: Date?
     private var userListener: ListenerRegistration?
     private var locationListener: ListenerRegistration?
     private weak var delegate: ARtyDelegate?
@@ -85,37 +85,26 @@ class ARty: SCNNode {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
-    func playPokeEmote() throws {
-        try playAnimation(pokeEmote)
+    func playAnimation(_ animation: String) throws {
+        removeAllAnimations()
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
     }
 
-    func playWalkAnimation() throws {
-        guard isIdle else {
-            return
-        }
-        try playAnimation(walkAnimation)
-    }
-
-    func stopWalkAnimation() {
-        removeAnimation(forKey: walkAnimation)
-    }
-
-    // todo: rename
-    func walk(to location: CLLocation) throws {
+    func walk(location: CLLocation) throws {
+        faceWalkingDirection(location: location)
         let speed = location.speed
         if speed > 0 {
             if speed < 0.5 {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
             } else if isIdle {
-                turn(to: location.course)
                 try playAnimation(walkAnimation)
             }
         } else {
             let distance = lastLocation.distance(from: location)
             if distance > 5 {
                 if isIdle {
-                    turn(to: location.course)
                     try playAnimation(walkAnimation)
                 }
                 lastLocation = location
@@ -179,11 +168,11 @@ private extension ARty {
             }
         }
 
-        locationListener = Database.locationListener(uid: uid) { [weak self] (latitude, longitude) in
+        locationListener = Database.locationListener(uid: uid) { [weak self] location in
             guard let `self` = self else {
                 return
             }
-            self.delegate?.arty(self, latitude: latitude, longitude: longitude)
+            self.delegate?.arty(self, didUpdateLocation: location)
         }
     }
 
@@ -195,7 +184,7 @@ private extension ARty {
 
     func setPokeTimestamp(to date: Date) {
         if self.pokeTimestamp != date {
-            try? playPokeEmote()
+            try? playAnimation(pokeEmote)
         }
         self.pokeTimestamp = date
     }
@@ -207,21 +196,14 @@ private extension ARty {
         return caAnimation
     }
 
-    func playAnimation(_ animation: String) throws {
-        removeAllAnimations()
-        let caAnimation = try self.animation(animation)
-        addAnimation(caAnimation, forKey: animation)
-    }
-
-    // todo: use ARtyMover rotate()?
     // todo: use heading if course not avail
-    func turn(to direction: CLLocationDirection) {
-        guard direction > -1 else {
+    func faceWalkingDirection(location: CLLocation) {
+        guard location.course >= 0 else {
             return
         }
         let rotateAction = SCNAction.rotateTo(
             x: 0,
-            y: direction.radians,
+            y: CGFloat(location.course.angle),
             z: 0,
             duration: 1,
             usesShortestUnitArc: true
@@ -238,12 +220,5 @@ private extension ARty {
             usesShortestUnitArc: true
         )
         runAction(rotateAction)
-    }
-}
-
-private extension CLLocationDirection {
-    var radians: CGFloat {
-        let adjusted = Float((450 - self).remainder(dividingBy: 360)) + 90  // todo: reduce
-        return CGFloat(GLKMathDegreesToRadians(adjusted))
     }
 }

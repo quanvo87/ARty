@@ -27,18 +27,17 @@ struct Database {
         }
     }
 
-    // todo: add course and heading
-    static func setLocation(uid: String, latitude: Double, longitude: Double, completion: @escaping (Error?) -> Void) {
-        database.collection("locations").document(uid).setData([
-            "latitude": latitude,
-            "longitude": longitude
-        ]) { error in
+    static func setLocation(uid: String, location: Location, completion: @escaping (Error?) -> Void) {
+        database.collection("locations").document(uid).setData(location.dictionary) { error in
             if let error = error {
                 completion(error)
                 return
             }
-            LocationDatabase.setLocation(uid: uid, latitude: latitude, longitude: longitude) { error in
-                completion(error)
+            LocationDatabase.setLocation(
+                uid: uid,
+                latitude: location.latitude,
+                longitude: location.longitude) { error in
+                    completion(error)
             }
         }
     }
@@ -71,19 +70,17 @@ struct Database {
         }
     }
 
-    static func locationListener(uid: String, callback: @escaping (Double, Double) -> Void) -> ListenerRegistration {
+    static func locationListener(uid: String, callback: @escaping (Location) -> Void) -> ListenerRegistration {
         return database.collection("locations").document(uid).addSnapshotListener { snapshot, error in
             if let error = error {
                 print(error)
                 return
             }
-            guard let data = snapshot?.data(),
-                let latitude = data["latitude"] as? Double,
-                let longitude = data["longitude"] as? Double else {
-                    print(ARtyError.invalidDataFromServer(snapshot?.data()))
-                    return
+            do {
+                callback(try .init(snapshot))
+            } catch {
+                print(error)
             }
-            callback(latitude, longitude)
         }
     }
 

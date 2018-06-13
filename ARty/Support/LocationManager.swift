@@ -29,4 +29,21 @@ class LocationManager: CLLocationManager {
             return true
         }
     }
+
+    func setLocationInDatabase(uid: String) {
+        guard let lastLocation = lastLocation, let heading = heading else {
+            return
+        }
+        let location = Location(
+            latitude: lastLocation.coordinate.latitude,
+            longitude: lastLocation.coordinate.longitude,
+            course: lastLocation.course,
+            heading: heading.trueHeading
+        )
+        Database.setLocation(uid: uid, location: location) { error in
+            if let error = error {
+                print(error)
+            }
+        }
+    }
 }

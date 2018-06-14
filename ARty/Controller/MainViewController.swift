@@ -69,7 +69,7 @@ extension MainViewController: ARSessionDelegate {
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        arty.position = currentPosition + arty.positionAdjustment
+        arty.position = currentPosition + ARty.zAdjustment
     }
 }
 
@@ -139,7 +139,7 @@ extension MainViewController: AuthManagerDelegate {
                     if user.model != "" {
                         do {
                             let arty = try ARty(user: user, delegate: nil)
-                            self?.addARtyToScene(arty, position: .init())
+                            self?.addARtyToScene(arty)
                         } catch {
                             print(error)
                         }
@@ -197,7 +197,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         if model != self.arty?.model {
             do {
                 let arty = try ARty(uid: uid, model: model, delegate: nil)
-                addARtyToScene(arty, position: .init())
+                addARtyToScene(arty)
                 setRecentEmotes(for: arty)
                 Database.updateModel(arty: arty) { error in
                     if let error = error {
@@ -258,9 +258,8 @@ private extension MainViewController {
         present(navigationController, animated: true)
     }
 
-    // todo: only use this for your arty. other artys will be added by their location observer
-    func addARtyToScene(_ arty: ARty, position: SCNVector3) {
-        arty.position = arty.positionAdjustment + position
+    func addARtyToScene(_ arty: ARty) {
+        arty.position = ARty.zAdjustment
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty

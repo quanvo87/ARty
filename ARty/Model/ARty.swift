@@ -8,18 +8,30 @@ protocol ARtyDelegate: class {
 }
 
 class ARty: SCNNode {
+    static let zAdjustment = SCNVector3(0, 0, -1)
+
     let uid: String
+
     let model: String
-    let positionAdjustment: SCNVector3  // todo: change to only a y adjustment
+
     let emotes: [String]
+
     private(set) var passiveEmote = ""
+
     private(set) var pokeEmote = ""
+
     private let animations: [String: CAAnimation]
+
     private let walkAnimation: String
+
     private var lastLocation = CLLocation()
+
     private var pokeTimestamp: Date?
+
     private var userListener: ListenerRegistration?
+
     private var locationListener: ListenerRegistration?
+
     private weak var delegate: ARtyDelegate?
 
     init(uid: String,
@@ -29,7 +41,6 @@ class ARty: SCNNode {
          delegate: ARtyDelegate?) throws {
         self.uid = uid
         self.model = model
-        positionAdjustment = try schema.positionAdjustment(for: model)
         emotes = try schema.emotes(for: model)
         animations = try schema.animations(for: model)
         walkAnimation = try schema.walkAnimation(for: model)

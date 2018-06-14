@@ -8,8 +8,7 @@ var schema = Schema(
 
 let elvira = ARtySchema(
     model: "elvira",
-    scale: 0.075,
-    positionAdjustment: -2,
+    scale: 0.02,
     emotes: [
         "elvira_twerk",
         "elvira_buttslap",
@@ -25,8 +24,7 @@ let elvira = ARtySchema(
 
 let mutant = ARtySchema(
     model: "mutant",
-    scale: 0.065,
-    positionAdjustment: -10,
+    scale: 0.0035,
     emotes: [
         "mutant_battlecry",
         "mutant_chestthump",
@@ -43,8 +41,7 @@ let mutant = ARtySchema(
 
 let paladin = ARtySchema(
     model: "paladin",
-    scale: 0.03,
-    positionAdjustment: -4,
+    scale: 0.003,
     emotes: [
         "paladin_fierce_attack",
         "paladin_slide_dance",

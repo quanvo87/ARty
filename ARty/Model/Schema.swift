@@ -8,11 +8,6 @@ struct Schema {
         return SCNVector3(scale, scale, scale)
     }
 
-    func positionAdjustment(for model: String) throws -> SCNVector3 {
-        let adjustment = Float(try arty(model).positionAdjustment)
-        return SCNVector3(0, -1, adjustment)
-    }
-
     func emotes(for model: String) throws -> [String] {
         return try arty(model).emotes
     }

@@ -27,7 +27,7 @@
 		5993889520C046750060A37E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5993889420C046750060A37E /* User.swift */; };
 		5999737E20CA6BA3004DE3F9 /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5999737D20CA6BA3004DE3F9 /* ARSessionManager.swift */; };
 		59B386EC20BF491D003BC2E5 /* ChooseARtyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */; };
-		59C1ADA720D0EC76002B920A /* LocationCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C1ADA620D0EC76002B920A /* LocationCalculator.swift */; };
+		59C1ADA720D0EC76002B920A /* PositionCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C1ADA620D0EC76002B920A /* PositionCalculator.swift */; };
 		59CAF1BF20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CAF1BE20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift */; };
 		59DBFD3020D1590500580F18 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59DBFD2F20D1590500580F18 /* Location.swift */; };
 		59E747FD20C629BD006217C4 /* AppStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E747FC20C629BD006217C4 /* AppStateObserver.swift */; };
@@ -60,7 +60,7 @@
 		5993889420C046750060A37E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		5999737D20CA6BA3004DE3F9 /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 		59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseARtyViewController.swift; sourceTree = "<group>"; };
-		59C1ADA620D0EC76002B920A /* LocationCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCalculator.swift; sourceTree = "<group>"; };
+		59C1ADA620D0EC76002B920A /* PositionCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionCalculator.swift; sourceTree = "<group>"; };
 		59CAF1BE20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseEmotesViewController.swift; sourceTree = "<group>"; };
 		59DBFD2F20D1590500580F18 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		59E747FC20C629BD006217C4 /* AppStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateObserver.swift; sourceTree = "<group>"; };
@@ -158,7 +158,7 @@
 				59298B1120C02D82003D1D98 /* Constant.swift */,
 				5908371E20C0BE2E00A36103 /* Database.swift */,
 				59EC1B0620D1D45100531998 /* Extension+Double.swift */,
-				59C1ADA620D0EC76002B920A /* LocationCalculator.swift */,
+				59C1ADA620D0EC76002B920A /* PositionCalculator.swift */,
 				5992347A20CEF890008F4762 /* LocationDatabase.swift */,
 				59584BD920C79B98000F72D9 /* LocationManager.swift */,
 			);
@@ -350,7 +350,7 @@
 				5993889520C046750060A37E /* User.swift in Sources */,
 				592C08E120BF7F8200E23EEC /* Schema.swift in Sources */,
 				59412B8E20B5721300A2ED02 /* MainViewController.swift in Sources */,
-				59C1ADA720D0EC76002B920A /* LocationCalculator.swift in Sources */,
+				59C1ADA720D0EC76002B920A /* PositionCalculator.swift in Sources */,
 				59298B0720BF973A003D1D98 /* ARty.swift in Sources */,
 				5908372A20C0FEB700A36103 /* LoginViewController.swift in Sources */,
 				59412B8A20B5721300A2ED02 /* AppDelegate.swift in Sources */,

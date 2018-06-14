@@ -5,14 +5,16 @@ class ARSessionManager {
     private let session: ARSession
     private lazy var appStateObserver = AppStateObserver(delegate: self)
 
-    init(session: ARSession) {
-        self.session = session
+    private(set) var worldOrigin: CLLocation? {
+        didSet {
+            let configuration = ARWorldTrackingConfiguration()
+            configuration.worldAlignment = .gravityAndHeading
+            session.run(configuration, options: [.resetTracking])
+        }
     }
 
-    private var worldOrigin: CLLocation? {
-        didSet {
-            runARSession()
-        }
+    init(session: ARSession) {
+        self.session = session
     }
 
     func start() {
@@ -21,15 +23,12 @@ class ARSessionManager {
 
     func stop() {
         appStateObserver.stop()
-        clearARSession()
+        pause()
     }
 
-    func restartARSession() {
-        guard worldOrigin != nil else {
-            return
-        }
+    func pause() {
         worldOrigin = nil
-        runARSession()
+        session.pause()
     }
 
     func setWorldOrigin(_ location: CLLocation) {
@@ -41,39 +40,13 @@ class ARSessionManager {
             self.worldOrigin = location
         }
     }
-
-    func positionARty(_ arty: ARty, location: Location) {
-        guard let worldOrigin = worldOrigin else {
-            return
-        }
-        LocationCalculator.position(arty, location: location, worldOrigin: worldOrigin)
-    }
-
-    func moveARty(_ arty: ARty, location: Location) {
-        guard let worldOrigin = worldOrigin else {
-            return
-        }
-        LocationCalculator.move(arty, location: location, worldOrigin: worldOrigin)
-    }
 }
 
 extension ARSessionManager: AppStateObserverDelegate {
-    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {}
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {
+    }
 
     func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
-        clearARSession()
-    }
-}
-
-private extension ARSessionManager {
-    func runARSession() {
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.worldAlignment = .gravityAndHeading
-        session.run(configuration, options: [.resetTracking])
-    }
-
-    func clearARSession() {
-        worldOrigin = nil
-        session.pause()
+        pause()
     }
 }

@@ -44,7 +44,7 @@ class MainViewController: UIViewController {
             let arty = arties[uid] else {
                 return
         }
-        // todo: turn to face user
+        // todo: face camera
         try? arty.playAnimation(arty.pokeEmote)
         updatePokeTimestamp(uid)
     }
@@ -89,6 +89,7 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
+            arty?.faceWalkingDirection(location: newLocation)
             try? arty?.walk(location: newLocation)
 
             arSessionManager.setWorldOrigin(newLocation)
@@ -174,11 +175,16 @@ extension MainViewController: ARtyDelegate {
     }
 
     func arty(_ arty: ARty, didUpdateLocation location: Location) {
+        guard let worldOrigin = arSessionManager.worldOrigin else {
+            return
+        }
+        let position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             sceneView.scene.rootNode.addChildNode(arty)
-            arSessionManager.positionARty(arty, location: location)
+            arty.position = position
         } else {
-            arSessionManager.moveARty(arty, location: location)
+            // todo: face walking direction
+            try? arty.walk(to: position)
         }
     }
 }
@@ -239,7 +245,7 @@ private extension MainViewController {
     }
 
     @IBAction func didTapReloadButton(_ sender: Any) {
-        arSessionManager.restartARSession()
+        arSessionManager.pause()
     }
 
     @IBAction func didTapLogOutButton(_ sender: Any) {

@@ -1,9 +1,8 @@
 import CoreLocation
 import SceneKit
 
-// todo: make functions return values, do the animations in the artys
-struct LocationCalculator {
-    static func position(_ arty: ARty, location: Location, worldOrigin: CLLocation) {
+struct PositionCalculator {
+    static func position(location: Location, worldOrigin: CLLocation) -> SCNVector3 {
         let bearing = self.bearing(origin: worldOrigin, location: location)
 
         let rotationMatrix = self.rotationMatrix(bearing: Float(bearing))
@@ -18,39 +17,11 @@ struct LocationCalculator {
 
         let locationTransform = simd_mul(matrix_identity_float4x4, transformMatrix)
 
-        let positionFromTransform = self.positionFromTransform(locationTransform)
-
-        arty.position = positionFromTransform
-    }
-
-    static func move(_ arty: ARty,
-                     location: Location,
-                     worldOrigin: CLLocation) {
-        rotate(arty, location: location)
-        position(arty, location: location, worldOrigin: worldOrigin)
-        // todo: scale
+        return positionFromTransform(locationTransform)
     }
 }
 
-private extension LocationCalculator {
-    static func rotate(_ arty: ARty, location: Location) {
-        var angle: Float
-
-        if location.course >= 0 {
-            angle = Float(location.course.angle)
-        } else if location.heading >= 0 {
-            angle = Float(location.heading.angle)
-        } else {
-            return
-        }
-
-        let rotation = SCNMatrix4MakeRotation(angle, 0, 1, 0)
-
-        let newTransform = SCNMatrix4Mult(arty.transform, rotation)
-
-        arty.transform = newTransform
-    }
-
+private extension PositionCalculator {
     static func bearing(origin: CLLocation, location: Location) -> Double {
         let lat1 = origin.coordinate.latitude.radians
         let long1 = origin.coordinate.longitude.radians

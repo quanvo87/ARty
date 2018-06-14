@@ -85,14 +85,27 @@ class ARty: SCNNode {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
+    // todo: use heading if course not avail
+    func faceWalkingDirection(location: CLLocation) {
+        guard location.course >= 0 else {
+            return
+        }
+        let rotateAction = SCNAction.rotateTo(
+            x: 0,
+            y: CGFloat(location.course.angle),
+            z: 0,
+            duration: 1,
+            usesShortestUnitArc: true
+        )
+        runAction(rotateAction)
+    }
+
     func playAnimation(_ animation: String) throws {
-        removeAllAnimations()
         let caAnimation = try self.animation(animation)
         addAnimation(caAnimation, forKey: animation)
     }
 
     func walk(location: CLLocation) throws {
-        faceWalkingDirection(location: location)
         let speed = location.speed
         if speed > 0 {
             if speed < 0.5 {
@@ -112,6 +125,20 @@ class ARty: SCNNode {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
             }
+        }
+    }
+
+    func walk(to position: SCNVector3) throws {
+        try playAnimation(walkAnimation)
+
+        // todo: make duration a function of distance?
+        let moveAction = SCNAction.move(to: position, duration: 5)
+
+        runAction(moveAction) { [weak self] in
+            guard let `self` = self else {
+                return
+            }
+            self.removeAnimation(forKey: self.walkAnimation, blendOutDuration: 0.5)
         }
     }
 
@@ -194,21 +221,6 @@ private extension ARty {
             throw ARtyError.invalidAnimationName(animation)
         }
         return caAnimation
-    }
-
-    // todo: use heading if course not avail
-    func faceWalkingDirection(location: CLLocation) {
-        guard location.course >= 0 else {
-            return
-        }
-        let rotateAction = SCNAction.rotateTo(
-            x: 0,
-            y: CGFloat(location.course.angle),
-            z: 0,
-            duration: 1,
-            usesShortestUnitArc: true
-        )
-        runAction(rotateAction)
     }
 
     func faceCamera() {

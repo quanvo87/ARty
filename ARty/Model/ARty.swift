@@ -85,14 +85,18 @@ class ARty: SCNNode {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
-    // todo: use heading if course not avail
-    func faceWalkingDirection(location: CLLocation) {
-        guard location.course >= 0 else {
+    func faceWalkingDirection(course: CLLocationDirection, heading: CLLocationDirection?) {
+        var angle: Double
+        if course >= 0 {
+            angle = course.angle
+        } else if let heading = heading, heading >= 0 {
+            angle = heading.angle
+        } else {
             return
         }
         let rotateAction = SCNAction.rotateTo(
             x: 0,
-            y: CGFloat(location.course.angle),
+            y: CGFloat(angle),
             z: 0,
             duration: 1,
             usesShortestUnitArc: true

@@ -89,7 +89,7 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
-            arty?.faceWalkingDirection(location: newLocation)
+            arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
             try? arty?.walk(location: newLocation)
 
             arSessionManager.setWorldOrigin(newLocation)
@@ -183,7 +183,7 @@ extension MainViewController: ARtyDelegate {
             sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
         } else {
-            // todo: face walking direction
+            arty.faceWalkingDirection(course: location.course, heading: location.heading)
             try? arty.walk(to: position)
         }
     }

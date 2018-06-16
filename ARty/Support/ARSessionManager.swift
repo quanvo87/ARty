@@ -5,16 +5,16 @@ class ARSessionManager {
     private let session: ARSession
     private lazy var appStateObserver = AppStateObserver(delegate: self)
 
+    init(session: ARSession) {
+        self.session = session
+    }
+
     private(set) var worldOrigin: CLLocation? {
         didSet {
             let configuration = ARWorldTrackingConfiguration()
             configuration.worldAlignment = .gravityAndHeading
             session.run(configuration, options: [.resetTracking])
         }
-    }
-
-    init(session: ARSession) {
-        self.session = session
     }
 
     func start() {

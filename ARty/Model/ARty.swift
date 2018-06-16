@@ -96,6 +96,11 @@ class ARty: SCNNode {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
+    func playAnimation(_ animation: String) throws {
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
+    }
+
     func faceWalkingDirection(course: CLLocationDirection, heading: CLLocationDirection?) {
         var angle: Double
         if course >= 0 {
@@ -113,11 +118,6 @@ class ARty: SCNNode {
             usesShortestUnitArc: true
         )
         runAction(rotateAction)
-    }
-
-    func playAnimation(_ animation: String) throws {
-        let caAnimation = try self.animation(animation)
-        addAnimation(caAnimation, forKey: animation)
     }
 
     func walk(location: CLLocation) throws {
@@ -144,11 +144,11 @@ class ARty: SCNNode {
     }
 
     func walk(to position: SCNVector3) throws {
-        try playAnimation(walkAnimation)
-
-        // todo: make duration a function of distance?
+        if isIdle {
+            try playAnimation(walkAnimation)
+        }
+        // todo: make duration a function of distance
         let moveAction = SCNAction.move(to: position, duration: 5)
-
         runAction(moveAction) { [weak self] in
             guard let `self` = self else {
                 return
@@ -198,7 +198,6 @@ private extension ARty {
             return
         }
         self.delegate = delegate
-
         userListener = Database.userListener(uid) { [weak self] user in
             guard let `self` = self else {
                 return
@@ -209,7 +208,6 @@ private extension ARty {
                 self.delegate?.arty(self, userChangedModel: user)
             }
         }
-
         locationListener = Database.locationListener(uid: uid) { [weak self] location in
             guard let `self` = self else {
                 return

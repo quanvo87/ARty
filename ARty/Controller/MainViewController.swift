@@ -103,6 +103,44 @@ extension MainViewController: CLLocationManagerDelegate {
             )
         }
     }
+
+    private func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
+        LocationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
+            switch result {
+            case .fail(let error):
+                print(error)
+            case .success(let uids):
+                uids.forEach {
+                    self?.observeUser($0)
+                }
+                self?.removeStaleUsers(uids)
+            }
+        }
+    }
+
+    private func observeUser(_ uid: String) {
+        if uid != self.uid && !arties.keys.contains(uid) {
+            ARty.make(uid: uid, delegate: self) { [weak self] result in
+                switch result {
+                case .fail(let error):
+                    print(error)
+                case .success(let arty):
+                    self?.arties[arty.uid] = arty
+                }
+            }
+        }
+    }
+
+    private func removeStaleUsers(_ uids: [String]) {
+        uids
+            .filter {
+                return !arties.keys.contains($0)
+            }
+            .forEach {
+                sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
+                arties.removeValue(forKey: $0)
+        }
+    }
 }
 
 extension MainViewController: AuthManagerDelegate {
@@ -154,8 +192,7 @@ extension MainViewController: AuthManagerDelegate {
     }
 
     private func showLoginViewController() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginViewController = storyboard.instantiateViewController(
+        let loginViewController = UIStoryboard.main.instantiateViewController(
             withIdentifier: String(describing: LoginViewController.self)
         )
         let navigationController = UINavigationController(rootViewController: loginViewController)
@@ -194,7 +231,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         guard let uid = uid else {
             return
         }
-        if model != self.arty?.model {
+        if model != arty?.model {
             do {
                 let arty = try ARty(uid: uid, model: model, delegate: nil)
                 addARtyToScene(arty)
@@ -263,44 +300,6 @@ private extension MainViewController {
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty
-    }
-
-    func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
-        LocationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
-            switch result {
-            case .fail(let error):
-                print(error)
-            case .success(let uids):
-                uids.forEach {
-                    self?.observeUser($0)
-                }
-                self?.removeStaleUsers(uids)
-            }
-        }
-    }
-
-    func observeUser(_ uid: String) {
-        if uid != self.uid && !arties.keys.contains(uid) {
-            ARty.make(uid: uid, delegate: self) { [weak self] result in
-                switch result {
-                case .fail(let error):
-                    print(error)
-                case .success(let arty):
-                    self?.arties[arty.uid] = arty
-                }
-            }
-        }
-    }
-
-    func removeStaleUsers(_ uids: [String]) {
-        uids
-            .filter {
-                return !arties.keys.contains($0)
-            }
-            .forEach {
-                sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
-                arties.removeValue(forKey: $0)
-        }
     }
 }
 

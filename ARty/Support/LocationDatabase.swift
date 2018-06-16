@@ -70,11 +70,9 @@ private extension DataRequest {
             if let error = error {
                 return .failure(error)
             }
-
             guard let data = data else {
                 return .failure(AFError.responseSerializationFailed(reason: .inputDataNil))
             }
-
             return Result {
                 try JSONDecoder().decode(T.self, from: data)
             }

@@ -11,6 +11,7 @@
 		5908372120C0C22D00A36103 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5908372020C0C22D00A36103 /* GoogleService-Info.plist */; };
 		5908372820C0FD2100A36103 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5908372720C0FD2100A36103 /* AuthManager.swift */; };
 		5908372A20C0FEB700A36103 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5908372920C0FEB700A36103 /* LoginViewController.swift */; };
+		59238E2720D442D300775BB8 /* Extension+UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59238E2620D442D300775BB8 /* Extension+UIStoryboard.swift */; };
 		59298B0720BF973A003D1D98 /* ARty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B0620BF973A003D1D98 /* ARty.swift */; };
 		59298B1220C02D82003D1D98 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59298B1120C02D82003D1D98 /* Constant.swift */; };
 		592C08D920BF5CEF00E23EEC /* ARtySchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592C08D820BF5CEF00E23EEC /* ARtySchema.swift */; };
@@ -42,6 +43,7 @@
 		5908372420C0F70700A36103 /* ARty.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ARty.entitlements; sourceTree = "<group>"; };
 		5908372720C0FD2100A36103 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		5908372920C0FEB700A36103 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		59238E2620D442D300775BB8 /* Extension+UIStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+UIStoryboard.swift"; sourceTree = "<group>"; };
 		59298B0620BF973A003D1D98 /* ARty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARty.swift; sourceTree = "<group>"; };
 		59298B1120C02D82003D1D98 /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		592C08D820BF5CEF00E23EEC /* ARtySchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARtySchema.swift; sourceTree = "<group>"; };
@@ -158,9 +160,10 @@
 				59298B1120C02D82003D1D98 /* Constant.swift */,
 				5908371E20C0BE2E00A36103 /* Database.swift */,
 				59EC1B0620D1D45100531998 /* Extension+Double.swift */,
-				59C1ADA620D0EC76002B920A /* PositionCalculator.swift */,
+				59238E2620D442D300775BB8 /* Extension+UIStoryboard.swift */,
 				5992347A20CEF890008F4762 /* LocationDatabase.swift */,
 				59584BD920C79B98000F72D9 /* LocationManager.swift */,
+				59C1ADA620D0EC76002B920A /* PositionCalculator.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -346,6 +349,7 @@
 				592C08D920BF5CEF00E23EEC /* ARtySchema.swift in Sources */,
 				59EC1B0720D1D45100531998 /* Extension+Double.swift in Sources */,
 				59E747FD20C629BD006217C4 /* AppStateObserver.swift in Sources */,
+				59238E2720D442D300775BB8 /* Extension+UIStoryboard.swift in Sources */,
 				5908372820C0FD2100A36103 /* AuthManager.swift in Sources */,
 				5993889520C046750060A37E /* User.swift in Sources */,
 				592C08E120BF7F8200E23EEC /* Schema.swift in Sources */,

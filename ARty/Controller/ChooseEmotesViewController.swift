@@ -26,9 +26,7 @@ class ChooseEmotesViewController: UIViewController {
     }
 
     static func make(arty: ARty) -> ChooseEmotesViewController {
-        guard let controller = UIStoryboard(
-            name: "Main",
-            bundle: nil).instantiateViewController(
+        guard let controller = UIStoryboard.main.instantiateViewController(
                 withIdentifier: String(describing: ChooseEmotesViewController.self)
             ) as? ChooseEmotesViewController else {
                 return ChooseEmotesViewController()

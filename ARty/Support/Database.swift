@@ -13,6 +13,35 @@ struct Database {
 
     private init() {}
 
+    static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
+        usersCollection.document(uid).setData([
+            "uid": uid
+        ], merge: true) { error in
+            if let error = error {
+                completion(error)
+                return
+            }
+            LocationDatabase.setUid(uid) { error in
+                completion(error)
+            }
+        }
+    }
+
+    static func setLocation(uid: String, location: Location, completion: @escaping (Error?) -> Void) {
+        database.collection("locations").document(uid).setData(location.dictionary) { error in
+            if let error = error {
+                completion(error)
+                return
+            }
+            LocationDatabase.setLocation(
+                uid: uid,
+                latitude: location.latitude,
+                longitude: location.longitude) { error in
+                    completion(error)
+            }
+        }
+    }
+
     static func user(_ uid: String, completion: @escaping (Result<User, Error>) -> Void) {
         usersCollection.document(uid).getDocument { snapshot, error in
             if let error = error {
@@ -22,22 +51,6 @@ struct Database {
                     completion(.success(try .init(snapshot)))
                 } catch {
                     completion(.fail(error))
-                }
-            }
-        }
-    }
-
-    static func nearbyUsers(latitude: Double,
-                            longitude: Double,
-                            completion: @escaping (Result<[User], Error>) -> Void) {
-        usersCollection.getDocuments { snapshot, error in
-            if let error = error {
-                completion(.fail(error))
-            } else {
-                do {
-                    completion(.success(try snapshot.users()))
-                } catch {
-                    completion(.fail(ARtyError.invalidDataFromServer(snapshot?.documents)))
                 }
             }
         }
@@ -57,41 +70,43 @@ struct Database {
         }
     }
 
-    static func setUid(_ uid: String, completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).setData([
-            "uid": uid
-        ], merge: true) { error in
-            completion(error)
+    static func locationListener(uid: String, callback: @escaping (Location) -> Void) -> ListenerRegistration {
+        return database.collection("locations").document(uid).addSnapshotListener { snapshot, error in
+            if let error = error {
+                print(error)
+                return
+            }
+            do {
+                callback(try .init(snapshot))
+            } catch {
+                print(error)
+            }
         }
     }
 
-    static func updateARty(_ arty: ARty, completion: @escaping (Error?) -> Void) {
+    static func updateModel(arty: ARty, completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
-            "model": arty.model,
-            "passiveAnimation": arty.passiveAnimation,
-            "pokeAnimation": arty.pokeAnimation
+            "model": arty.model
         ]) { error in
             completion(error)
         }
     }
 
-    static func updatePassiveAnimation(to animation: String,
-                                       for arty: ARty,
-                                       completion: @escaping (Error?) -> Void) {
+    static func updatePassiveEmote(to emote: String,
+                                   for arty: ARty,
+                                   completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
-            "passiveAnimation": animation,
-            "recentPassiveAnimations": [arty.model: animation]
+            "passiveEmotes.\(arty.model)": emote
         ]) { error in
             completion(error)
         }
     }
 
-    static func updatePokeAnimation(to animation: String,
-                                    for arty: ARty,
-                                    completion: @escaping (Error?) -> Void) {
+    static func updatePokeEmote(to emote: String,
+                                for arty: ARty,
+                                completion: @escaping (Error?) -> Void) {
         usersCollection.document(arty.uid).updateData([
-            "pokeAnimation": animation,
-            "recentPokeAnimations": [arty.model: animation]
+            "pokeEmotes.\(arty.model)": emote
         ]) { error in
             completion(error)
         }
@@ -100,17 +115,6 @@ struct Database {
     static func updatePokeTimestamp(for uid: String, completion: @escaping (Error?) -> Void) {
         usersCollection.document(uid).updateData([
             "pokeTimestamp": Date()
-        ]) { error in
-            completion(error)
-        }
-    }
-
-    static func updateLocation(latitude: Double,
-                               longitude: Double,
-                               uid: String,
-                               completion: @escaping (Error?) -> Void) {
-        usersCollection.document(uid).updateData([
-            "location": GeoPoint(latitude: latitude, longitude: longitude)
         ]) { error in
             completion(error)
         }

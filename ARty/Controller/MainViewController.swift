@@ -5,12 +5,11 @@ class MainViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var label: UILabel!
 
-    private let locationManager = LocationManager()
     private var uid: String?
     private var arties = [String: ARty]()
-    private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
-    private lazy var nearbyUsersPoller = NearbyUsersPoller(delegate: self)
+    private lazy var locationManager = LocationManager(delegate: self)
+    private lazy var arSessionManager = ARSessionManager(session: sceneView.session)
 
     private var arty: ARty? {
         guard let uid = uid else {
@@ -25,16 +24,14 @@ class MainViewController: UIViewController {
         sceneView.delegate = self
         sceneView.session.delegate = self
         sceneView.autoenablesDefaultLighting = true
+        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
         return scene
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        UIApplication.shared.isIdleTimerDisabled = true
         sceneView.scene = scene
-        locationManager.delegate = self
-        runARSession()
-        appStateObserver.start()
+        sceneView.session.run(ARWorldTrackingConfiguration())
         authManager.listenForAuthState()
     }
 
@@ -47,13 +44,18 @@ class MainViewController: UIViewController {
             let arty = arties[uid] else {
                 return
         }
-        try? arty.playPokeAnimation()   // todo: turn to face user, turn to original spot after poke animation
+        // todo: face camera
+        try? arty.playAnimation(arty.pokeEmote)
         updatePokeTimestamp(uid)
     }
 
     private func updatePokeTimestamp(_ uid: String) {
         if uid == self.uid {
-            Database.updatePokeTimestamp(for: uid) { _ in }
+            Database.updatePokeTimestamp(for: uid) { error in
+                if let error = error {
+                    print(error)
+                }
+            }
         }
     }
 }
@@ -67,7 +69,7 @@ extension MainViewController: ARSessionDelegate {
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        arty.position = currentPosition + arty.positionAdjustment
+        arty.position = currentPosition + ARty.zAdjustment
     }
 }
 
@@ -76,53 +78,90 @@ extension MainViewController: CLLocationManagerDelegate {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
             // todo: if they only authorized when in use, ask again one more time
             locationManager.startUpdatingLocation()
+            locationManager.startUpdatingHeading()
         } else {
             // todo: show alert
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let newLocation = manager.location else {
+        guard let uid = uid, let newLocation = manager.location else {
             return
         }
         if locationManager.isValidLocation(newLocation) {
-            try? arty?.playWalkAnimation(location: newLocation)
-            arty?.turn(location: newLocation)
-            nearbyUsersPoller.coordinates = (newLocation.coordinate.latitude, newLocation.coordinate.longitude)
+            arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
+            try? arty?.walk(location: newLocation)
+
+            arSessionManager.setWorldOrigin(newLocation)
+
+            locationManager.setLocationInDatabase(uid: uid)
+
+            nearbyUsers(
+                uid: uid,
+                latitude: newLocation.coordinate.latitude,
+                longitude: newLocation.coordinate.longitude
+            )
         }
-        locationManager.lastLocation = newLocation
-    }
-}
-
-extension MainViewController: AppStateObserverDelegate {
-    func appStateObserverAppBecameActive(_ observer: AppStateObserver) {
-        runARSession()
     }
 
-    func appStateObserverAppEnteredBackground(_ observer: AppStateObserver) {
-        pauseARSession()
+    private func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
+        LocationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
+            switch result {
+            case .fail(let error):
+                print(error)
+            case .success(let uids):
+                uids.forEach {
+                    self?.observeUser($0)
+                }
+                self?.removeStaleUsers(uids)
+            }
+        }
+    }
+
+    private func observeUser(_ uid: String) {
+        if uid != self.uid && !arties.keys.contains(uid) {
+            ARty.make(uid: uid, delegate: self) { [weak self] result in
+                switch result {
+                case .fail(let error):
+                    print(error)
+                case .success(let arty):
+                    self?.arties[arty.uid] = arty
+                }
+            }
+        }
+    }
+
+    private func removeStaleUsers(_ uids: [String]) {
+        uids
+            .filter {
+                return !arties.keys.contains($0)
+            }
+            .forEach {
+                sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
+                arties.removeValue(forKey: $0)
+        }
     }
 }
 
 extension MainViewController: AuthManagerDelegate {
-    func authManager(_ manager: AuthManager, userLoggedIn uid: String) {
+    func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
+        UIApplication.shared.isIdleTimerDisabled = true
         self.uid = uid
-        runARSession()
-        appStateObserver.start()
-        loadUser(uid)
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
-        nearbyUsersPoller.start()
+        locationManager.startUpdatingHeading()
+        arSessionManager.start()
+        loadUser(uid)
     }
 
-    func authManagerUserLoggedOut(_ manager: AuthManager) {
+    func authManagerUserDidLogOut(_ manager: AuthManager) {
+        UIApplication.shared.isIdleTimerDisabled = false
         uid = nil
         arties.removeAll()
-        sceneView.scene = scene
-        pauseARSession()
-        appStateObserver.stop()
         locationManager.stopUpdatingLocation()
-        nearbyUsersPoller.stop()
+        locationManager.stopUpdatingHeading()
+        sceneView.scene = scene
+        arSessionManager.stop()
         showLoginViewController()
     }
 
@@ -138,12 +177,12 @@ extension MainViewController: AuthManagerDelegate {
                     if user.model != "" {
                         do {
                             let arty = try ARty(user: user, delegate: nil)
-                            self?.addARtyToScene(arty, position: .init())
+                            self?.addARtyToScene(arty)
                         } catch {
                             print(error)
                         }
                     } else {
-                        self?.showEditARtyViewController()
+                        self?.showChooseARtyViewController()
                     }
                 case .fail(let error):
                     print(error)
@@ -153,8 +192,7 @@ extension MainViewController: AuthManagerDelegate {
     }
 
     private func showLoginViewController() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginViewController = storyboard.instantiateViewController(
+        let loginViewController = UIStoryboard.main.instantiateViewController(
             withIdentifier: String(describing: LoginViewController.self)
         )
         let navigationController = UINavigationController(rootViewController: loginViewController)
@@ -162,106 +200,67 @@ extension MainViewController: AuthManagerDelegate {
     }
 }
 
-extension MainViewController: NearbyUsersPollerDelegate {
-    func nearbyUsersPoller(_ poller: NearbyUsersPoller, observeUser user: User) {
-        if user.uid != uid && !arties.keys.contains(user.uid) {
-            do {
-                let arty = try ARty(user: user, delegate: self)
-                addARtyToScene(arty, position: .random)
-            } catch {
-                print(error)
-            }
-        }
-    }
-
-    func nearbyUsersPoller(_ poller: NearbyUsersPoller, removeStaleUsers users: [User]) {
-        users
-            .filter {
-                return !arties.keys.contains($0.uid)
-            }
-            .forEach {
-                sceneView.scene.rootNode.childNode(withName: $0.uid, recursively: false)?.removeFromParentNode()
-                arties.removeValue(forKey: $0.uid)
-        }
-    }
-}
-
 extension MainViewController: ARtyDelegate {
-    func arty(_ arty: ARty, updateUser user: User) {
-        guard let arty = arties[user.uid] else {
+    func arty(_ arty: ARty, userChangedModel user: User) {
+        do {
+            let arty = try ARty(user: user, delegate: self)
+            sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
+            arties[arty.uid] = arty
+        } catch {
+            print(error)
+        }
+    }
+
+    func arty(_ arty: ARty, didUpdateLocation location: Location) {
+        guard let worldOrigin = arSessionManager.worldOrigin else {
             return
         }
-        if user.model != arty.model {
-            do {
-                let arty = try ARty(user: user, delegate: self)
-                addARtyToScene(arty, position: .random)
-            } catch {
-                print(error)
-            }
+        let position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
+        if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
+            sceneView.scene.rootNode.addChildNode(arty)
+            arty.position = position
         } else {
-            // todo: move to ARty?
-            try? arty.setPassiveAnimation(user.passiveAnimation)
-            try? arty.setPokeAnimation(user.pokeAnimation)
-            setPokeTimestamp(arty: arty, user: user)
-            // todo: walk to new location if necessary
+            arty.faceWalkingDirection(course: location.course, heading: location.heading)
+            try? arty.walk(to: position)
         }
-    }
-
-    private func setPokeTimestamp(arty: ARty, user: User) {
-        if arty.pokeTimestamp != user.pokeTimestamp {
-            try? arty.playPokeAnimation()
-        }
-        arty.pokeTimestamp = user.pokeTimestamp
     }
 }
 
-extension MainViewController: EditARtyViewControllerDelegate {
-    func editARtyViewController(_ controller: EditARtyViewController, changeARtyTo model: String) {
+extension MainViewController: ChooseARtyViewControllerDelegate {
+    func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String) {
         guard let uid = uid else {
             return
         }
-        if model != self.arty?.model {
+        if model != arty?.model {
             do {
                 let arty = try ARty(uid: uid, model: model, delegate: nil)
-                addARtyToScene(arty, position: .init())
-                setAnimationsFromBackend(for: arty)
+                addARtyToScene(arty)
+                setRecentEmotes(for: arty)
+                Database.updateModel(arty: arty) { error in
+                    if let error = error {
+                        print(error)
+                    }
+                }
             } catch {
                 print(error)
             }
         }
     }
 
-    private func setAnimationsFromBackend(for arty: ARty) {
+    private func setRecentEmotes(for arty: ARty) {
         Database.user(arty.uid) { result in
             switch result {
             case .success(let user):
-                if let passiveAnimation = user.recentPassiveAnimations[arty.model] {
-                    try? arty.setPassiveAnimation(passiveAnimation)
+                if let passiveEmote = user.passiveEmotes[arty.model] {
+                    try? arty.setPassiveEmote(to: passiveEmote)
                 }
-                if let pokeAnimation = user.recentPokeAnimations[arty.model] {
-                    try? arty.setPokeAnimation(pokeAnimation)
+                if let pokeEmote = user.pokeEmotes[arty.model] {
+                    try? arty.setPokeEmote(to: pokeEmote)
                 }
             case .fail(let error):
                 print(error)
             }
-            Database.updateARty(arty) { _ in }
         }
-    }
-}
-
-extension MainViewController: EditAnimationsViewControllerDelegate {
-    func editAnimationsViewController(_ controller: EditAnimationsViewController,
-                                      setPassiveAnimationTo animation: String,
-                                      for arty: ARty) {
-        try? arty.setPassiveAnimation(animation)
-        Database.updatePassiveAnimation(to: animation, for: arty) { _ in }
-    }
-
-    func editAnimationsViewController(_ controller: EditAnimationsViewController,
-                                      setPokeAnimationTo animation: String,
-                                      for arty: ARty) {
-        try? arty.setPokeAnimation(animation)
-        Database.updatePokeAnimation(to: animation, for: arty) { _ in }
     }
 }
 
@@ -269,45 +268,35 @@ private extension MainViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
     }
 
-    @IBAction func didTapEditAnimationsButton(_ sender: Any) {
+    @IBAction func didTapChooseEmotesButton(_ sender: Any) {
         guard let arty = arty else {
             return
         }
-        let viewController = EditAnimationsViewController.make(arty: arty, delegate: self)
-        let navigationController = UINavigationController(rootViewController: viewController)
+        let controller = ChooseEmotesViewController.make(arty: arty)
+        let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
 
-    @IBAction func didTapEditARtyButton(_ sender: Any) {
-        showEditARtyViewController()
+    @IBAction func didTapChooseARtyButton(_ sender: Any) {
+        showChooseARtyViewController()
     }
 
     @IBAction func didTapReloadButton(_ sender: Any) {
-        runARSession()
+        arSessionManager.pause()
     }
 
     @IBAction func didTapLogOutButton(_ sender: Any) {
         authManager.logout()
     }
 
-    func runARSession() {
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.worldAlignment = .gravityAndHeading
-        sceneView.session.run(configuration, options: [.resetTracking])
-    }
-
-    func pauseARSession() {
-        sceneView.session.pause()
-    }
-
-    func showEditARtyViewController() {
-        let viewController = EditARtyViewController(delegate: self)
-        let navigationController = UINavigationController(rootViewController: viewController)
+    func showChooseARtyViewController() {
+        let controller = ChooseARtyViewController(currentARty: arty?.model ?? "", delegate: self)
+        let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
 
-    func addARtyToScene(_ arty: ARty, position: SCNVector3) {
-        arty.position = arty.positionAdjustment + position  // todo: user anchors
+    func addARtyToScene(_ arty: ARty) {
+        arty.position = ARty.zAdjustment
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
         arties[arty.uid] = arty

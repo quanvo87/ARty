@@ -12,6 +12,7 @@ target 'ARty' do
   pod 'Firebase/Auth'
   pod 'FacebookCore'
   pod 'FacebookLogin'
+  pod 'Alamofire'
   pod 'SwiftLint'
 
   # Pods for ARty

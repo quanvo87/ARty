@@ -1,8 +1,8 @@
 import UIKit
 
 protocol AppStateObserverDelegate: class {
-    func appStateObserverAppBecameActive(_ observer: AppStateObserver)
-    func appStateObserverAppEnteredBackground(_ observer: AppStateObserver)
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver)
+    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver)
 }
 
 class AppStateObserver {
@@ -22,7 +22,7 @@ class AppStateObserver {
                 guard let `self` = self else {
                     return
                 }
-                self.delegate?.appStateObserverAppBecameActive(self)
+                self.delegate?.appStateObserverAppDidBecomeActive(self)
         }
 
         appDidEnterBackgroundObserver = NotificationCenter.default.addObserver(
@@ -32,7 +32,7 @@ class AppStateObserver {
                 guard let `self` = self else {
                     return
                 }
-                self.delegate?.appStateObserverAppEnteredBackground(self)
+                self.delegate?.appStateObserverAppDidEnterBackground(self)
         }
     }
 

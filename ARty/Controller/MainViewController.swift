@@ -9,7 +9,7 @@ class MainViewController: UIViewController {
     private var arties = [String: ARty]()
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var locationManager = LocationManager(delegate: self)
-    private lazy var arSessionManager = ARSessionManager(session: sceneView.session)
+    private lazy var arSessionManager = ARSessionManager(session: sceneView.session, delegate: self)
 
     private var arty: ARty? {
         guard let uid = uid else {
@@ -197,6 +197,18 @@ extension MainViewController: AuthManagerDelegate {
         )
         let navigationController = UINavigationController(rootViewController: loginViewController)
         present(navigationController, animated: true)
+    }
+}
+
+extension MainViewController: ARSessionManagerDelegate {
+    func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
+        arties.values.forEach {
+            guard let location = $0.location else {
+                return
+            }
+            let position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
+            $0.position = position
+        }
     }
 }
 

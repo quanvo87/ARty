@@ -20,11 +20,11 @@ class ARty: SCNNode {
 
     private(set) var pokeEmote = ""
 
+    private(set) var location: Location?
+
     private let animations: [String: CAAnimation]
 
     private let walkAnimation: String
-
-    private var lastLocation = CLLocation()
 
     private var pokeTimestamp: Date?
 
@@ -130,12 +130,16 @@ class ARty: SCNNode {
                 try playAnimation(walkAnimation)
             }
         } else {
+            guard let lastLocation = self.location else {
+                self.location = Location(location: location)
+                return
+            }
             let distance = lastLocation.distance(from: location)
             if distance > 5 {
                 if isIdle {
                     try playAnimation(walkAnimation)
                 }
-                lastLocation = location
+                self.location = Location(location: location)
             } else {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
@@ -213,6 +217,7 @@ private extension ARty {
                 return
             }
             self.delegate?.arty(self, didUpdateLocation: location)
+            self.location = location
         }
     }
 

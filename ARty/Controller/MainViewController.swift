@@ -7,6 +7,9 @@ class MainViewController: UIViewController {
 
     private var uid: String?
     private var arties = [String: ARty]()
+    private var appIsActive = true
+    private let locationDatabase = LocationDatabase()
+    private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var locationManager = LocationManager(delegate: self)
     private lazy var arSessionManager = ARSessionManager(session: sceneView.session, delegate: self)
@@ -18,21 +21,17 @@ class MainViewController: UIViewController {
         return arties[uid]
     }
 
-    private var scene: SCNScene {
-        let scene = SCNScene()
-        sceneView.scene = scene
-        sceneView.delegate = self
-        sceneView.session.delegate = self
-        sceneView.autoenablesDefaultLighting = true
-        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
-        return scene
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+        let scene = SCNScene()
         sceneView.scene = scene
+        sceneView.autoenablesDefaultLighting = true
+        sceneView.delegate = self
+        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
+        sceneView.session.delegate = self
         sceneView.session.run(ARWorldTrackingConfiguration())
         authManager.listenForAuthState()
+        arSessionManager.load()
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -89,23 +88,27 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
-            arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
-            try? arty?.walk(location: newLocation)
+            if let arty = arty, arties[arty.uid] != nil {
+                locationManager.setLocationInDatabase(uid: uid)
+            }
 
-            arSessionManager.setWorldOrigin(newLocation)
+            if appIsActive {
+                arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
+                try? arty?.walk(location: newLocation)
 
-            locationManager.setLocationInDatabase(uid: uid)
+                arSessionManager.setWorldOrigin(newLocation)
 
-            nearbyUsers(
-                uid: uid,
-                latitude: newLocation.coordinate.latitude,
-                longitude: newLocation.coordinate.longitude
-            )
+                nearbyUsers(
+                    uid: uid,
+                    latitude: newLocation.coordinate.latitude,
+                    longitude: newLocation.coordinate.longitude
+                )
+            }
         }
     }
 
     private func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
-        LocationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
+        locationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
             switch result {
             case .fail(let error):
                 print(error)
@@ -143,14 +146,25 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 }
 
+extension MainViewController: AppStateObserverDelegate {
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {
+        appIsActive = true
+    }
+
+    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
+        appIsActive = false
+        arSessionManager.pause()
+    }
+}
+
 extension MainViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
         UIApplication.shared.isIdleTimerDisabled = true
         self.uid = uid
+        appStateObserver.start()
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
         locationManager.startUpdatingHeading()
-        arSessionManager.start()
         loadUser(uid)
     }
 
@@ -158,10 +172,11 @@ extension MainViewController: AuthManagerDelegate {
         UIApplication.shared.isIdleTimerDisabled = false
         uid = nil
         arties.removeAll()
+        removeNodes()
+        appStateObserver.stop()
         locationManager.stopUpdatingLocation()
         locationManager.stopUpdatingHeading()
-        sceneView.scene = scene
-        arSessionManager.stop()
+        arSessionManager.pause()
         showLoginViewController()
     }
 
@@ -188,6 +203,12 @@ extension MainViewController: AuthManagerDelegate {
                     print(error)
                 }
             }
+        }
+    }
+
+    private func removeNodes() {
+        sceneView.scene.rootNode.childNodes.forEach {
+            $0.removeFromParentNode()
         }
     }
 
@@ -308,10 +329,10 @@ private extension MainViewController {
     }
 
     func addARtyToScene(_ arty: ARty) {
+        arties[arty.uid] = arty
         arty.position = ARty.zAdjustment
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
-        arties[arty.uid] = arty
     }
 }
 

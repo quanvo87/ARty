@@ -6,6 +6,7 @@ class MainViewController: UIViewController {
     @IBOutlet weak var label: UILabel!
 
     private var uid: String?
+    private var arty: ARty?
     private var arties = [String: ARty]()
     private var appIsActive = true
     private let locationDatabase = LocationDatabase()
@@ -13,13 +14,6 @@ class MainViewController: UIViewController {
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var locationManager = LocationManager(delegate: self)
     private lazy var arSessionManager = ARSessionManager(session: sceneView.session, delegate: self)
-
-    private var arty: ARty? {
-        guard let uid = uid else {
-            return nil
-        }
-        return arties[uid]
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,21 +33,22 @@ class MainViewController: UIViewController {
             return
         }
         let hitTest = sceneView.hitTest(location, options: [SCNHitTestOption.boundingBoxOnly: true])
-        guard let uid = (hitTest.first?.node.parent as? ARty)?.uid,
-            let arty = arties[uid] else {
-                return
+        guard let uid = (hitTest.first?.node.parent as? ARty)?.uid else {
+            return
         }
-        // todo: face camera
-        try? arty.playAnimation(arty.pokeEmote)
-        updatePokeTimestamp(uid)
+        if let arty = arty, uid == arty.uid {
+            try? arty.playAnimation(arty.pokeEmote)
+            updatePokeTimestamp(uid)
+        } else if let arty = arties[uid] {
+            // todo: face camera
+            try? arty.playAnimation(arty.pokeEmote)
+        }
     }
 
     private func updatePokeTimestamp(_ uid: String) {
-        if uid == self.uid {
-            Database.updatePokeTimestamp(for: uid) { error in
-                if let error = error {
-                    print(error)
-                }
+        Database.updatePokeTimestamp(for: uid) { error in
+            if let error = error {
+                print(error)
             }
         }
     }
@@ -88,8 +83,8 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
-            if let arty = arty, arties[arty.uid] != nil {
-                locationManager.setLocationInDatabase(uid: uid)
+            if let arty = arty {
+                locationManager.setLocationInDatabase(uid: arty.uid)
             }
 
             if appIsActive {
@@ -329,7 +324,7 @@ private extension MainViewController {
     }
 
     func addARtyToScene(_ arty: ARty) {
-        arties[arty.uid] = arty
+        self.arty = arty
         arty.position = ARty.zAdjustment
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)

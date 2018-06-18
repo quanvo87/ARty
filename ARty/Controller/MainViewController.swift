@@ -8,7 +8,6 @@ class MainViewController: UIViewController {
     private var uid: String?
     private var arty: ARty?
     private var arties = [String: ARty]()
-    private var appIsActive = true
     private let locationDatabase = LocationDatabase()
     private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
@@ -59,9 +58,8 @@ extension MainViewController: ARSCNViewDelegate {
 
 extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard let arty = arty,
-            let currentPosition = sceneView.pointOfView?.position else {
-                return
+        guard let arty = arty, let currentPosition = sceneView.pointOfView?.position else {
+            return
         }
         arty.position = currentPosition + ARty.zAdjustment
     }
@@ -87,7 +85,7 @@ extension MainViewController: CLLocationManagerDelegate {
                 locationManager.setLocationInDatabase(uid: arty.uid)
             }
 
-            if appIsActive {
+            if appStateObserver.appIsActive {
                 arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
                 try? arty?.walk(location: newLocation)
 
@@ -142,12 +140,9 @@ extension MainViewController: CLLocationManagerDelegate {
 }
 
 extension MainViewController: AppStateObserverDelegate {
-    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {
-        appIsActive = true
-    }
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {}
 
     func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
-        appIsActive = false
         arSessionManager.pause()
     }
 }
@@ -247,6 +242,7 @@ extension MainViewController: ARtyDelegate {
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
+            // todo: rotate to random angle
         } else {
             arty.faceWalkingDirection(course: location.course, heading: location.heading)
             try? arty.walk(to: position)

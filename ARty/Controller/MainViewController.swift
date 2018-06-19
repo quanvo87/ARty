@@ -116,7 +116,7 @@ extension MainViewController: CLLocationManagerDelegate {
 
     private func observeUser(_ uid: String) {
         if uid != self.uid && !arties.keys.contains(uid) {
-            ARty.make(uid: uid, delegate: self) { [weak self] result in
+            ARty.make(uid: uid, pointOfView: sceneView.pointOfView, delegate: self) { [weak self] result in
                 switch result {
                 case .fail(let error):
                     print(error)
@@ -182,7 +182,7 @@ extension MainViewController: AuthManagerDelegate {
                 case .success(let user):
                     if user.model != "" {
                         do {
-                            let arty = try ARty(user: user, delegate: nil)
+                            let arty = try ARty(user: user, pointOfView: nil, delegate: nil)
                             self?.addARtyToScene(arty)
                         } catch {
                             print(error)
@@ -227,7 +227,7 @@ extension MainViewController: ARSessionManagerDelegate {
 extension MainViewController: ARtyDelegate {
     func arty(_ arty: ARty, userChangedModel user: User) {
         do {
-            let arty = try ARty(user: user, delegate: self)
+            let arty = try ARty(user: user, pointOfView: sceneView.pointOfView, delegate: self)
             sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
             arties[arty.uid] = arty
         } catch {
@@ -243,7 +243,6 @@ extension MainViewController: ARtyDelegate {
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
-            arty.setStatusConstraint(target: sceneView.pointOfView)
             // todo: rotate to random angle
         } else {
             arty.faceWalkingDirection(course: location.course, heading: location.heading)
@@ -259,7 +258,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         }
         if model != arty?.model {
             do {
-                let arty = try ARty(uid: uid, model: model, delegate: nil)
+                let arty = try ARty(uid: uid, model: model, pointOfView: nil, delegate: nil)
                 addARtyToScene(arty)
                 setRecentEmotes(for: arty)
                 Database.updateModel(arty: arty) { error in

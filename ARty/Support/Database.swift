@@ -1,6 +1,5 @@
 import FirebaseFirestore
 
-// todo: make callbacks print errors instead of returning them
 struct Database {
     private static let database: Firestore = {
         let database = Firestore.firestore()

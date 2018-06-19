@@ -26,6 +26,8 @@ class ARty: SCNNode {
 
     private let walkAnimation: String
 
+    private let pointOfView: SCNNode?
+
     private var pokeTimestamp: Date?
 
     private var userListener: ListenerRegistration?
@@ -38,9 +40,11 @@ class ARty: SCNNode {
          model: String,
          passiveEmote: String = "",
          pokeEmote: String = "",
+         pointOfView: SCNNode?,
          delegate: ARtyDelegate?) throws {
         self.uid = uid
         self.model = model
+        self.pointOfView = pointOfView
         emotes = try schema.emotes(for: model)
         animations = try schema.animations(for: model)
         walkAnimation = try schema.walkAnimation(for: model)
@@ -61,17 +65,19 @@ class ARty: SCNNode {
         }
     }
 
-    convenience init(user: User, delegate: ARtyDelegate?) throws {
+    convenience init(user: User, pointOfView: SCNNode?, delegate: ARtyDelegate?) throws {
         try self.init(
             uid: user.uid,
             model: user.model,
             passiveEmote: user.passiveEmote(for: user.model),
             pokeEmote: user.pokeEmote(for: user.model),
+            pointOfView: pointOfView,
             delegate: delegate
         )
     }
 
     static func make(uid: String,
+                     pointOfView: SCNNode?,
                      delegate: ARtyDelegate,
                      completion: @escaping (Database.Result<ARty, Error>) -> Void) {
         Database.user(uid) { result in
@@ -80,7 +86,7 @@ class ARty: SCNNode {
                 completion(.fail(error))
             case .success(let user):
                 do {
-                    completion(.success(try .init(user: user, delegate: delegate)))
+                    completion(.success(try .init(user: user, pointOfView: pointOfView, delegate: delegate)))
                 } catch {
                     completion(.fail(error))
                 }
@@ -172,16 +178,6 @@ class ARty: SCNNode {
             }
             self.removeAnimation(forKey: self.walkAnimation, blendOutDuration: 0.5)
         }
-    }
-
-    func setStatusConstraint(target: SCNNode?) {
-        guard let target = target, let node = childNode(withName: "status", recursively: false) else {
-            return
-        }
-        let constraint = SCNLookAtConstraint(target: target)
-        constraint.isGimbalLockEnabled = true
-        constraint.localFront = .init(0, 0, 1)
-        node.constraints = [constraint]
     }
 
     deinit {
@@ -306,6 +302,13 @@ private extension ARty {
         // swiftlint:enable identifier_name
 
         node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
+
+        if let pointOfView = pointOfView {
+            let constraint = SCNLookAtConstraint(target: pointOfView)
+            constraint.isGimbalLockEnabled = true
+            constraint.localFront = .init(0, 0, 1)
+            node.constraints = [constraint]
+        }
 
         addChildNode(node)
     }

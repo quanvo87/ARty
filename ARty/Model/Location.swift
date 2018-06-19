@@ -1,3 +1,4 @@
+import CoreLocation
 import FirebaseFirestore
 
 struct Location {
@@ -14,6 +15,13 @@ struct Location {
         self.longitude = longitude
         self.course = course
         self.heading = heading
+    }
+
+    init(location: CLLocation) {
+        latitude = location.coordinate.latitude
+        longitude = location.coordinate.longitude
+        course = location.course
+        heading = -1
     }
 
     init(_ snapshot: DocumentSnapshot?) throws {
@@ -38,5 +46,10 @@ struct Location {
             "course": course,
             "heading": heading
         ]
+    }
+
+    func distance(from location: CLLocation) -> Double {
+        let here = CLLocation(latitude: latitude, longitude: longitude)
+        return here.distance(from: location)
     }
 }

@@ -1,30 +1,32 @@
 import ARKit
 import CoreLocation
 
+protocol ARSessionManagerDelegate: class {
+    func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation)
+}
+
 class ARSessionManager {
     private let session: ARSession
-    private lazy var appStateObserver = AppStateObserver(delegate: self)
+    private weak var delegate: ARSessionManagerDelegate?
 
-    init(session: ARSession) {
+    init(session: ARSession, delegate: ARSessionManagerDelegate) {
         self.session = session
+        self.delegate = delegate
     }
 
     private(set) var worldOrigin: CLLocation? {
         didSet {
+            guard let worldOrigin = worldOrigin else {
+                return
+            }
             let configuration = ARWorldTrackingConfiguration()
             configuration.worldAlignment = .gravityAndHeading
             session.run(configuration, options: [.resetTracking])
+            delegate?.arSessionManager(self, didUpdateWorldOrigin: worldOrigin)
         }
     }
 
-    func start() {
-        appStateObserver.start()
-    }
-
-    func stop() {
-        appStateObserver.stop()
-        pause()
-    }
+    func load() {}
 
     func pause() {
         worldOrigin = nil
@@ -39,14 +41,5 @@ class ARSessionManager {
         if location.horizontalAccuracy < worldOrigin.horizontalAccuracy {
             self.worldOrigin = location
         }
-    }
-}
-
-extension ARSessionManager: AppStateObserverDelegate {
-    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {
-    }
-
-    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
-        pause()
     }
 }

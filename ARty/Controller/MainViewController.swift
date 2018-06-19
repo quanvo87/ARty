@@ -6,33 +6,25 @@ class MainViewController: UIViewController {
     @IBOutlet weak var label: UILabel!
 
     private var uid: String?
+    private var arty: ARty?
     private var arties = [String: ARty]()
+    private let locationDatabase = LocationDatabase()
+    private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var locationManager = LocationManager(delegate: self)
-    private lazy var arSessionManager = ARSessionManager(session: sceneView.session)
-
-    private var arty: ARty? {
-        guard let uid = uid else {
-            return nil
-        }
-        return arties[uid]
-    }
-
-    private var scene: SCNScene {
-        let scene = SCNScene()
-        sceneView.scene = scene
-        sceneView.delegate = self
-        sceneView.session.delegate = self
-        sceneView.autoenablesDefaultLighting = true
-        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
-        return scene
-    }
+    private lazy var arSessionManager = ARSessionManager(session: sceneView.session, delegate: self)
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        let scene = SCNScene()
         sceneView.scene = scene
+        sceneView.autoenablesDefaultLighting = true
+        sceneView.delegate = self
+        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
+        sceneView.session.delegate = self
         sceneView.session.run(ARWorldTrackingConfiguration())
         authManager.listenForAuthState()
+        arSessionManager.load()
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -40,21 +32,22 @@ class MainViewController: UIViewController {
             return
         }
         let hitTest = sceneView.hitTest(location, options: [SCNHitTestOption.boundingBoxOnly: true])
-        guard let uid = (hitTest.first?.node.parent as? ARty)?.uid,
-            let arty = arties[uid] else {
-                return
+        guard let uid = (hitTest.first?.node.parent as? ARty)?.uid else {
+            return
         }
-        // todo: face camera
-        try? arty.playAnimation(arty.pokeEmote)
-        updatePokeTimestamp(uid)
+        if let arty = arty, uid == arty.uid {
+            try? arty.playAnimation(arty.pokeEmote)
+            updatePokeTimestamp(uid)
+        } else if let arty = arties[uid] {
+            // todo: face camera
+            try? arty.playAnimation(arty.pokeEmote)
+        }
     }
 
     private func updatePokeTimestamp(_ uid: String) {
-        if uid == self.uid {
-            Database.updatePokeTimestamp(for: uid) { error in
-                if let error = error {
-                    print(error)
-                }
+        Database.updatePokeTimestamp(for: uid) { error in
+            if let error = error {
+                print(error)
             }
         }
     }
@@ -65,9 +58,8 @@ extension MainViewController: ARSCNViewDelegate {
 
 extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard let arty = arty,
-            let currentPosition = sceneView.pointOfView?.position else {
-                return
+        guard let arty = arty, let currentPosition = sceneView.pointOfView?.position else {
+            return
         }
         arty.position = currentPosition + ARty.zAdjustment
     }
@@ -89,23 +81,27 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
-            arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
-            try? arty?.walk(location: newLocation)
+            if let arty = arty {
+                locationManager.setLocationInDatabase(uid: arty.uid)
+            }
 
-            arSessionManager.setWorldOrigin(newLocation)
+            if appStateObserver.appIsActive {
+                arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
+                try? arty?.walk(location: newLocation)
 
-            locationManager.setLocationInDatabase(uid: uid)
+                arSessionManager.setWorldOrigin(newLocation)
 
-            nearbyUsers(
-                uid: uid,
-                latitude: newLocation.coordinate.latitude,
-                longitude: newLocation.coordinate.longitude
-            )
+                nearbyUsers(
+                    uid: uid,
+                    latitude: newLocation.coordinate.latitude,
+                    longitude: newLocation.coordinate.longitude
+                )
+            }
         }
     }
 
     private func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
-        LocationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
+        locationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
             switch result {
             case .fail(let error):
                 print(error)
@@ -143,14 +139,22 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 }
 
+extension MainViewController: AppStateObserverDelegate {
+    func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {}
+
+    func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
+        arSessionManager.pause()
+    }
+}
+
 extension MainViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
         UIApplication.shared.isIdleTimerDisabled = true
         self.uid = uid
+        appStateObserver.start()
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
         locationManager.startUpdatingHeading()
-        arSessionManager.start()
         loadUser(uid)
     }
 
@@ -158,10 +162,11 @@ extension MainViewController: AuthManagerDelegate {
         UIApplication.shared.isIdleTimerDisabled = false
         uid = nil
         arties.removeAll()
+        removeNodes()
+        appStateObserver.stop()
         locationManager.stopUpdatingLocation()
         locationManager.stopUpdatingHeading()
-        sceneView.scene = scene
-        arSessionManager.stop()
+        arSessionManager.pause()
         showLoginViewController()
     }
 
@@ -191,12 +196,30 @@ extension MainViewController: AuthManagerDelegate {
         }
     }
 
+    private func removeNodes() {
+        sceneView.scene.rootNode.childNodes.forEach {
+            $0.removeFromParentNode()
+        }
+    }
+
     private func showLoginViewController() {
         let loginViewController = UIStoryboard.main.instantiateViewController(
             withIdentifier: String(describing: LoginViewController.self)
         )
         let navigationController = UINavigationController(rootViewController: loginViewController)
         present(navigationController, animated: true)
+    }
+}
+
+extension MainViewController: ARSessionManagerDelegate {
+    func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
+        arties.values.forEach {
+            guard let location = $0.location else {
+                return
+            }
+            let position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
+            $0.position = position
+        }
     }
 }
 
@@ -219,6 +242,7 @@ extension MainViewController: ARtyDelegate {
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
+            // todo: rotate to random angle
         } else {
             arty.faceWalkingDirection(course: location.course, heading: location.heading)
             try? arty.walk(to: position)
@@ -296,10 +320,10 @@ private extension MainViewController {
     }
 
     func addARtyToScene(_ arty: ARty) {
+        self.arty = arty
         arty.position = ARty.zAdjustment
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
-        arties[arty.uid] = arty
     }
 }
 

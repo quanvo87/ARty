@@ -7,7 +7,7 @@ struct PositionCalculator {
 
         let rotationMatrix = self.rotationMatrix(bearing: Float(bearing))
 
-        let distance = self.distance(location: location, worldOrigin: worldOrigin)
+        let distance = location.distance(from: worldOrigin)
 
         let position = vector_float4(0, 0, Float(-distance), 0)
 
@@ -49,11 +49,6 @@ private extension PositionCalculator {
         matrix.columns.2.z = cos(bearing)
 
         return matrix.inverse
-    }
-
-    static func distance(location: Location, worldOrigin: CLLocation) -> Double {
-        let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
-        return clLocation.distance(from: worldOrigin)
     }
 
     static func translationMatrix(translation: vector_float4) -> simd_float4x4 {

@@ -6,6 +6,7 @@ protocol AppStateObserverDelegate: class {
 }
 
 class AppStateObserver {
+    var appIsActive = true
     private var appDidBecomeActiveObserver: NSObjectProtocol?
     private var appDidEnterBackgroundObserver: NSObjectProtocol?
     private weak var delegate: AppStateObserverDelegate?
@@ -22,6 +23,7 @@ class AppStateObserver {
                 guard let `self` = self else {
                     return
                 }
+                self.appIsActive = true
                 self.delegate?.appStateObserverAppDidBecomeActive(self)
         }
 
@@ -32,6 +34,7 @@ class AppStateObserver {
                 guard let `self` = self else {
                     return
                 }
+                self.appIsActive = false
                 self.delegate?.appStateObserverAppDidEnterBackground(self)
         }
     }

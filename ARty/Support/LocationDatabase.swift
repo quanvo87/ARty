@@ -1,7 +1,8 @@
 import Alamofire
 
-struct LocationDatabase {
+class LocationDatabase {
     private static let url = "https://arty-backend.herokuapp.com"
+    private var isQuerying = false
 
     static func setUid(_ uid: String, complation: @escaping (Error?) -> Void) {
         let query = "/user/create?uid=\(uid)"
@@ -32,17 +33,23 @@ struct LocationDatabase {
         }
     }
 
-    static func nearbyUsers(uid: String,
-                            latitude: Double,
-                            longitude: Double,
-                            querySize: Int = 20,
-                            radius: Int = 50,
-                            completion: @escaping (Database.Result<[String], Error>) -> Void) {
+    func nearbyUsers(uid: String,
+                     latitude: Double,
+                     longitude: Double,
+                     querySize: Int = 20,
+                     radius: Int = 100,
+                     completion: @escaping (Database.Result<[String], Error>) -> Void) {
+        guard !isQuerying else {
+            return
+        }
+        isQuerying = true
+
         // swiftlint:disable line_length
         let query = "/user/getNearby?uid=\(uid)&lat=\(latitude)&long=\(longitude)&querySize=\(querySize)&radius=\(radius)"
         // swiftlint:enable line_length
 
-        Alamofire.request(url + query).nearbyUsersResponse { response in
+        Alamofire.request(LocationDatabase.url + query).nearbyUsersResponse { [weak self] response in
+            self?.isQuerying = false
             if let error = response.result.error {
                 completion(.fail(error))
                 return

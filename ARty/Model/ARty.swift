@@ -55,6 +55,10 @@ class ARty: SCNNode {
         loopPassiveEmote()
         centerPivot()
         makeListeners(delegate: delegate)
+
+        defer {
+            status = "Hello :)" // todo: add to init, default to random greeting
+        }
     }
 
     convenience init(user: User, delegate: ARtyDelegate?) throws {
@@ -81,6 +85,15 @@ class ARty: SCNNode {
                     completion(.fail(error))
                 }
             }
+        }
+    }
+
+    var status: String = "" {
+        didSet {
+            // todo: language filter
+            let trimmed = status.prefix(10)
+            addStatusNode(String(trimmed))
+            status = String(trimmed)
         }
     }
 
@@ -131,7 +144,7 @@ class ARty: SCNNode {
             }
         } else {
             guard let lastLocation = self.location else {
-                self.location = Location(location: location)
+                self.location = Location(location: location, heading: nil)
                 return
             }
             let distance = lastLocation.distance(from: location)
@@ -139,7 +152,7 @@ class ARty: SCNNode {
                 if isIdle {
                     try playAnimation(walkAnimation)
                 }
-                self.location = Location(location: location)
+                self.location = Location(location: location, heading: nil)
             } else {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
@@ -159,6 +172,16 @@ class ARty: SCNNode {
             }
             self.removeAnimation(forKey: self.walkAnimation, blendOutDuration: 0.5)
         }
+    }
+
+    func setStatusConstraint(target: SCNNode?) {
+        guard let target = target, let node = childNode(withName: "status", recursively: false) else {
+            return
+        }
+        let constraint = SCNLookAtConstraint(target: target)
+        constraint.isGimbalLockEnabled = true
+        constraint.localFront = .init(0, 0, 1)
+        node.constraints = [constraint]
     }
 
     deinit {
@@ -211,6 +234,7 @@ private extension ARty {
             } else {
                 self.delegate?.arty(self, userChangedModel: user)
             }
+            // todo: add status to user. check if it needs to be updated.
         }
         locationListener = Database.locationListener(uid: uid) { [weak self] location in
             guard let `self` = self else {
@@ -250,5 +274,39 @@ private extension ARty {
             usesShortestUnitArc: true
         )
         runAction(rotateAction)
+    }
+
+    func addStatusNode(_ status: String) {
+        childNode(withName: "status", recursively: false)?.removeFromParentNode()
+
+        let text = SCNText(string: status, extrusionDepth: 1)
+
+        let material = SCNMaterial()
+
+        material.diffuse.contents = delegate == nil ? UIColor.green : UIColor.white
+
+        text.materials = [material]
+
+        let node = SCNNode()
+
+        node.name = "status"
+
+        node.position = .init(x: 0, y: 200, z: 0)  // todo: add y to schema
+
+        node.scale = .init(x: 5, y: 5, z: 5)
+
+        node.geometry = text
+
+        let (min, max) = node.boundingBox
+
+        // swiftlint:disable identifier_name
+        let dx = min.x + 0.5 * (max.x - min.x)
+        let dy = min.y + 0.5 * (max.y - min.y)
+        let dz = min.z + 0.5 * (max.z - min.z)
+        // swiftlint:enable identifier_name
+
+        node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
+
+        addChildNode(node)
     }
 }

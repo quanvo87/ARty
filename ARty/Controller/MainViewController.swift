@@ -161,6 +161,7 @@ extension MainViewController: AuthManagerDelegate {
     func authManagerUserDidLogOut(_ manager: AuthManager) {
         UIApplication.shared.isIdleTimerDisabled = false
         uid = nil
+        arty = nil
         arties.removeAll()
         removeNodes()
         appStateObserver.stop()
@@ -242,6 +243,7 @@ extension MainViewController: ARtyDelegate {
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
+            arty.setStatusConstraint(target: sceneView.pointOfView)
             // todo: rotate to random angle
         } else {
             arty.faceWalkingDirection(course: location.course, heading: location.heading)

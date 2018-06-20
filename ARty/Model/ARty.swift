@@ -26,6 +26,8 @@ class ARty: SCNNode {
 
     private let walkAnimation: String
 
+    private let pointOfView: SCNNode?
+
     private var pokeTimestamp: Date?
 
     private var userListener: ListenerRegistration?
@@ -38,9 +40,12 @@ class ARty: SCNNode {
          model: String,
          passiveEmote: String = "",
          pokeEmote: String = "",
+         status: String,
+         pointOfView: SCNNode?,
          delegate: ARtyDelegate?) throws {
         self.uid = uid
         self.model = model
+        self.pointOfView = pointOfView
         emotes = try schema.emotes(for: model)
         animations = try schema.animations(for: model)
         walkAnimation = try schema.walkAnimation(for: model)
@@ -55,19 +60,26 @@ class ARty: SCNNode {
         loopPassiveEmote()
         centerPivot()
         makeListeners(delegate: delegate)
+
+        defer {
+            self.status = status
+        }
     }
 
-    convenience init(user: User, delegate: ARtyDelegate?) throws {
+    convenience init(user: User, pointOfView: SCNNode?, delegate: ARtyDelegate?) throws {
         try self.init(
             uid: user.uid,
             model: user.model,
             passiveEmote: user.passiveEmote(for: user.model),
             pokeEmote: user.pokeEmote(for: user.model),
+            status: user.status,
+            pointOfView: pointOfView,
             delegate: delegate
         )
     }
 
     static func make(uid: String,
+                     pointOfView: SCNNode?,
                      delegate: ARtyDelegate,
                      completion: @escaping (Database.Result<ARty, Error>) -> Void) {
         Database.user(uid) { result in
@@ -76,9 +88,24 @@ class ARty: SCNNode {
                 completion(.fail(error))
             case .success(let user):
                 do {
-                    completion(.success(try .init(user: user, delegate: delegate)))
+                    completion(.success(try .init(user: user, pointOfView: pointOfView, delegate: delegate)))
                 } catch {
                     completion(.fail(error))
+                }
+            }
+        }
+    }
+
+    var status: String = "" {
+        didSet {
+            // todo: language filter
+            let trimmed = status.trimmingCharacters(in: .init(charactersIn: " "))
+            let truncated = String(trimmed.prefix(10))
+            status = truncated
+            try? addStatusNode(truncated)
+            Database.setStatus(truncated, for: uid) { error in
+                if let error = error {
+                    print(error)
                 }
             }
         }
@@ -131,7 +158,7 @@ class ARty: SCNNode {
             }
         } else {
             guard let lastLocation = self.location else {
-                self.location = Location(location: location)
+                self.location = Location(location: location, heading: nil)
                 return
             }
             let distance = lastLocation.distance(from: location)
@@ -139,7 +166,7 @@ class ARty: SCNNode {
                 if isIdle {
                     try playAnimation(walkAnimation)
                 }
-                self.location = Location(location: location)
+                self.location = Location(location: location, heading: nil)
             } else {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
@@ -225,6 +252,9 @@ private extension ARty {
         try? setPassiveEmote(to: user.passiveEmote(for: user.model))
         try? setPokeEmote(to: user.pokeEmote(for: user.model))
         setPokeTimestamp(to: user.pokeTimestamp)
+        if user.status != status {
+            status = user.status
+        }
     }
 
     func setPokeTimestamp(to date: Date) {
@@ -250,5 +280,44 @@ private extension ARty {
             usesShortestUnitArc: true
         )
         runAction(rotateAction)
+    }
+
+    func addStatusNode(_ status: String) throws {
+        childNode(withName: "status", recursively: false)?.removeFromParentNode()
+
+        let text = SCNText(string: status, extrusionDepth: 1)
+
+        let material = SCNMaterial()
+
+        material.diffuse.contents = delegate == nil ? UIColor.green : UIColor.white
+
+        text.materials = [material]
+
+        let node = SCNNode()
+
+        node.name = "status"
+
+        node.position = .init(x: 0, y: try schema.statusHeight(for: model), z: 0)
+
+        node.scale = try schema.statusScale(for: model)
+
+        node.geometry = text
+
+        let (min, max) = node.boundingBox
+
+        // swiftlint:disable identifier_name
+        let dx = min.x + 0.5 * (max.x - min.x)
+        let dy = min.y + 0.5 * (max.y - min.y)
+        let dz = min.z + 0.5 * (max.z - min.z)
+        // swiftlint:enable identifier_name
+
+        node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
+
+        let constraint = SCNLookAtConstraint(target: pointOfView)
+        constraint.isGimbalLockEnabled = true
+        constraint.localFront = .init(0, 0, 1)
+        node.constraints = [constraint]
+
+        addChildNode(node)
     }
 }

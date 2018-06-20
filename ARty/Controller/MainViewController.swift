@@ -116,7 +116,7 @@ extension MainViewController: CLLocationManagerDelegate {
 
     private func observeUser(_ uid: String) {
         if uid != self.uid && !arties.keys.contains(uid) {
-            ARty.make(uid: uid, delegate: self) { [weak self] result in
+            ARty.make(uid: uid, pointOfView: sceneView.pointOfView, delegate: self) { [weak self] result in
                 switch result {
                 case .fail(let error):
                     print(error)
@@ -161,6 +161,7 @@ extension MainViewController: AuthManagerDelegate {
     func authManagerUserDidLogOut(_ manager: AuthManager) {
         UIApplication.shared.isIdleTimerDisabled = false
         uid = nil
+        arty = nil
         arties.removeAll()
         removeNodes()
         appStateObserver.stop()
@@ -181,7 +182,7 @@ extension MainViewController: AuthManagerDelegate {
                 case .success(let user):
                     if user.model != "" {
                         do {
-                            let arty = try ARty(user: user, delegate: nil)
+                            let arty = try ARty(user: user, pointOfView: self?.sceneView.pointOfView, delegate: nil)
                             self?.addARtyToScene(arty)
                         } catch {
                             print(error)
@@ -226,7 +227,7 @@ extension MainViewController: ARSessionManagerDelegate {
 extension MainViewController: ARtyDelegate {
     func arty(_ arty: ARty, userChangedModel user: User) {
         do {
-            let arty = try ARty(user: user, delegate: self)
+            let arty = try ARty(user: user, pointOfView: sceneView.pointOfView, delegate: self)
             sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
             arties[arty.uid] = arty
         } catch {
@@ -257,7 +258,13 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         }
         if model != arty?.model {
             do {
-                let arty = try ARty(uid: uid, model: model, delegate: nil)
+                let arty = try ARty(
+                    uid: uid,
+                    model: model,
+                    status: self.arty?.status ?? "Hello :)",
+                    pointOfView: sceneView.pointOfView,
+                    delegate: nil
+                )
                 addARtyToScene(arty)
                 setRecentEmotes(for: arty)
                 Database.updateModel(arty: arty) { error in
@@ -303,6 +310,30 @@ private extension MainViewController {
 
     @IBAction func didTapChooseARtyButton(_ sender: Any) {
         showChooseARtyViewController()
+    }
+
+    @IBAction func didTapEditStatusButton(_ sender: Any) {
+        guard let arty = arty else {
+            return
+        }
+        let alert = UIAlertController(
+            title: "What's on your mind?",
+            message: "Max 10 chars",
+            preferredStyle: .alert
+        )
+        alert.addTextField { textField in
+            textField.text = arty.status
+            textField.placeholder = "Enter a status"
+            textField.clearButtonMode = .whileEditing
+        }
+        alert.addAction(UIAlertAction(title: "Save", style: .default) { [weak alert] _ in
+            guard let status = alert?.textFields?[0].text else {
+                return
+            }
+            arty.status = status
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(alert, animated: true)
     }
 
     @IBAction func didTapReloadButton(_ sender: Any) {

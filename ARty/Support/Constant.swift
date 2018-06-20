@@ -19,7 +19,9 @@ let elvira = ARtySchema(
     fallAnimation: "",
     defaultPassiveEmote: "elvira_wave",
     defaultPokeEmote: "elvira_buttslap",
-    animationRepeatCounts: ["elvira_wave": 4]
+    animationRepeatCounts: ["elvira_wave": 4],
+    statusHeight: 35,
+    statusScale: 1
 )
 
 let mutant = ARtySchema(
@@ -36,7 +38,9 @@ let mutant = ARtySchema(
     fallAnimation: "mutant_fall",
     defaultPassiveEmote: "mutant_chestthump",
     defaultPokeEmote: "mutant_battlecry",
-    animationRepeatCounts: [:]
+    animationRepeatCounts: [:],
+    statusHeight: 200,
+    statusScale: 5
 )
 
 let paladin = ARtySchema(
@@ -53,5 +57,7 @@ let paladin = ARtySchema(
     fallAnimation: "paladin_fall",
     defaultPassiveEmote: "paladin_wave",
     defaultPokeEmote: "paladin_fierce_attack",
-    animationRepeatCounts: ["paladin_wave": 4]
+    animationRepeatCounts: ["paladin_wave": 4],
+    statusHeight: 200,
+    statusScale: 5
 )

@@ -5,7 +5,7 @@ struct Schema {
 
     func scale(for model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
-        return SCNVector3(scale, scale, scale)
+        return .init(scale, scale, scale)
     }
 
     func emotes(for model: String) throws -> [String] {
@@ -55,6 +55,15 @@ struct Schema {
 
     func defaultPokeEmote(for model: String) throws -> String {
         return try arty(model).defaultPokeEmote
+    }
+
+    func statusHeight(for model: String) throws -> Float {
+        return try arty(model).statusHeight
+    }
+
+    func statusScale(for model: String) throws -> SCNVector3 {
+        let scale = try arty(model).statusScale
+        return .init(scale, scale, scale)
     }
 }
 

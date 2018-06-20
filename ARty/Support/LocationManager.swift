@@ -34,13 +34,8 @@ class LocationManager: CLLocationManager {
         guard let lastLocation = lastLocation else {
             return
         }
-        let location = Location(
-            latitude: lastLocation.coordinate.latitude,
-            longitude: lastLocation.coordinate.longitude,
-            course: lastLocation.course,
-            heading: heading?.trueHeading ?? -1
-        )
-        Database.setLocation(uid: uid, location: location) { error in
+        let location = Location(location: lastLocation, heading: heading?.trueHeading)
+        Database.setLocation(location, for: uid) { error in
             if let error = error {
                 print(error)
             }

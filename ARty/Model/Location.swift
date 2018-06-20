@@ -17,11 +17,15 @@ struct Location {
         self.heading = heading
     }
 
-    init(location: CLLocation) {
+    init(location: CLLocation, heading: CLLocationDirection?) {
         latitude = location.coordinate.latitude
         longitude = location.coordinate.longitude
         course = location.course
-        heading = -1
+        if let heading = heading {
+            self.heading = heading
+        } else {
+            self.heading = -1
+        }
     }
 
     init(_ snapshot: DocumentSnapshot?) throws {

@@ -137,6 +137,13 @@
                                     <action selector="didTapChooseARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="agP-J1-c8H">
+                                <rect key="frame" x="10" y="627" width="75" height="30"/>
+                                <state key="normal" title="Edit Status"/>
+                                <connections>
+                                    <action selector="didTapEditStatusButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="tAK-pA-hHn"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -155,9 +162,12 @@
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="XUW-Yb-qnm"/>
                             <constraint firstItem="uT0-tf-TfT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="exD-5z-Iv0"/>
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" id="gaW-HK-dae"/>
+                            <constraint firstItem="agP-J1-c8H" firstAttribute="leading" secondItem="6Pb-WM-QEe" secondAttribute="leading" constant="10" id="mNz-H7-Nbd"/>
                             <constraint firstItem="pYK-VT-FEI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="o47-Eh-wfc"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="agP-J1-c8H" secondAttribute="trailing" constant="20" symbolic="YES" id="r7T-c5-AOG"/>
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="top" secondItem="6Pb-WM-QEe" secondAttribute="top" id="rYn-9R-giT"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="7az-ZH-489" secondAttribute="bottom" constant="10" id="sLo-0y-vwu"/>
+                            <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="agP-J1-c8H" secondAttribute="bottom" constant="10" id="zbV-Lb-yU2"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Pb-WM-QEe"/>
                     </view>

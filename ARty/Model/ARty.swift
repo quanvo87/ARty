@@ -313,12 +313,10 @@ private extension ARty {
 
         node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
 
-        if let pointOfView = pointOfView {
-            let constraint = SCNLookAtConstraint(target: pointOfView)
-            constraint.isGimbalLockEnabled = true
-            constraint.localFront = .init(0, 0, 1)
-            node.constraints = [constraint]
-        }
+        let constraint = SCNLookAtConstraint(target: pointOfView)
+        constraint.isGimbalLockEnabled = true
+        constraint.localFront = .init(0, 0, 1)
+        node.constraints = [constraint]
 
         addChildNode(node)
     }

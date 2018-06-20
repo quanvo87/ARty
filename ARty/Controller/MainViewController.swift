@@ -182,7 +182,7 @@ extension MainViewController: AuthManagerDelegate {
                 case .success(let user):
                     if user.model != "" {
                         do {
-                            let arty = try ARty(user: user, pointOfView: nil, delegate: nil)
+                            let arty = try ARty(user: user, pointOfView: self?.sceneView.pointOfView, delegate: nil)
                             self?.addARtyToScene(arty)
                         } catch {
                             print(error)
@@ -262,7 +262,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
                     uid: uid,
                     model: model,
                     status: self.arty?.status ?? "Hello :)",
-                    pointOfView: nil,
+                    pointOfView: sceneView.pointOfView,
                     delegate: nil
                 )
                 addARtyToScene(arty)

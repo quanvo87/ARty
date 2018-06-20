@@ -8,4 +8,6 @@ struct ARtySchema {
     let defaultPassiveEmote: String
     let defaultPokeEmote: String
     let animationRepeatCounts: [String: Float]
+    let statusHeight: Float
+    let statusScale: Double
 }

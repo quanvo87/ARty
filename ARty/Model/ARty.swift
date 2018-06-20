@@ -102,7 +102,7 @@ class ARty: SCNNode {
             let trimmed = status.trimmingCharacters(in: .init(charactersIn: " "))
             let truncated = String(trimmed.prefix(10))
             status = truncated
-            addStatusNode(truncated)
+            try? addStatusNode(truncated)
             Database.setStatus(truncated, for: uid) { error in
                 if let error = error {
                     print(error)
@@ -282,7 +282,7 @@ private extension ARty {
         runAction(rotateAction)
     }
 
-    func addStatusNode(_ status: String) {
+    func addStatusNode(_ status: String) throws {
         childNode(withName: "status", recursively: false)?.removeFromParentNode()
 
         let text = SCNText(string: status, extrusionDepth: 1)
@@ -297,9 +297,9 @@ private extension ARty {
 
         node.name = "status"
 
-        node.position = .init(x: 0, y: 200, z: 0)  // todo: add y to schema
+        node.position = .init(x: 0, y: try schema.statusHeight(for: model), z: 0)
 
-        node.scale = .init(x: 5, y: 5, z: 5)
+        node.scale = try schema.statusScale(for: model)
 
         node.geometry = text
 

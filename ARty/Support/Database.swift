@@ -27,7 +27,7 @@ struct Database {
         }
     }
 
-    static func setLocation(uid: String, location: Location, completion: @escaping (Error?) -> Void) {
+    static func setLocation(_ location: Location, for uid: String, completion: @escaping (Error?) -> Void) {
         database.collection("locations").document(uid).setData(location.dictionary) { error in
             if let error = error {
                 completion(error)
@@ -39,6 +39,14 @@ struct Database {
                 longitude: location.longitude) { error in
                     completion(error)
             }
+        }
+    }
+
+    static func setStatus(_ status: String, for uid: String, completion: @escaping (Error?) -> Void) {
+        usersCollection.document(uid).updateData([
+            "status": status
+        ]) { error in
+            completion(error)
         }
     }
 

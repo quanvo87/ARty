@@ -6,6 +6,7 @@ struct User {
     let passiveEmotes: [String: String]
     let pokeEmotes: [String: String]
     let pokeTimestamp: Date
+    let status: String
 
     init(_ snapshot: DocumentSnapshot?) throws {
         guard let unwrappedSnapshot = snapshot,
@@ -18,6 +19,7 @@ struct User {
         passiveEmotes = data["passiveEmotes"] as? [String: String] ?? [:]
         pokeEmotes = data["pokeEmotes"] as? [String: String] ?? [:]
         pokeTimestamp = (data["pokeTimestamp"] as? Timestamp)?.dateValue() ?? Date()
+        status = data["status"] as? String ?? ""
     }
 
     func passiveEmote(for model: String) throws -> String {

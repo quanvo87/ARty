@@ -40,6 +40,7 @@ class ARty: SCNNode {
          model: String,
          passiveEmote: String = "",
          pokeEmote: String = "",
+         status: String,
          pointOfView: SCNNode?,
          delegate: ARtyDelegate?) throws {
         self.uid = uid
@@ -61,7 +62,7 @@ class ARty: SCNNode {
         makeListeners(delegate: delegate)
 
         defer {
-            status = "Hello :)" // todo: add to init, default to random greeting
+            self.status = status
         }
     }
 
@@ -71,6 +72,7 @@ class ARty: SCNNode {
             model: user.model,
             passiveEmote: user.passiveEmote(for: user.model),
             pokeEmote: user.pokeEmote(for: user.model),
+            status: user.status,
             pointOfView: pointOfView,
             delegate: delegate
         )
@@ -97,9 +99,15 @@ class ARty: SCNNode {
     var status: String = "" {
         didSet {
             // todo: language filter
-            let trimmed = status.prefix(10)
-            addStatusNode(String(trimmed))
-            status = String(trimmed)
+            let trimmed = status.trimmingCharacters(in: .init(charactersIn: " "))
+            let truncated = String(trimmed.prefix(10))
+            status = truncated
+            addStatusNode(truncated)
+            Database.setStatus(truncated, for: uid) { error in
+                if let error = error {
+                    print(error)
+                }
+            }
         }
     }
 
@@ -230,7 +238,6 @@ private extension ARty {
             } else {
                 self.delegate?.arty(self, userChangedModel: user)
             }
-            // todo: add status to user. check if it needs to be updated.
         }
         locationListener = Database.locationListener(uid: uid) { [weak self] location in
             guard let `self` = self else {
@@ -245,6 +252,9 @@ private extension ARty {
         try? setPassiveEmote(to: user.passiveEmote(for: user.model))
         try? setPokeEmote(to: user.pokeEmote(for: user.model))
         setPokeTimestamp(to: user.pokeTimestamp)
+        if user.status != status {
+            status = user.status
+        }
     }
 
     func setPokeTimestamp(to date: Date) {

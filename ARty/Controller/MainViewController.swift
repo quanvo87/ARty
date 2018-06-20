@@ -258,7 +258,13 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         }
         if model != arty?.model {
             do {
-                let arty = try ARty(uid: uid, model: model, pointOfView: nil, delegate: nil)
+                let arty = try ARty(
+                    uid: uid,
+                    model: model,
+                    status: self.arty?.status ?? "Hello :)",
+                    pointOfView: nil,
+                    delegate: nil
+                )
                 addARtyToScene(arty)
                 setRecentEmotes(for: arty)
                 Database.updateModel(arty: arty) { error in
@@ -304,6 +310,30 @@ private extension MainViewController {
 
     @IBAction func didTapChooseARtyButton(_ sender: Any) {
         showChooseARtyViewController()
+    }
+
+    @IBAction func didTapEditStatusButton(_ sender: Any) {
+        guard let arty = arty else {
+            return
+        }
+        let alert = UIAlertController(
+            title: "What's on your mind?",
+            message: "Max 10 chars",
+            preferredStyle: .alert
+        )
+        alert.addTextField { textField in
+            textField.text = arty.status
+            textField.placeholder = "Enter a status"
+            textField.clearButtonMode = .whileEditing
+        }
+        alert.addAction(UIAlertAction(title: "Save", style: .default) { [weak alert] _ in
+            guard let status = alert?.textFields?[0].text else {
+                return
+            }
+            arty.status = status
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(alert, animated: true)
     }
 
     @IBAction func didTapReloadButton(_ sender: Any) {

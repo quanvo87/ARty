@@ -1,6 +1,7 @@
 import CoreLocation
 import SceneKit
 
+// todo: add min max
 struct PositionCalculator {
     static func position(location: Location, worldOrigin: CLLocation) -> SCNVector3 {
         let bearing = self.bearing(origin: worldOrigin, location: location)

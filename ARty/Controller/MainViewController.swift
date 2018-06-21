@@ -18,7 +18,7 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         let scene = SCNScene()
         sceneView.scene = scene
-        sceneView.autoenablesDefaultLighting = true
+//        sceneView.autoenablesDefaultLighting = true
         sceneView.delegate = self
         sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
         sceneView.session.delegate = self
@@ -100,6 +100,7 @@ extension MainViewController: CLLocationManagerDelegate {
         }
     }
 
+    // todo: test
     private func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
         locationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
             switch result {
@@ -128,9 +129,9 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 
     private func removeStaleUsers(_ uids: [String]) {
-        uids
+        arties.keys
             .filter {
-                return !arties.keys.contains($0)
+                return !uids.contains($0)
             }
             .forEach {
                 sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()

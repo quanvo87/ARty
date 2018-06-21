@@ -8,6 +8,8 @@ class LocationManager: CLLocationManager {
         super.init()
         self.delegate = delegate
         desiredAccuracy = kCLLocationAccuracyBest
+        allowsBackgroundLocationUpdates = true
+        pausesLocationUpdatesAutomatically = false
     }
 
     func isValidLocation(_ location: CLLocation) -> Bool {

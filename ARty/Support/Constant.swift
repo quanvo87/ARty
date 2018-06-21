@@ -8,6 +8,8 @@ var schema = Schema(
     ]
 )
 
+// todo: make arties a little smaller
+// todo: add a slight negative y value
 let elvira = ARtySchema(
     model: "elvira",
     scale: 0.02,

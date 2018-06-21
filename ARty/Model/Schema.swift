@@ -2,6 +2,7 @@ import SceneKit
 
 struct Schema {
     let arties: [String: ARtySchema]
+    private let animationCache = NSCache<NSString, CAAnimation>()
 
     func scale(for model: String) throws -> SCNVector3 {
         let scale = try arty(model).scale
@@ -92,6 +93,9 @@ private extension Schema {
     }
 
     func animation(model: String, animation: String) throws -> CAAnimation {
+        if let caAnimation = animationCache.object(forKey: animation as NSString) {
+            return caAnimation
+        }
         let resourcePath = model.resourcePath + "/" + animation
         guard let url = Bundle.main.url(forResource: resourcePath, withExtension: "dae") else {
             throw ARtyError.resourceNotFound(resourcePath + ".dae")
@@ -105,6 +109,7 @@ private extension Schema {
         caAnimation.repeatCount = try animationRepeatCount(model: model, animation: animation)
         caAnimation.fadeInDuration = 1
         caAnimation.fadeOutDuration = 0.5
+        animationCache.setObject(caAnimation, forKey: animation as NSString)
         return caAnimation
     }
 

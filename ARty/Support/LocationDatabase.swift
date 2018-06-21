@@ -37,7 +37,7 @@ class LocationDatabase {
                      latitude: Double,
                      longitude: Double,
                      querySize: Int = 20,
-                     radius: Int = 100,
+                     radius: Int = 300,
                      completion: @escaping (Database.Result<[String], Error>) -> Void) {
         guard !isQuerying else {
             return

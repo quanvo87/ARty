@@ -47,7 +47,7 @@ extension ChooseARtyViewController: UITableViewDataSource {
         let arty = arties[indexPath.row]
 
         let cell = UITableViewCell()
-        cell.textLabel?.text = arty.capitalized
+        cell.textLabel?.text = arty.replacingUnderscoresWithSpaces.capitalized
         cell.accessoryType = arty == currentARty ? .checkmark : .none
 
         return cell
@@ -65,5 +65,11 @@ extension ChooseARtyViewController: UITableViewDelegate {
 private extension ChooseARtyViewController {
     @objc func close() {
         dismiss(animated: true)
+    }
+}
+
+private extension String {
+    var replacingUnderscoresWithSpaces: String {
+        return replacingOccurrences(of: "_", with: " ")
     }
 }

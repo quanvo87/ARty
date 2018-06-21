@@ -1,8 +1,10 @@
+// swiftlint:disable identifier_name
 var schema = Schema(
     arties: [
         elvira.model: elvira,
         mutant.model: mutant,
-        paladin.model: paladin
+        paladin.model: paladin,
+        gunship_soldier.model: gunship_soldier
     ]
 )
 
@@ -61,3 +63,27 @@ let paladin = ARtySchema(
     statusHeight: 200,
     statusScale: 5
 )
+
+let gunship_soldier = ARtySchema(
+    model: "gunship_soldier",
+    scale: 0.1,
+    emotes: [
+        "gunship_soldier_backflip_uppercut",
+        "gunship_soldier_bboy_hip_hop_dance",
+        "gunship_soldier_fighting_stance",
+        "gunship_soldier_wave"
+    ],
+    idleAnimation: "gunship_soldier_idle",
+    walkAnimation: "gunship_soldier_walk",
+    fallAnimation: "",
+    defaultPassiveEmote: "gunship_soldier_fighting_stance",
+    defaultPokeEmote: "gunship_soldier_backflip_uppercut",
+    animationRepeatCounts: [
+        "gunship_soldier_bboy_hip_hop_dance": 2,
+        "gunship_soldier_fighting_stance": 2,
+        "gunship_soldier_wave": 4
+    ],
+    statusHeight: 6.5,
+    statusScale: 0.15
+)
+// swiftlint:enable identifier_name

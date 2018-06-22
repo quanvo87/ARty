@@ -8,8 +8,6 @@ protocol ARtyDelegate: class {
 }
 
 class ARty: SCNNode {
-    static let zAdjustment = SCNVector3(0, 0, -1)
-
     let uid: String
 
     let model: String

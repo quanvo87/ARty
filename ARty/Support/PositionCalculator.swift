@@ -1,7 +1,6 @@
 import CoreLocation
 import SceneKit
 
-// todo: add min max
 struct PositionCalculator {
     static func position(location: Location, worldOrigin: CLLocation) -> SCNVector3 {
         let bearing = self.bearing(origin: worldOrigin, location: location)
@@ -18,7 +17,9 @@ struct PositionCalculator {
 
         let locationTransform = simd_mul(matrix_identity_float4x4, transformMatrix)
 
-        return positionFromTransform(locationTransform)
+        let positionFromTransform = self.positionFromTransform(locationTransform)
+
+        return positionFromTransform.minApplied.maxApplied.yAdjusted
     }
 }
 
@@ -60,5 +61,31 @@ private extension PositionCalculator {
 
     static func positionFromTransform(_ transform: simd_float4x4) -> SCNVector3 {
         return .init(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
+    }
+}
+
+private extension SCNVector3 {
+    var minApplied: SCNVector3 {
+        if length < 1 {
+            let multiplier = 1 / length
+            return multiplied(by: multiplier)
+        }
+        return self
+    }
+
+    var maxApplied: SCNVector3 {
+        if length > 5 {
+            let multiplier = 5 / length
+            return multiplied(by: multiplier)
+        }
+        return self
+    }
+
+    var length: Float {
+        return sqrt((x * x + y * y + z * z))
+    }
+
+    func multiplied(by scalar: Float) -> SCNVector3 {
+        return .init(x * scalar, y * scalar, z * scalar)
     }
 }

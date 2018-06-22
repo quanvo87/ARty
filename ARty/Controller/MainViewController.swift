@@ -37,18 +37,13 @@ class MainViewController: UIViewController {
         }
         if let arty = arty, uid == arty.uid {
             try? arty.playAnimation(arty.pokeEmote)
-            updatePokeTimestamp(uid)
-        } else if let arty = arties[uid] {
-            // todo: face camera
-            try? arty.playAnimation(arty.pokeEmote)
-        }
-    }
-
-    private func updatePokeTimestamp(_ uid: String) {
-        Database.updatePokeTimestamp(for: uid) { error in
-            if let error = error {
-                print(error)
+            Database.updatePokeTimestamp(for: uid) { error in
+                if let error = error {
+                    print(error)
+                }
             }
+        } else if let arty = arties[uid] {
+            try? arty.playAnimation(arty.pokeEmote)
         }
     }
 }
@@ -68,11 +63,7 @@ extension MainViewController: ARSessionDelegate {
 extension MainViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
-            // todo: if they only authorized when in use, ask again one more time
             locationManager.startUpdatingLocation()
-            locationManager.startUpdatingHeading()
-        } else {
-            // todo: show alert
         }
     }
 
@@ -81,12 +72,14 @@ extension MainViewController: CLLocationManagerDelegate {
             return
         }
         if locationManager.isValidLocation(newLocation) {
+            locationManager.lastLocation = newLocation
+
             if let arty = arty {
                 locationManager.setLocationInDatabase(uid: arty.uid)
             }
 
             if appStateObserver.appIsActive {
-                arty?.faceWalkingDirection(course: newLocation.course, heading: nil)
+                arty?.faceWalkingDirection(newLocation.course)
                 try? arty?.walk(location: newLocation)
 
                 arSessionManager.setWorldOrigin(newLocation)
@@ -100,7 +93,6 @@ extension MainViewController: CLLocationManagerDelegate {
         }
     }
 
-    // todo: test
     private func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
         locationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
             switch result {
@@ -155,7 +147,6 @@ extension MainViewController: AuthManagerDelegate {
         appStateObserver.start()
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
-        locationManager.startUpdatingHeading()
         loadUser(uid)
     }
 
@@ -167,7 +158,6 @@ extension MainViewController: AuthManagerDelegate {
         removeNodes()
         appStateObserver.stop()
         locationManager.stopUpdatingLocation()
-        locationManager.stopUpdatingHeading()
         arSessionManager.pause()
         showLoginViewController()
     }
@@ -219,8 +209,7 @@ extension MainViewController: ARSessionManagerDelegate {
             guard let location = $0.location else {
                 return
             }
-            let position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
-            $0.position = position
+            $0.position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
         }
     }
 }
@@ -236,7 +225,7 @@ extension MainViewController: ARtyDelegate {
         }
     }
 
-    func arty(_ arty: ARty, didUpdateLocation location: Location) {
+    func arty(_ arty: ARty, didUpdateLocation location: CLLocation) {
         guard let worldOrigin = arSessionManager.worldOrigin else {
             return
         }
@@ -244,9 +233,8 @@ extension MainViewController: ARtyDelegate {
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
-            // todo: rotate to random angle
         } else {
-            arty.faceWalkingDirection(course: location.course, heading: location.heading)
+            arty.faceWalkingDirection(location.course)
             try? arty.walk(to: position)
         }
     }

@@ -8,6 +8,7 @@ var schema = Schema(
     ]
 )
 
+// todo: make arties bigger, maybe lower
 let elvira = ARtySchema(
     model: "elvira",
     scale: 0.02,

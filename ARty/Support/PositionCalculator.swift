@@ -33,10 +33,8 @@ private extension PositionCalculator {
 
         let longDiff = long2 - long1
 
-        // swiftlint:disable identifier_name
         let y = sin(longDiff) * cos(lat2)
         let x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(longDiff)
-        // swiftlint:enable identifier_name
 
         return atan2(y, x)
     }

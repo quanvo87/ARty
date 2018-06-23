@@ -18,9 +18,10 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         let scene = SCNScene()
         sceneView.scene = scene
-//        sceneView.autoenablesDefaultLighting = true
+        sceneView.autoenablesDefaultLighting = true
         sceneView.delegate = self
         sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
+//        sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         sceneView.session.delegate = self
         sceneView.session.run(ARWorldTrackingConfiguration())
         authManager.listenForAuthState()
@@ -162,6 +163,7 @@ extension MainViewController: AuthManagerDelegate {
         showLoginViewController()
     }
 
+    // todo: add user defaults
     private func loadUser(_ uid: String) {
         Database.setUid(uid) { [weak self] error in
             if let error = error {
@@ -233,6 +235,7 @@ extension MainViewController: ARtyDelegate {
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
+            arty.eulerAngles.y = Float(arc4random_uniform(360))
         } else {
             arty.faceWalkingDirection(location.course)
             try? arty.walk(to: position)
@@ -341,6 +344,7 @@ private extension MainViewController {
 
     func addARtyToScene(_ arty: ARty) {
         self.arty = arty
+        arty.position = arty.position.yAdjusted.zAdjusted
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
     }

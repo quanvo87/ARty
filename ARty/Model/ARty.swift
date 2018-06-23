@@ -129,9 +129,11 @@ class ARty: SCNNode {
         guard direction != -1 else {
             return
         }
+        let adjustedDirection = -1 * (direction - 180)
+        let radians = adjustedDirection.radians
         let rotateAction = SCNAction.rotateTo(
             x: 0,
-            y: CGFloat(direction.angle),
+            y: CGFloat(radians),
             z: 0,
             duration: 1,
             usesShortestUnitArc: true
@@ -296,11 +298,9 @@ private extension ARty {
 
         let (min, max) = node.boundingBox
 
-        // swiftlint:disable identifier_name
         let dx = min.x + 0.5 * (max.x - min.x)
         let dy = min.y + 0.5 * (max.y - min.y)
         let dz = min.z + 0.5 * (max.z - min.z)
-        // swiftlint:enable identifier_name
 
         node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
 

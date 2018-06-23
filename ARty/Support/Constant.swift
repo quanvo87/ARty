@@ -1,4 +1,3 @@
-// swiftlint:disable identifier_name
 var schema = Schema(
     arties: [
         elvira.model: elvira,
@@ -8,6 +7,7 @@ var schema = Schema(
     ]
 )
 
+// todo: make arties bigger, maybe lower
 let elvira = ARtySchema(
     model: "elvira",
     scale: 0.02,
@@ -86,4 +86,3 @@ let gunship_soldier = ARtySchema(
     statusHeight: 6.5,
     statusScale: 0.15
 )
-// swiftlint:enable identifier_name

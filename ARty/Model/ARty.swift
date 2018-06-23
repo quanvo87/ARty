@@ -4,7 +4,7 @@ import FirebaseFirestore
 
 protocol ARtyDelegate: class {
     func arty(_ arty: ARty, userChangedModel user: User)
-    func arty(_ arty: ARty, didUpdateLocation location: Location)
+    func arty(_ arty: ARty, didUpdateLocation location: CLLocation)
 }
 
 class ARty: SCNNode {
@@ -18,7 +18,7 @@ class ARty: SCNNode {
 
     private(set) var pokeEmote = ""
 
-    private(set) var location: Location?
+    private(set) var location: CLLocation?
 
     private let animations: [String: CAAnimation]
 
@@ -96,7 +96,6 @@ class ARty: SCNNode {
 
     var status: String = "" {
         didSet {
-            // todo: language filter
             let trimmed = status.trimmingCharacters(in: .init(charactersIn: " "))
             let truncated = String(trimmed.prefix(10))
             status = truncated
@@ -126,18 +125,15 @@ class ARty: SCNNode {
         addAnimation(caAnimation, forKey: animation)
     }
 
-    func faceWalkingDirection(course: CLLocationDirection, heading: CLLocationDirection?) {
-        var angle: Double
-        if course >= 0 {
-            angle = course.angle
-        } else if let heading = heading, heading >= 0 {
-            angle = heading.angle
-        } else {
+    func faceWalkingDirection(_ direction: CLLocationDirection) {
+        guard direction != -1 else {
             return
         }
+        let adjustedDirection = -1 * (direction - 180)
+        let radians = adjustedDirection.radians
         let rotateAction = SCNAction.rotateTo(
             x: 0,
-            y: CGFloat(angle),
+            y: CGFloat(radians),
             z: 0,
             duration: 1,
             usesShortestUnitArc: true
@@ -147,7 +143,7 @@ class ARty: SCNNode {
 
     func walk(location: CLLocation) throws {
         let speed = location.speed
-        if speed > 0 {
+        if speed != -1 {
             if speed < 0.5 {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
@@ -156,7 +152,7 @@ class ARty: SCNNode {
             }
         } else {
             guard let lastLocation = self.location else {
-                self.location = Location(location: location, heading: nil)
+                self.location = location
                 return
             }
             let distance = lastLocation.distance(from: location)
@@ -164,7 +160,7 @@ class ARty: SCNNode {
                 if isIdle {
                     try playAnimation(walkAnimation)
                 }
-                self.location = Location(location: location, heading: nil)
+                self.location = location
             } else {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
                 faceCamera()
@@ -176,7 +172,6 @@ class ARty: SCNNode {
         if isIdle {
             try playAnimation(walkAnimation)
         }
-        // todo: make duration a function of distance
         let moveAction = SCNAction.move(to: position, duration: 5)
         runAction(moveAction) { [weak self] in
             guard let `self` = self else {
@@ -256,10 +251,10 @@ private extension ARty {
     }
 
     func setPokeTimestamp(to date: Date) {
-        if self.pokeTimestamp != date {
+        if pokeTimestamp != date {
             try? playAnimation(pokeEmote)
         }
-        self.pokeTimestamp = date
+        pokeTimestamp = date
     }
 
     func animation(_ animation: String) throws -> CAAnimation {
@@ -303,11 +298,9 @@ private extension ARty {
 
         let (min, max) = node.boundingBox
 
-        // swiftlint:disable identifier_name
         let dx = min.x + 0.5 * (max.x - min.x)
         let dy = min.y + 0.5 * (max.y - min.y)
         let dz = min.z + 0.5 * (max.z - min.z)
-        // swiftlint:enable identifier_name
 
         node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
 

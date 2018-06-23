@@ -5,6 +5,7 @@ protocol ARSessionManagerDelegate: class {
     func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation)
 }
 
+// todo: reset every once in a while?
 class ARSessionManager {
     private let session: ARSession
     private weak var delegate: ARSessionManagerDelegate?

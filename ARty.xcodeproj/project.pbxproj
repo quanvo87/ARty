@@ -31,7 +31,7 @@
 		59B386EC20BF491D003BC2E5 /* ChooseARtyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */; };
 		59C1ADA720D0EC76002B920A /* PositionCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C1ADA620D0EC76002B920A /* PositionCalculator.swift */; };
 		59CAF1BF20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CAF1BE20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift */; };
-		59DBFD3020D1590500580F18 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59DBFD2F20D1590500580F18 /* Location.swift */; };
+		59DBFD3020D1590500580F18 /* Extension+CLLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59DBFD2F20D1590500580F18 /* Extension+CLLocation.swift */; };
 		59E747FD20C629BD006217C4 /* AppStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E747FC20C629BD006217C4 /* AppStateObserver.swift */; };
 		59EC1B0720D1D45100531998 /* Extension+Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59EC1B0620D1D45100531998 /* Extension+Double.swift */; };
 		5FF4BFC55782DF0B617E4301 /* Pods_ARty.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B62A1CF86D92BA288F60E1DD /* Pods_ARty.framework */; };
@@ -66,7 +66,7 @@
 		59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseARtyViewController.swift; sourceTree = "<group>"; };
 		59C1ADA620D0EC76002B920A /* PositionCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionCalculator.swift; sourceTree = "<group>"; };
 		59CAF1BE20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseEmotesViewController.swift; sourceTree = "<group>"; };
-		59DBFD2F20D1590500580F18 /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		59DBFD2F20D1590500580F18 /* Extension+CLLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+CLLocation.swift"; sourceTree = "<group>"; };
 		59E747FC20C629BD006217C4 /* AppStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateObserver.swift; sourceTree = "<group>"; };
 		59EC1B0620D1D45100531998 /* Extension+Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+Double.swift"; sourceTree = "<group>"; };
 		B62A1CF86D92BA288F60E1DD /* Pods_ARty.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ARty.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,7 +133,6 @@
 			children = (
 				59298B0620BF973A003D1D98 /* ARty.swift */,
 				592C08D820BF5CEF00E23EEC /* ARtySchema.swift */,
-				59DBFD2F20D1590500580F18 /* Location.swift */,
 				592C08E020BF7F8200E23EEC /* Schema.swift */,
 				5993889420C046750060A37E /* User.swift */,
 			);
@@ -161,6 +160,7 @@
 				5908372720C0FD2100A36103 /* AuthManager.swift */,
 				59298B1120C02D82003D1D98 /* Constant.swift */,
 				5908371E20C0BE2E00A36103 /* Database.swift */,
+				59DBFD2F20D1590500580F18 /* Extension+CLLocation.swift */,
 				59EC1B0620D1D45100531998 /* Extension+Double.swift */,
 				594E406B20DC7ED800F9FBCD /* Extension+SCNVector3.swift */,
 				59238E2620D442D300775BB8 /* Extension+UIStoryboard.swift */,
@@ -363,7 +363,7 @@
 				5908372A20C0FEB700A36103 /* LoginViewController.swift in Sources */,
 				59412B8A20B5721300A2ED02 /* AppDelegate.swift in Sources */,
 				5999737E20CA6BA3004DE3F9 /* ARSessionManager.swift in Sources */,
-				59DBFD3020D1590500580F18 /* Location.swift in Sources */,
+				59DBFD3020D1590500580F18 /* Extension+CLLocation.swift in Sources */,
 				59584BDA20C79B98000F72D9 /* LocationManager.swift in Sources */,
 				5992347B20CEF890008F4762 /* LocationDatabase.swift in Sources */,
 				59CAF1BF20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift in Sources */,

@@ -1,4 +1,5 @@
 import FirebaseFirestore
+import CoreLocation
 
 struct Database {
     private static let database: Firestore = {
@@ -27,7 +28,7 @@ struct Database {
         }
     }
 
-    static func setLocation(_ location: Location, for uid: String, completion: @escaping (Error?) -> Void) {
+    static func setLocation(_ location: CLLocation, for uid: String, completion: @escaping (Error?) -> Void) {
         database.collection("locations").document(uid).setData(location.dictionary) { error in
             if let error = error {
                 completion(error)
@@ -35,8 +36,8 @@ struct Database {
             }
             LocationDatabase.setLocation(
                 uid: uid,
-                latitude: location.latitude,
-                longitude: location.longitude) { error in
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude) { error in
                     completion(error)
             }
         }
@@ -78,7 +79,7 @@ struct Database {
         }
     }
 
-    static func locationListener(uid: String, callback: @escaping (Location) -> Void) -> ListenerRegistration {
+    static func locationListener(uid: String, callback: @escaping (CLLocation) -> Void) -> ListenerRegistration {
         return database.collection("locations").document(uid).addSnapshotListener { snapshot, error in
             if let error = error {
                 print(error)

@@ -1,15 +1,15 @@
 import CoreLocation
 
 class LocationManager: CLLocationManager {
+    var lastLocation: CLLocation?
     private let startDate = Date()
-    private var lastLocation: CLLocation?
 
     init(delegate: CLLocationManagerDelegate) {
         super.init()
         self.delegate = delegate
         desiredAccuracy = kCLLocationAccuracyBest
-        allowsBackgroundLocationUpdates = true
-        pausesLocationUpdatesAutomatically = false
+//        allowsBackgroundLocationUpdates = true
+//        pausesLocationUpdatesAutomatically = false
     }
 
     func isValidLocation(_ location: CLLocation) -> Bool {
@@ -20,14 +20,8 @@ class LocationManager: CLLocationManager {
             return false
         }
         if let lastLocation = lastLocation {
-            if location.timestamp.timeIntervalSince(lastLocation.timestamp) < 0 {
-                return false
-            } else {
-                self.lastLocation = location
-                return true
-            }
+            return location.timestamp.timeIntervalSince(lastLocation.timestamp) < 0 ? false : true
         } else {
-            lastLocation = location
             return true
         }
     }
@@ -36,8 +30,7 @@ class LocationManager: CLLocationManager {
         guard let lastLocation = lastLocation else {
             return
         }
-        let location = Location(location: lastLocation, heading: heading?.trueHeading)
-        Database.setLocation(location, for: uid) { error in
+        Database.setLocation(lastLocation, for: uid) { error in
             if let error = error {
                 print(error)
             }

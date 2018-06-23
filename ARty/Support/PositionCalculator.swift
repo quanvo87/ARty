@@ -2,7 +2,7 @@ import CoreLocation
 import SceneKit
 
 struct PositionCalculator {
-    static func position(location: Location, worldOrigin: CLLocation) -> SCNVector3 {
+    static func position(location: CLLocation, worldOrigin: CLLocation) -> SCNVector3 {
         let bearing = self.bearing(origin: worldOrigin, location: location)
 
         let rotationMatrix = self.rotationMatrix(bearing: Float(bearing))
@@ -24,19 +24,17 @@ struct PositionCalculator {
 }
 
 private extension PositionCalculator {
-    static func bearing(origin: CLLocation, location: Location) -> Double {
+    static func bearing(origin: CLLocation, location: CLLocation) -> Double {
         let lat1 = origin.coordinate.latitude.radians
         let long1 = origin.coordinate.longitude.radians
 
-        let lat2 = location.latitude.radians
-        let long2 = location.longitude.radians
+        let lat2 = location.coordinate.latitude.radians
+        let long2 = location.coordinate.longitude.radians
 
         let longDiff = long2 - long1
 
-        // swiftlint:disable identifier_name
         let y = sin(longDiff) * cos(lat2)
         let x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(longDiff)
-        // swiftlint:enable identifier_name
 
         return atan2(y, x)
     }

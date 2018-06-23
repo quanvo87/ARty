@@ -44,6 +44,7 @@ class MainViewController: UIViewController {
                 }
             }
         } else if let arty = arties[uid] {
+            arty.faceCamera()
             try? arty.playAnimation(arty.pokeEmote)
         }
     }

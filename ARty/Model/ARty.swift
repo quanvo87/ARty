@@ -120,6 +120,20 @@ class ARty: SCNNode {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
+    func faceCamera() {
+        guard let pointOfViewRotation = pointOfView?.eulerAngles else {
+            return
+        }
+        let rotateAction = SCNAction.rotateTo(
+            x: CGFloat(pointOfViewRotation.x),
+            y: CGFloat(pointOfViewRotation.y),
+            z: CGFloat(pointOfViewRotation.z),
+            duration: 1,
+            usesShortestUnitArc: true
+        )
+        runAction(rotateAction)
+    }
+
     func playAnimation(_ animation: String) throws {
         let caAnimation = try self.animation(animation)
         addAnimation(caAnimation, forKey: animation)
@@ -264,36 +278,19 @@ private extension ARty {
         return caAnimation
     }
 
-    func faceCamera() {
-        let rotateAction = SCNAction.rotateTo(
-            x: 0,
-            y: 0,
-            z: 0,
-            duration: 1,
-            usesShortestUnitArc: true
-        )
-        runAction(rotateAction)
-    }
-
     func addStatusNode(_ status: String) throws {
         childNode(withName: "status", recursively: false)?.removeFromParentNode()
 
-        let text = SCNText(string: status, extrusionDepth: 1)
-
         let material = SCNMaterial()
-
         material.diffuse.contents = delegate == nil ? UIColor.green : UIColor.white
 
+        let text = SCNText(string: status, extrusionDepth: 1)
         text.materials = [material]
 
         let node = SCNNode()
-
         node.name = "status"
-
         node.position = .init(x: 0, y: try schema.statusHeight(for: model), z: 0)
-
         node.scale = try schema.statusScale(for: model)
-
         node.geometry = text
 
         let (min, max) = node.boundingBox

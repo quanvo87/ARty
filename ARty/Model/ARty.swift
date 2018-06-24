@@ -7,6 +7,7 @@ protocol ARtyDelegate: class {
     func arty(_ arty: ARty, didUpdateLocation location: CLLocation)
 }
 
+// todo: add shadows
 class ARty: SCNNode {
     let uid: String
 
@@ -294,11 +295,9 @@ private extension ARty {
         node.geometry = text
 
         let (min, max) = node.boundingBox
-
         let dx = min.x + 0.5 * (max.x - min.x)
         let dy = min.y + 0.5 * (max.y - min.y)
         let dz = min.z + 0.5 * (max.z - min.z)
-
         node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
 
         let constraint = SCNLookAtConstraint(target: pointOfView)

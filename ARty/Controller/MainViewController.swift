@@ -33,7 +33,7 @@ class MainViewController: UIViewController {
             return
         }
         let hitTest = sceneView.hitTest(location, options: [SCNHitTestOption.boundingBoxOnly: true])
-        guard let uid = (hitTest.first?.node.parent as? ARty)?.uid else {
+        guard let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid else {
             return
         }
         if let arty = arty, uid == arty.uid {

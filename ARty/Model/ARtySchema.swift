@@ -1,6 +1,5 @@
 struct ARtySchema {
     let model: String
-    let scale: Double
     let emotes: [String]
     let idleAnimation: String
     let walkAnimation: String
@@ -8,6 +7,4 @@ struct ARtySchema {
     let defaultPassiveEmote: String
     let defaultPokeEmote: String
     let animationRepeatCounts: [String: Float]
-    let statusHeight: Float
-    let statusScale: Double
 }

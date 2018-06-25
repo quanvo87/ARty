@@ -4,11 +4,6 @@ struct Schema {
     let arties: [String: ARtySchema]
     private let animationCache = NSCache<NSString, CAAnimation>()
 
-    func scale(for model: String) throws -> SCNVector3 {
-        let scale = try arty(model).scale
-        return .init(scale, scale, scale)
-    }
-
     func emotes(for model: String) throws -> [String] {
         return try arty(model).emotes
     }
@@ -56,15 +51,6 @@ struct Schema {
 
     func defaultPokeEmote(for model: String) throws -> String {
         return try arty(model).defaultPokeEmote
-    }
-
-    func statusHeight(for model: String) throws -> Float {
-        return try arty(model).statusHeight
-    }
-
-    func statusScale(for model: String) throws -> SCNVector3 {
-        let scale = try arty(model).statusScale
-        return .init(scale, scale, scale)
     }
 }
 

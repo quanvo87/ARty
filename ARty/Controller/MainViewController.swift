@@ -55,10 +55,12 @@ extension MainViewController: ARSCNViewDelegate {
 
 extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard let arty = arty, let currentPosition = sceneView.pointOfView?.position else {
-            return
+        guard let arty = arty,
+            let basePosition = arty.basePosition,
+            let currentPosition = sceneView.pointOfView?.position else {
+                return
         }
-        arty.position = currentPosition.yAdjusted.zAdjusted
+        arty.position = basePosition + currentPosition
     }
 }
 
@@ -208,6 +210,7 @@ extension MainViewController: AuthManagerDelegate {
 
 extension MainViewController: ARSessionManagerDelegate {
     func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
+        arty?.setBasePosition()
         arties.values.forEach {
             guard let location = $0.location else {
                 return
@@ -345,7 +348,7 @@ private extension MainViewController {
 
     func addARtyToScene(_ arty: ARty) {
         self.arty = arty
-        arty.position = arty.position.yAdjusted.zAdjusted
+        arty.setBasePosition()
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         sceneView.scene.rootNode.addChildNode(arty)
     }

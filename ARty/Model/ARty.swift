@@ -15,6 +15,8 @@ class ARty: SCNNode {
 
     let emotes: [String]
 
+    var basePosition: SCNVector3?
+
     private(set) var passiveEmote = ""
 
     private(set) var pokeEmote = ""
@@ -57,7 +59,7 @@ class ARty: SCNNode {
         try setPokeEmote(to: pokeEmote)
         loopPassiveEmote()
         centerPivot()
-        makeListeners(delegate: delegate)
+        configure(delegate: delegate)
 
         defer {
             self.status = status
@@ -110,6 +112,16 @@ class ARty: SCNNode {
 
     var isIdle: Bool {
         return animationKeys.isEmpty
+    }
+
+    func setBasePosition() {
+        guard let pointOfView = pointOfView else {
+            return
+        }
+        let zAdjustment = SCNVector3(0, 0, -1)
+        let basePosition = pointOfView.convertPosition(zAdjustment, to: nil)
+        self.basePosition = basePosition
+        position = basePosition
     }
 
     func setPassiveEmote(to emote: String) throws {
@@ -228,27 +240,29 @@ private extension ARty {
         pivot = SCNMatrix4MakeTranslation(0, (maxBox.y - minBox.y)/2, 0)
     }
 
-    func makeListeners(delegate: ARtyDelegate?) {
-        guard let delegate = delegate else {
-            return
-        }
-        self.delegate = delegate
-        userListener = Database.userListener(uid) { [weak self] user in
-            guard let `self` = self else {
-                return
+    func configure(delegate: ARtyDelegate?) {
+        if delegate == nil {
+            constraints = [lookAtConstraint()]
+            setBasePosition()
+        } else {
+            self.delegate = delegate
+            userListener = Database.userListener(uid) { [weak self] user in
+                guard let `self` = self else {
+                    return
+                }
+                if user.model == self.model {
+                    self.update(from: user)
+                } else {
+                    self.delegate?.arty(self, userChangedModel: user)
+                }
             }
-            if user.model == self.model {
-                self.update(from: user)
-            } else {
-                self.delegate?.arty(self, userChangedModel: user)
+            locationListener = Database.locationListener(uid: uid) { [weak self] location in
+                guard let `self` = self else {
+                    return
+                }
+                self.delegate?.arty(self, didUpdateLocation: location)
+                self.location = location
             }
-        }
-        locationListener = Database.locationListener(uid: uid) { [weak self] location in
-            guard let `self` = self else {
-                return
-            }
-            self.delegate?.arty(self, didUpdateLocation: location)
-            self.location = location
         }
     }
 

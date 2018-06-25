@@ -52,7 +52,6 @@ class ARty: SCNNode {
         super.init()
 
         name = uid
-        scale = try schema.scale(for: model)
         try addIdleScene()
         try setPassiveEmote(to: passiveEmote)
         try setPokeEmote(to: pokeEmote)
@@ -100,7 +99,7 @@ class ARty: SCNNode {
             let trimmed = status.trimmingCharacters(in: .init(charactersIn: " "))
             let truncated = String(trimmed.prefix(10))
             status = truncated
-            try? addStatusNode(truncated)
+            addStatusNode(truncated)
             Database.setStatus(truncated, for: uid) { error in
                 if let error = error {
                     print(error)
@@ -279,7 +278,7 @@ private extension ARty {
         return caAnimation
     }
 
-    func addStatusNode(_ status: String) throws {
+    func addStatusNode(_ status: String) {
         childNode(withName: "status", recursively: false)?.removeFromParentNode()
 
         let material = SCNMaterial()
@@ -290,8 +289,8 @@ private extension ARty {
 
         let node = SCNNode()
         node.name = "status"
-        node.position = .init(x: 0, y: try schema.statusHeight(for: model), z: 0)
-        node.scale = try schema.statusScale(for: model)
+        node.position.y = 0.7
+        node.scale = .init(0.01, 0.01, 0.01)
         node.geometry = text
 
         let (min, max) = node.boundingBox

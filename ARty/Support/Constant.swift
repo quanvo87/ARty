@@ -10,7 +10,6 @@ var schema = Schema(
 // todo: make arties bigger, maybe lower
 let elvira = ARtySchema(
     model: "elvira",
-    scale: 0.02,
     emotes: [
         "elvira_twerk",
         "elvira_buttslap",
@@ -21,14 +20,11 @@ let elvira = ARtySchema(
     fallAnimation: "",
     defaultPassiveEmote: "elvira_wave",
     defaultPokeEmote: "elvira_buttslap",
-    animationRepeatCounts: ["elvira_wave": 4],
-    statusHeight: 35,
-    statusScale: 1
+    animationRepeatCounts: ["elvira_wave": 4]
 )
 
 let mutant = ARtySchema(
     model: "mutant",
-    scale: 0.0035,
     emotes: [
         "mutant_battlecry",
         "mutant_chestthump",
@@ -40,14 +36,11 @@ let mutant = ARtySchema(
     fallAnimation: "mutant_fall",
     defaultPassiveEmote: "mutant_chestthump",
     defaultPokeEmote: "mutant_battlecry",
-    animationRepeatCounts: [:],
-    statusHeight: 200,
-    statusScale: 5
+    animationRepeatCounts: [:]
 )
 
 let paladin = ARtySchema(
     model: "paladin",
-    scale: 0.003,
     emotes: [
         "paladin_fierce_attack",
         "paladin_slide_dance",
@@ -59,14 +52,11 @@ let paladin = ARtySchema(
     fallAnimation: "paladin_fall",
     defaultPassiveEmote: "paladin_wave",
     defaultPokeEmote: "paladin_fierce_attack",
-    animationRepeatCounts: ["paladin_wave": 4],
-    statusHeight: 200,
-    statusScale: 5
+    animationRepeatCounts: ["paladin_wave": 4]
 )
 
 let gunship_soldier = ARtySchema(
     model: "gunship_soldier",
-    scale: 0.1,
     emotes: [
         "gunship_soldier_backflip_uppercut",
         "gunship_soldier_bboy_hip_hop_dance",
@@ -82,7 +72,5 @@ let gunship_soldier = ARtySchema(
         "gunship_soldier_bboy_hip_hop_dance": 2,
         "gunship_soldier_fighting_stance": 2,
         "gunship_soldier_wave": 4
-    ],
-    statusHeight: 6.5,
-    statusScale: 0.15
+    ]
 )

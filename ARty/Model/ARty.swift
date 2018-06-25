@@ -15,11 +15,11 @@ class ARty: SCNNode {
 
     let emotes: [String]
 
-    var basePosition: SCNVector3?
-
     private(set) var passiveEmote = ""
 
     private(set) var pokeEmote = ""
+
+    private(set) var basePosition: SCNVector3?
 
     private(set) var location: CLLocation?
 
@@ -114,6 +114,14 @@ class ARty: SCNNode {
         return animationKeys.isEmpty
     }
 
+    func setPassiveEmote(to emote: String) throws {
+        passiveEmote = try schema.setPassiveEmote(for: model, to: emote)
+    }
+
+    func setPokeEmote(to emote: String) throws {
+        pokeEmote = try schema.setPokeEmote(for: model, to: emote)
+    }
+
     func setBasePosition() {
         guard let pointOfView = pointOfView else {
             return
@@ -122,14 +130,6 @@ class ARty: SCNNode {
         let basePosition = pointOfView.convertPosition(zAdjustment, to: nil)
         self.basePosition = basePosition
         position = basePosition
-    }
-
-    func setPassiveEmote(to emote: String) throws {
-        passiveEmote = try schema.setPassiveEmote(for: model, to: emote)
-    }
-
-    func setPokeEmote(to emote: String) throws {
-        pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
     func faceCamera() {
@@ -266,29 +266,6 @@ private extension ARty {
         }
     }
 
-    func update(from user: User) {
-        try? setPassiveEmote(to: user.passiveEmote(for: user.model))
-        try? setPokeEmote(to: user.pokeEmote(for: user.model))
-        setPokeTimestamp(to: user.pokeTimestamp)
-        if user.status != status {
-            status = user.status
-        }
-    }
-
-    func setPokeTimestamp(to date: Date) {
-        if pokeTimestamp != date {
-            try? playAnimation(pokeEmote)
-        }
-        pokeTimestamp = date
-    }
-
-    func animation(_ animation: String) throws -> CAAnimation {
-        guard let caAnimation = animations[animation] else {
-            throw ARtyError.invalidAnimationName(animation)
-        }
-        return caAnimation
-    }
-
     func addStatusNode(_ status: String) {
         childNode(withName: "status", recursively: false)?.removeFromParentNode()
 
@@ -320,5 +297,28 @@ private extension ARty {
         constraint.isGimbalLockEnabled = true
         constraint.localFront = .init(0, 0, 1)
         return constraint
+    }
+
+    func update(from user: User) {
+        try? setPassiveEmote(to: user.passiveEmote(for: user.model))
+        try? setPokeEmote(to: user.pokeEmote(for: user.model))
+        setPokeTimestamp(to: user.pokeTimestamp)
+        if user.status != status {
+            status = user.status
+        }
+    }
+
+    func setPokeTimestamp(to date: Date) {
+        if pokeTimestamp != date {
+            try? playAnimation(pokeEmote)
+        }
+        pokeTimestamp = date
+    }
+
+    func animation(_ animation: String) throws -> CAAnimation {
+        guard let caAnimation = animations[animation] else {
+            throw ARtyError.invalidAnimationName(animation)
+        }
+        return caAnimation
     }
 }

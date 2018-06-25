@@ -121,17 +121,13 @@ class ARty: SCNNode {
     }
 
     func faceCamera() {
-        guard let pointOfViewRotation = pointOfView?.eulerAngles else {
-            return
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 5
+        SCNTransaction.completionBlock = { [weak self] in
+            self?.constraints = []
         }
-        let rotateAction = SCNAction.rotateTo(
-            x: CGFloat(pointOfViewRotation.x),
-            y: CGFloat(pointOfViewRotation.y),
-            z: CGFloat(pointOfViewRotation.z),
-            duration: 1,
-            usesShortestUnitArc: true
-        )
-        runAction(rotateAction)
+        constraints = [lookAtConstraint()]
+        SCNTransaction.commit()
     }
 
     func playAnimation(_ animation: String) throws {
@@ -143,6 +139,7 @@ class ARty: SCNNode {
         guard direction != -1 else {
             return
         }
+        constraints = []
         let adjustedDirection = -1 * (direction - 180)
         let radians = adjustedDirection.radians
         let rotateAction = SCNAction.rotateTo(
@@ -299,11 +296,15 @@ private extension ARty {
         let dz = min.z + 0.5 * (max.z - min.z)
         node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
 
+        node.constraints = [lookAtConstraint()]
+
+        addChildNode(node)
+    }
+
+    func lookAtConstraint() -> SCNLookAtConstraint {
         let constraint = SCNLookAtConstraint(target: pointOfView)
         constraint.isGimbalLockEnabled = true
         constraint.localFront = .init(0, 0, 1)
-        node.constraints = [constraint]
-
-        addChildNode(node)
+        return constraint
     }
 }

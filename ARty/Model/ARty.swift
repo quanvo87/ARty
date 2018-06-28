@@ -113,12 +113,6 @@ class ARty: SCNNode {
         }
     }
 
-    private lazy var billboardConstraint: SCNBillboardConstraint = {
-        let constraint = SCNBillboardConstraint()
-        constraint.freeAxes = [.Y]
-        return constraint
-    }()
-
     func setPassiveEmote(to emote: String) throws {
         passiveEmote = try schema.setPassiveEmote(for: model, to: emote)
     }
@@ -217,6 +211,12 @@ class ARty: SCNNode {
         addAnimation(caAnimation, forKey: animation)
     }
 
+    private lazy var billboardConstraint: SCNBillboardConstraint = {
+        let constraint = SCNBillboardConstraint()
+        constraint.freeAxes = [.Y]
+        return constraint
+    }()
+
     deinit {
         userListener?.remove()
         locationListener?.remove()
@@ -270,7 +270,7 @@ private extension ARty {
 
     func centerPivot() {
         let (minBox, maxBox) = boundingBox
-        pivot = SCNMatrix4MakeTranslation(0, (maxBox.y - minBox.y)/2, 0)
+        pivot = SCNMatrix4MakeTranslation(0, (maxBox.y - minBox.y) / 2, 0)
     }
 
     func makeListeners() {

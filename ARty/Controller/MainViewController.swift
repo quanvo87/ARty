@@ -52,7 +52,8 @@ class MainViewController: UIViewController {
 
 extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard let arty = arty,
+        guard
+            let arty = arty,
             let basePosition = arty.basePosition,
             let currentPosition = sceneView.pointOfView?.position else {
                 return
@@ -75,8 +76,8 @@ extension MainViewController: CLLocationManagerDelegate {
         if locationManager.isValidLocation(newLocation) {
             locationManager.lastLocation = newLocation
 
-            if let arty = arty {
-                locationManager.setLocationInDatabase(uid: arty.uid)
+            if arty != nil {
+                locationManager.setLocationInDatabase(to: newLocation, for: uid)
             }
 
             if appStateObserver.appIsActive {
@@ -218,8 +219,8 @@ extension MainViewController: ARSessionManagerDelegate {
 extension MainViewController: ARtyDelegate {
     func arty(_ arty: ARty, userChangedModel user: User) {
         do {
+            sceneView.scene.rootNode.childNode(withName: user.uid, recursively: false)?.removeFromParentNode()
             let arty = try ARty(user: user, pointOfView: sceneView.pointOfView, delegate: self)
-            sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
             arties[arty.uid] = arty
         } catch {
             print(error)
@@ -275,11 +276,11 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
         Database.user(arty.uid) { result in
             switch result {
             case .success(let user):
-                if let passiveEmote = user.passiveEmotes[arty.model] {
-                    try? arty.setPassiveEmote(to: passiveEmote)
-                }
-                if let pokeEmote = user.pokeEmotes[arty.model] {
-                    try? arty.setPokeEmote(to: pokeEmote)
+                do {
+                    try arty.setPassiveEmote(to: user.passiveEmote(for: user.model))
+                    try arty.setPokeEmote(to: user.pokeEmote(for: user.model))
+                } catch {
+                    print(error)
                 }
             case .fail(let error):
                 print(error)

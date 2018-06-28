@@ -9,7 +9,8 @@ struct User {
     let status: String
 
     init(_ snapshot: DocumentSnapshot?) throws {
-        guard let unwrappedSnapshot = snapshot,
+        guard
+            let unwrappedSnapshot = snapshot,
             let data = unwrappedSnapshot.data(),
             let uid = data["uid"] as? String else {
                 throw ARtyError.invalidDataFromServer(snapshot?.data())

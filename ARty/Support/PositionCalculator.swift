@@ -5,22 +5,22 @@ struct PositionCalculator {
     static func position(location: CLLocation, worldOrigin: CLLocation) -> SCNVector3 {
         let bearing = self.bearing(origin: worldOrigin, location: location)
 
-        let rotationTransform = self.rotationTransform(degrees: Float(bearing))
+        let rotationAroundY = self.rotationAroundY(radians: Float(bearing))
 
         let distance = location.distance(from: worldOrigin)
 
         let positionTranslation = simd_float4(0, 0, Float(-distance), 0)
 
-        let transformFromTranslation = self.transformFromTranslation(positionTranslation)
+        let translationMatrix = self.translationMatrix(translation: positionTranslation)
 
-        let newTransform = simd_mul(rotationTransform, transformFromTranslation)
+        let newTransform = simd_mul(rotationAroundY, translationMatrix)
 
         let transformFromOrigin = simd_mul(matrix_identity_float4x4, newTransform)
 
-        var positionFromTransform = self.positionFromTransform(transformFromOrigin).minApplied.maxApplied
-        positionFromTransform.y = -1
+        var position = self.position(transform: transformFromOrigin).minApplied.maxApplied
+        position.y = -1
 
-        return positionFromTransform
+        return position
     }
 }
 
@@ -40,25 +40,25 @@ private extension PositionCalculator {
         return atan2(y, x)
     }
 
-    static func rotationTransform(degrees: Float) -> simd_float4x4 {
+    static func rotationAroundY(radians: Float) -> simd_float4x4 {
         var matrix = matrix_identity_float4x4
 
-        matrix.columns.0.x = cos(degrees)
-        matrix.columns.0.z = -sin(degrees)
+        matrix.columns.0.x = cos(radians)
+        matrix.columns.0.z = -sin(radians)
 
-        matrix.columns.2.x = sin(degrees)
-        matrix.columns.2.z = cos(degrees)
+        matrix.columns.2.x = sin(radians)
+        matrix.columns.2.z = cos(radians)
 
         return matrix.inverse
     }
 
-    static func transformFromTranslation(_ translation: simd_float4) -> simd_float4x4 {
+    static func translationMatrix(translation: simd_float4) -> simd_float4x4 {
         var matrix = matrix_identity_float4x4
         matrix.columns.3 = translation
         return matrix
     }
 
-    static func positionFromTransform(_ transform: simd_float4x4) -> SCNVector3 {
+    static func position(transform: simd_float4x4) -> SCNVector3 {
         return .init(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
 }

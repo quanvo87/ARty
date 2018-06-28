@@ -15,7 +15,8 @@ extension CLLocation {
     }
 
     convenience init(_ snapshot: DocumentSnapshot?) throws {
-        guard let unwrappedSnapshot = snapshot,
+        guard
+            let unwrappedSnapshot = snapshot,
             let data = unwrappedSnapshot.data(),
             let latitude = data["latitude"] as? Double,
             let longitude = data["longitude"] as? Double,

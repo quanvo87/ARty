@@ -18,9 +18,8 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         let scene = SCNScene()
         sceneView.scene = scene
-        sceneView.autoenablesDefaultLighting = true
-        sceneView.delegate = self
-        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
+//        sceneView.autoenablesDefaultLighting = true
+//        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
 //        sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         sceneView.session.delegate = self
         sceneView.session.run(ARWorldTrackingConfiguration())
@@ -32,11 +31,12 @@ class MainViewController: UIViewController {
         guard let location = touches.first?.location(in: sceneView) else {
             return
         }
-        let hitTest = sceneView.hitTest(location, options: [SCNHitTestOption.boundingBoxOnly: true])
+        let hitTest = sceneView.hitTest(location)
         guard let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid else {
             return
         }
         if let arty = arty, uid == arty.uid {
+            arty.turnToCamera()
             try? arty.playAnimation(arty.pokeEmote)
             Database.updatePokeTimestamp(for: uid) { error in
                 if let error = error {
@@ -44,21 +44,20 @@ class MainViewController: UIViewController {
                 }
             }
         } else if let arty = arties[uid] {
-            arty.faceCamera()
+            arty.turnToCamera()
             try? arty.playAnimation(arty.pokeEmote)
         }
     }
 }
 
-extension MainViewController: ARSCNViewDelegate {
-}
-
 extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        guard let arty = arty, let currentPosition = sceneView.pointOfView?.position else {
-            return
+        guard let arty = arty,
+            let basePosition = arty.basePosition,
+            let currentPosition = sceneView.pointOfView?.position else {
+                return
         }
-        arty.position = currentPosition.yAdjusted.zAdjusted
+        arty.position = basePosition + currentPosition
     }
 }
 
@@ -81,7 +80,7 @@ extension MainViewController: CLLocationManagerDelegate {
             }
 
             if appStateObserver.appIsActive {
-                arty?.faceWalkingDirection(newLocation.course)
+                arty?.turnToDirection(newLocation.course)
                 try? arty?.walk(location: newLocation)
 
                 arSessionManager.setWorldOrigin(newLocation)
@@ -164,7 +163,6 @@ extension MainViewController: AuthManagerDelegate {
         showLoginViewController()
     }
 
-    // todo: add user defaults
     private func loadUser(_ uid: String) {
         Database.setUid(uid) { [weak self] error in
             if let error = error {
@@ -234,11 +232,13 @@ extension MainViewController: ARtyDelegate {
         }
         let position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
-            sceneView.scene.rootNode.addChildNode(arty)
             arty.position = position
-            arty.eulerAngles.y = Float(arc4random_uniform(360))
+            arty.eulerAngles.y = Float(Double(arc4random_uniform(360)).radians)
+            DispatchQueue.main.async { [weak self] in
+                self?.sceneView.scene.rootNode.addChildNode(arty)
+            }
         } else {
-            arty.faceWalkingDirection(location.course)
+            arty.turnToDirection(location.course)
             try? arty.walk(to: position)
         }
     }
@@ -345,8 +345,11 @@ private extension MainViewController {
 
     func addARtyToScene(_ arty: ARty) {
         self.arty = arty
-        arty.position = arty.position.yAdjusted.zAdjusted
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
-        sceneView.scene.rootNode.addChildNode(arty)
+        DispatchQueue.main.async { [weak self] in
+            self?.sceneView.scene.rootNode.addChildNode(arty)
+            arty.setBasePosition()
+            arty.turnToCamera()
+        }
     }
 }

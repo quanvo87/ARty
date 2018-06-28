@@ -15,11 +15,12 @@ struct PositionCalculator {
 
         let newTransform = simd_mul(rotationTransform, transformFromTranslation)
 
-        let adjustedTransform = simd_mul(matrix_identity_float4x4, newTransform)
+        let transformFromOrigin = simd_mul(matrix_identity_float4x4, newTransform)
 
-        let positionFromTransform = self.positionFromTransform(adjustedTransform)
+        var positionFromTransform = self.positionFromTransform(transformFromOrigin).minApplied.maxApplied
+        positionFromTransform.y = -1
 
-        return positionFromTransform.minApplied.maxApplied.yAdjusted
+        return positionFromTransform
     }
 }
 
@@ -72,8 +73,8 @@ private extension SCNVector3 {
     }
 
     var maxApplied: SCNVector3 {
-        if length > 5 {
-            let multiplier = 5 / length
+        if length > 3 {
+            let multiplier = 3 / length
             return multiplied(by: multiplier)
         }
         return self

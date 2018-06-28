@@ -7,7 +7,6 @@ var schema = Schema(
     ]
 )
 
-// todo: make arties bigger, maybe lower
 let elvira = ARtySchema(
     model: "elvira",
     emotes: [

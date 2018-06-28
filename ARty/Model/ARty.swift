@@ -7,7 +7,6 @@ protocol ARtyDelegate: class {
     func arty(_ arty: ARty, didUpdateLocation location: CLLocation)
 }
 
-// todo: add shadows
 class ARty: SCNNode {
     let uid: String
 
@@ -18,6 +17,8 @@ class ARty: SCNNode {
     private(set) var passiveEmote = ""
 
     private(set) var pokeEmote = ""
+
+    private(set) var basePosition: SCNVector3?
 
     private(set) var location: CLLocation?
 
@@ -57,7 +58,11 @@ class ARty: SCNNode {
         try setPokeEmote(to: pokeEmote)
         loopPassiveEmote()
         centerPivot()
-        makeListeners(delegate: delegate)
+
+        if delegate != nil {
+            self.delegate = delegate
+            makeListeners()
+        }
 
         defer {
             self.status = status
@@ -108,9 +113,11 @@ class ARty: SCNNode {
         }
     }
 
-    var isIdle: Bool {
-        return animationKeys.isEmpty
-    }
+    private lazy var billboardConstraint: SCNBillboardConstraint = {
+        let constraint = SCNBillboardConstraint()
+        constraint.freeAxes = [.Y]
+        return constraint
+    }()
 
     func setPassiveEmote(to emote: String) throws {
         passiveEmote = try schema.setPassiveEmote(for: model, to: emote)
@@ -120,26 +127,39 @@ class ARty: SCNNode {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
-    func faceCamera() {
+    func setBasePosition() {
+        guard let pointOfView = pointOfView else {
+            return
+        }
+        let zAdjustment = SCNVector3(0, 0, -1)
+        var basePosition = pointOfView.convertPosition(zAdjustment, to: nil)
+        basePosition.y = -0.75
+        self.basePosition = basePosition
+        position = basePosition
+    }
+
+    func turnToCamera() {
+        guard !isTurningToCamera else {
+            return
+        }
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 5
         SCNTransaction.completionBlock = { [weak self] in
-            self?.constraints = []
+            guard let `self` = self else {
+                return
+            }
+            if let index = self.constraints?.index(of: self.billboardConstraint) {
+                self.constraints?.remove(at: index)
+            }
         }
-        constraints = [lookAtConstraint()]
+        constraints?.append(billboardConstraint)
         SCNTransaction.commit()
     }
 
-    func playAnimation(_ animation: String) throws {
-        let caAnimation = try self.animation(animation)
-        addAnimation(caAnimation, forKey: animation)
-    }
-
-    func faceWalkingDirection(_ direction: CLLocationDirection) {
-        guard direction != -1 else {
+    func turnToDirection(_ direction: CLLocationDirection) {
+        guard direction != -1, !isTurningToCamera else {
             return
         }
-        constraints = []
         let adjustedDirection = -1 * (direction - 180)
         let radians = adjustedDirection.radians
         let rotateAction = SCNAction.rotateTo(
@@ -157,7 +177,7 @@ class ARty: SCNNode {
         if speed != -1 {
             if speed < 0.5 {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
-                faceCamera()
+                turnToCamera()
             } else if isIdle {
                 try playAnimation(walkAnimation)
             }
@@ -174,7 +194,7 @@ class ARty: SCNNode {
                 self.location = location
             } else {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
-                faceCamera()
+                turnToCamera()
             }
         }
     }
@@ -192,6 +212,11 @@ class ARty: SCNNode {
         }
     }
 
+    func playAnimation(_ animation: String) throws {
+        let caAnimation = try self.animation(animation)
+        addAnimation(caAnimation, forKey: animation)
+    }
+
     deinit {
         userListener?.remove()
         locationListener?.remove()
@@ -203,6 +228,26 @@ class ARty: SCNNode {
 }
 
 private extension ARty {
+    var isIdle: Bool {
+        return animationKeys.isEmpty
+    }
+
+    var isTurningToCamera: Bool {
+        if let constraints = constraints {
+            return constraints.contains(billboardConstraint)
+        } else {
+            constraints = []
+            return false
+        }
+    }
+
+    var lookAtConstraint: SCNLookAtConstraint {
+        let constraint = SCNLookAtConstraint(target: pointOfView)
+        constraint.isGimbalLockEnabled = true
+        constraint.localFront = .init(0, 0, 1)
+        return constraint
+    }
+
     func addIdleScene() throws {
         let scene = try schema.idleScene(for: model)
         scene.rootNode.childNodes.forEach {
@@ -228,11 +273,7 @@ private extension ARty {
         pivot = SCNMatrix4MakeTranslation(0, (maxBox.y - minBox.y)/2, 0)
     }
 
-    func makeListeners(delegate: ARtyDelegate?) {
-        guard let delegate = delegate else {
-            return
-        }
-        self.delegate = delegate
+    func makeListeners() {
         userListener = Database.userListener(uid) { [weak self] user in
             guard let `self` = self else {
                 return
@@ -268,13 +309,6 @@ private extension ARty {
         pokeTimestamp = date
     }
 
-    func animation(_ animation: String) throws -> CAAnimation {
-        guard let caAnimation = animations[animation] else {
-            throw ARtyError.invalidAnimationName(animation)
-        }
-        return caAnimation
-    }
-
     func addStatusNode(_ status: String) {
         childNode(withName: "status", recursively: false)?.removeFromParentNode()
 
@@ -286,7 +320,7 @@ private extension ARty {
 
         let node = SCNNode()
         node.name = "status"
-        node.position.y = 0.7
+        node.position.y = 0.8
         node.scale = .init(0.01, 0.01, 0.01)
         node.geometry = text
 
@@ -296,15 +330,15 @@ private extension ARty {
         let dz = min.z + 0.5 * (max.z - min.z)
         node.pivot = SCNMatrix4MakeTranslation(dx, dy, dz)
 
-        node.constraints = [lookAtConstraint()]
+        node.constraints = [lookAtConstraint]
 
         addChildNode(node)
     }
 
-    func lookAtConstraint() -> SCNLookAtConstraint {
-        let constraint = SCNLookAtConstraint(target: pointOfView)
-        constraint.isGimbalLockEnabled = true
-        constraint.localFront = .init(0, 0, 1)
-        return constraint
+    func animation(_ animation: String) throws -> CAAnimation {
+        guard let caAnimation = animations[animation] else {
+            throw ARtyError.invalidAnimationName(animation)
+        }
+        return caAnimation
     }
 }

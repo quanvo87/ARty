@@ -126,8 +126,7 @@ class ARty: SCNNode {
             return
         }
         var worldFront = pointOfView.simdWorldFront
-        worldFront.y = -0.75
-        let position = SCNVector3(worldFront.x, worldFront.y, worldFront.z)
+        let position = SCNVector3(worldFront.x, -0.75, worldFront.z)
         basePosition = position
         self.position = position
     }

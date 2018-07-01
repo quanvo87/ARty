@@ -32,20 +32,27 @@ class MainViewController: UIViewController {
             return
         }
         let hitTest = sceneView.hitTest(location)
-        guard let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid else {
-            return
-        }
-        if let arty = arty, uid == arty.uid {
-            arty.turnToCamera()
-            try? arty.playAnimation(arty.pokeEmote)
-            Database.updatePokeTimestamp(for: uid) { error in
-                if let error = error {
-                    print(error)
+        if let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid {
+            if let arty = arty, uid == arty.uid {
+                arty.turnToCamera()
+                try? arty.playAnimation(arty.pokeEmote)
+                Database.updatePokeTimestamp(for: uid) { error in
+                    if let error = error {
+                        print(error)
+                    }
                 }
+            } else if let arty = arties[uid] {
+                arty.turnToCamera()
+                try? arty.playAnimation(arty.pokeEmote)
             }
-        } else if let arty = arties[uid] {
-            arty.turnToCamera()
-            try? arty.playAnimation(arty.pokeEmote)
+        } else {
+            guard let result = sceneView.hitTest(location, types: .featurePoint).first else {
+                return
+            }
+            var position = SCNVector3.make(transform: result.worldTransform).normalized
+            position.y = -0.75
+            arty?.basePosition = position
+            arty?.position = position
         }
     }
 }
@@ -53,12 +60,11 @@ class MainViewController: UIViewController {
 extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         guard
-            let arty = arty,
-            let basePosition = arty.basePosition,
+            let basePosition = arty?.basePosition,
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        arty.position = basePosition + currentPosition
+        arty?.position = basePosition + currentPosition
     }
 }
 

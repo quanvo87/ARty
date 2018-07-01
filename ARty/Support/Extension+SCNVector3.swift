@@ -23,14 +23,6 @@ extension SCNVector3 {
         return position
     }
 
-    // todo: delete unless needed for #46
-    static func make(transform: simd_float4x4, z: Float) -> SCNVector3 {
-        var translation = matrix_identity_float4x4
-        translation.columns.3.z = z
-        let newTransform = transform * translation
-        return make(transform: newTransform)
-    }
-
     static func make(transform: simd_float4x4) -> SCNVector3 {
         return .init(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
     }
@@ -39,18 +31,26 @@ extension SCNVector3 {
         return SCNVector3Make(left.x + right.x, left.y + right.y, left.z + right.z)
     }
 
+    static func * (vector: SCNVector3, scalar: Float) -> SCNVector3 {
+        return SCNVector3Make(vector.x * scalar, vector.y * scalar, vector.z * scalar)
+    }
+
+    static func / (vector: SCNVector3, scalar: Float) -> SCNVector3 {
+        return SCNVector3Make(vector.x / scalar, vector.y / scalar, vector.z / scalar)
+    }
+
     var length: Float {
         return sqrt(x * x + y * y + z * z)
     }
 
-    func multiplied(by scalar: Float) -> SCNVector3 {
-        return .init(x * scalar, y * scalar, z * scalar)
+    var normalized: SCNVector3 {
+        return self / length
     }
 
     func minApplied(_ min: Float) -> SCNVector3 {
         if length < min {
             let multiplier = min / length
-            return multiplied(by: multiplier)
+            return self * multiplier
         }
         return self
     }
@@ -58,7 +58,7 @@ extension SCNVector3 {
     func maxApplied(_ max: Float) -> SCNVector3 {
         if length > max {
             let multiplier = max / length
-            return multiplied(by: multiplier)
+            return self * multiplier
         }
         return self
     }

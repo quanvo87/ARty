@@ -149,7 +149,7 @@ class ARty: SCNNode {
         SCNTransaction.commit()
     }
 
-    func turnToDirection(_ direction: CLLocationDirection) {
+    func turnToDirection(_ direction: Double) {
         guard direction != -1, !isTurningToCamera else {
             return
         }
@@ -196,7 +196,8 @@ class ARty: SCNNode {
         if isIdle {
             try playAnimation(walkAnimation)
         }
-        let moveAction = SCNAction.move(to: position, duration: 5)
+        let duration = TimeInterval(self.position.distance(to: position))
+        let moveAction = SCNAction.move(to: position, duration: duration)
         runAction(moveAction) { [weak self] in
             guard let `self` = self else {
                 return

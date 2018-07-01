@@ -125,11 +125,11 @@ class ARty: SCNNode {
         guard let pointOfView = pointOfView else {
             return
         }
-        let zAdjustment = SCNVector3(0, 0, -1)
-        var basePosition = pointOfView.convertPosition(zAdjustment, to: nil)
-        basePosition.y = -0.75
-        self.basePosition = basePosition
-        position = basePosition
+        var worldFront = pointOfView.simdWorldFront
+        worldFront.y = -0.75
+        let position = SCNVector3(worldFront.x, worldFront.y, worldFront.z)
+        basePosition = position
+        self.position = position
     }
 
     func turnToCamera() {

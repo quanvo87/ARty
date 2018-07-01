@@ -211,7 +211,7 @@ extension MainViewController: ARSessionManagerDelegate {
             guard let location = $0.location else {
                 return
             }
-            $0.position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
+            $0.position = SCNVector3.make(location: location, worldOrigin: worldOrigin)
         }
     }
 }
@@ -231,7 +231,7 @@ extension MainViewController: ARtyDelegate {
         guard let worldOrigin = arSessionManager.worldOrigin else {
             return
         }
-        let position = PositionCalculator.position(location: location, worldOrigin: worldOrigin)
+        let position = SCNVector3.make(location: location, worldOrigin: worldOrigin)
         if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
             arty.position = position
             arty.eulerAngles.y = Float(Double(arc4random_uniform(360)).radians)
@@ -345,11 +345,16 @@ private extension MainViewController {
     }
 
     func addARtyToScene(_ arty: ARty) {
+        if let basePosition = self.arty?.basePosition {
+            arty.basePosition = basePosition
+            arty.position = basePosition
+        } else {
+            arty.setBasePosition()
+        }
         self.arty = arty
         sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
         DispatchQueue.main.async { [weak self] in
             self?.sceneView.scene.rootNode.addChildNode(arty)
-            arty.setBasePosition()
             arty.turnToCamera()
         }
     }

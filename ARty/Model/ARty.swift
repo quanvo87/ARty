@@ -14,11 +14,11 @@ class ARty: SCNNode {
 
     let emotes: [String]
 
+    var basePosition: SCNVector3?
+
     private(set) var passiveEmote = ""
 
     private(set) var pokeEmote = ""
-
-    private(set) var basePosition: SCNVector3?
 
     private(set) var location: CLLocation?
 

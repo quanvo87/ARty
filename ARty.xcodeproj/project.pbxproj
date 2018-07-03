@@ -30,6 +30,8 @@
 		5993889520C046750060A37E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5993889420C046750060A37E /* User.swift */; };
 		5999737E20CA6BA3004DE3F9 /* ARSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5999737D20CA6BA3004DE3F9 /* ARSessionManager.swift */; };
 		59B386EC20BF491D003BC2E5 /* ChooseARtyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */; };
+		59C408A720EAEF4F003651E2 /* MyARty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C408A620EAEF4F003651E2 /* MyARty.swift */; };
+		59C408A920EAF770003651E2 /* FriendlyARty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C408A820EAF770003651E2 /* FriendlyARty.swift */; };
 		59CAF1BF20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CAF1BE20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift */; };
 		59DBFD3020D1590500580F18 /* Extension+CLLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59DBFD2F20D1590500580F18 /* Extension+CLLocation.swift */; };
 		59E747FD20C629BD006217C4 /* AppStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E747FC20C629BD006217C4 /* AppStateObserver.swift */; };
@@ -65,6 +67,8 @@
 		5993889420C046750060A37E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		5999737D20CA6BA3004DE3F9 /* ARSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessionManager.swift; sourceTree = "<group>"; };
 		59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseARtyViewController.swift; sourceTree = "<group>"; };
+		59C408A620EAEF4F003651E2 /* MyARty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyARty.swift; sourceTree = "<group>"; };
+		59C408A820EAF770003651E2 /* FriendlyARty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendlyARty.swift; sourceTree = "<group>"; };
 		59CAF1BE20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseEmotesViewController.swift; sourceTree = "<group>"; };
 		59DBFD2F20D1590500580F18 /* Extension+CLLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extension+CLLocation.swift"; sourceTree = "<group>"; };
 		59E747FC20C629BD006217C4 /* AppStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateObserver.swift; sourceTree = "<group>"; };
@@ -133,6 +137,8 @@
 			children = (
 				59298B0620BF973A003D1D98 /* ARty.swift */,
 				592C08D820BF5CEF00E23EEC /* ARtySchema.swift */,
+				59C408A820EAF770003651E2 /* FriendlyARty.swift */,
+				59C408A620EAEF4F003651E2 /* MyARty.swift */,
 				592C08E020BF7F8200E23EEC /* Schema.swift */,
 				5993889420C046750060A37E /* User.swift */,
 			);
@@ -348,6 +354,7 @@
 			files = (
 				59B386EC20BF491D003BC2E5 /* ChooseARtyViewController.swift in Sources */,
 				59298B1220C02D82003D1D98 /* Constant.swift in Sources */,
+				59C408A920EAF770003651E2 /* FriendlyARty.swift in Sources */,
 				5908371F20C0BE2E00A36103 /* Database.swift in Sources */,
 				592C08D920BF5CEF00E23EEC /* ARtySchema.swift in Sources */,
 				59EC1B0720D1D45100531998 /* Extension+Double.swift in Sources */,
@@ -365,6 +372,7 @@
 				5999737E20CA6BA3004DE3F9 /* ARSessionManager.swift in Sources */,
 				59DBFD3020D1590500580F18 /* Extension+CLLocation.swift in Sources */,
 				59584BDA20C79B98000F72D9 /* LocationManager.swift in Sources */,
+				59C408A720EAEF4F003651E2 /* MyARty.swift in Sources */,
 				5992347B20CEF890008F4762 /* LocationDatabase.swift in Sources */,
 				59CAF1BF20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift in Sources */,
 				59389A1520B6313D00F7FA67 /* ARtyError.swift in Sources */,

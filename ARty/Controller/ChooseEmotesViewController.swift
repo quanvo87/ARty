@@ -3,7 +3,7 @@ import UIKit
 class ChooseEmotesViewController: UIViewController {
     @IBOutlet weak var emoteTypePicker: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
-    private var arty: ARty?
+    private var arty: MyARty?
     private var emotes = [String]()
 
     override func viewDidLoad() {
@@ -25,14 +25,14 @@ class ChooseEmotesViewController: UIViewController {
         tableView.reloadData()
     }
 
-    static func make(arty: ARty) -> ChooseEmotesViewController {
+    static func make(myARty: MyARty) -> ChooseEmotesViewController {
         guard let controller = UIStoryboard.main.instantiateViewController(
                 withIdentifier: String(describing: ChooseEmotesViewController.self)
             ) as? ChooseEmotesViewController else {
                 return ChooseEmotesViewController()
         }
-        controller.arty = arty
-        controller.emotes = arty.emotes.sorted()
+        controller.arty = myARty
+        controller.emotes = myARty.emotes.sorted()
         return controller
     }
 }

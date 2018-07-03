@@ -6,8 +6,8 @@ class MainViewController: UIViewController {
     @IBOutlet weak var label: UILabel!
 
     private var uid: String?
-    private var arty: ARty?
-    private var arties = [String: ARty]()
+    private var myARty: MyARty?
+    private var friendlyARties = [String: ARty]()
     private let locationDatabase = LocationDatabase()
     private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
@@ -33,26 +33,25 @@ class MainViewController: UIViewController {
         }
         let hitTest = sceneView.hitTest(location)
         if let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid {
-            if let arty = arty, uid == arty.uid {
-                arty.turnToCamera()
-                try? arty.playAnimation(arty.pokeEmote)
+            if let myARty = myARty, uid == myARty.uid {
+                myARty.turnToCamera()
+                try? myARty.playAnimation(myARty.pokeEmote)
                 Database.updatePokeTimestamp(for: uid) { error in
                     if let error = error {
                         print(error)
                     }
                 }
-            } else if let arty = arties[uid] {
-                arty.turnToCamera()
-                try? arty.playAnimation(arty.pokeEmote)
+            } else if let friendlyARty = friendlyARties[uid] {
+                friendlyARty.turnToCamera()
+                try? friendlyARty.playAnimation(friendlyARty.pokeEmote)
             }
         } else {
-            guard let result = sceneView.hitTest(location, types: .featurePoint).first else {
+            guard let transform = sceneView.hitTest(location, types: .featurePoint).first?.worldTransform else {
                 return
             }
-            var position = SCNVector3.make(transform: result.worldTransform).normalized
-            position.y = -0.75
-            arty?.basePosition = position
-            arty?.position = position
+            let position = MyARty.basePosition(transform: transform)
+            myARty?.basePosition = position
+            myARty?.position = position
         }
     }
 }
@@ -60,11 +59,11 @@ class MainViewController: UIViewController {
 extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         guard
-            let basePosition = arty?.basePosition,
+            let myARty = myARty,
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        arty?.position = basePosition + currentPosition
+        myARty.position = myARty.basePosition + currentPosition
     }
 }
 
@@ -82,13 +81,13 @@ extension MainViewController: CLLocationManagerDelegate {
         if locationManager.isValidLocation(newLocation) {
             locationManager.lastLocation = newLocation
 
-            if arty != nil {
+            if myARty != nil {
                 locationManager.setLocationInDatabase(to: newLocation, for: uid)
             }
 
             if appStateObserver.appIsActive {
-                arty?.turnToDirection(newLocation.course)
-                try? arty?.walk(location: newLocation)
+                myARty?.turnToDirection(newLocation.course)
+                try? myARty?.walk(location: newLocation)
 
                 arSessionManager.setWorldOrigin(newLocation)
 
@@ -116,26 +115,29 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 
     private func observeUser(_ uid: String) {
-        if uid != self.uid && !arties.keys.contains(uid) {
-            ARty.make(uid: uid, pointOfView: sceneView.pointOfView, delegate: self) { [weak self] result in
+        guard let pointOfView = sceneView.pointOfView else {
+            return
+        }
+        if !friendlyARties.keys.contains(uid) {
+            FriendlyARty.make(uid: uid, pointOfView: pointOfView, delegate: self) { [weak self] result in
                 switch result {
                 case .fail(let error):
                     print(error)
-                case .success(let arty):
-                    self?.arties[arty.uid] = arty
+                case .success(let friendlyARty):
+                    self?.friendlyARties[friendlyARty.uid] = friendlyARty
                 }
             }
         }
     }
 
     private func removeStaleUsers(_ uids: [String]) {
-        arties.keys
+        friendlyARties.keys
             .filter {
                 return !uids.contains($0)
             }
             .forEach {
                 sceneView.scene.rootNode.childNode(withName: $0, recursively: false)?.removeFromParentNode()
-                arties.removeValue(forKey: $0)
+                friendlyARties.removeValue(forKey: $0)
         }
     }
 }
@@ -161,8 +163,8 @@ extension MainViewController: AuthManagerDelegate {
     func authManagerUserDidLogOut(_ manager: AuthManager) {
         UIApplication.shared.isIdleTimerDisabled = false
         uid = nil
-        arty = nil
-        arties.removeAll()
+        myARty = nil
+        friendlyARties.removeAll()
         removeNodes()
         appStateObserver.stop()
         locationManager.stopUpdatingLocation()
@@ -180,9 +182,12 @@ extension MainViewController: AuthManagerDelegate {
                 switch result {
                 case .success(let user):
                     if user.model != "" {
+                        guard let pointOfView = self?.sceneView.pointOfView else {
+                            return
+                        }
                         do {
-                            let arty = try ARty(user: user, pointOfView: self?.sceneView.pointOfView, delegate: nil)
-                            self?.addARtyToScene(arty)
+                            let myARty = try MyARty.makeFromUser(user, pointOfView: pointOfView)
+                            self?.addMyARtyToScene(myARty)
                         } catch {
                             print(error)
                         }
@@ -213,7 +218,7 @@ extension MainViewController: AuthManagerDelegate {
 
 extension MainViewController: ARSessionManagerDelegate {
     func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
-        arties.values.forEach {
+        friendlyARties.values.forEach {
             guard let location = $0.location else {
                 return
             }
@@ -222,52 +227,60 @@ extension MainViewController: ARSessionManagerDelegate {
     }
 }
 
-extension MainViewController: ARtyDelegate {
-    func arty(_ arty: ARty, userChangedModel user: User) {
+extension MainViewController: FriendlyARtyDelegate {
+    func friendlyARty(_ friendlyARty: FriendlyARty, userChangedModel user: User) {
+        guard let pointOfView = sceneView.pointOfView else {
+            return
+        }
+        sceneView.scene.rootNode.childNode(withName: user.uid, recursively: false)?.removeFromParentNode()
         do {
-            sceneView.scene.rootNode.childNode(withName: user.uid, recursively: false)?.removeFromParentNode()
-            let arty = try ARty(user: user, pointOfView: sceneView.pointOfView, delegate: self)
-            arties[arty.uid] = arty
+            let friendlyARty = try FriendlyARty(user: user, pointOfView: pointOfView, delegate: self)
+            friendlyARties[friendlyARty.uid] = friendlyARty
         } catch {
             print(error)
         }
     }
 
-    func arty(_ arty: ARty, didUpdateLocation location: CLLocation) {
+    func friendlyARty(_ friendlyARty: FriendlyARty, didUpdateLocation location: CLLocation) {
         guard let worldOrigin = arSessionManager.worldOrigin else {
             return
         }
         let position = SCNVector3.make(location: location, worldOrigin: worldOrigin)
-        if sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false) == nil {
-            arty.position = position
-            arty.eulerAngles.y = Float(Double(arc4random_uniform(360)).radians)
+        if sceneView.scene.rootNode.childNode(withName: friendlyARty.uid, recursively: false) == nil {
+            friendlyARty.position = position
+            friendlyARty.rotateToRandomAngle()
             DispatchQueue.main.async { [weak self] in
-                self?.sceneView.scene.rootNode.addChildNode(arty)
+                self?.sceneView.scene.rootNode.addChildNode(friendlyARty)
             }
         } else {
-            arty.turnToDirection(location.course)
-            try? arty.walk(to: position)
+            friendlyARty.turnToDirection(location.course)
+            try? friendlyARty.walk(to: position)
         }
     }
 }
 
 extension MainViewController: ChooseARtyViewControllerDelegate {
     func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String) {
-        guard let uid = uid else {
+        guard let uid = uid, let pointOfView = sceneView.pointOfView else {
             return
         }
-        if model != arty?.model {
+        if model != myARty?.model {
             do {
-                let arty = try ARty(
-                    uid: uid,
-                    model: model,
-                    status: self.arty?.status ?? "Hello :)",
-                    pointOfView: sceneView.pointOfView,
-                    delegate: nil
-                )
-                addARtyToScene(arty)
-                setRecentEmotes(for: arty)
-                Database.updateModel(arty: arty) { error in
+                var newMyARty: MyARty
+                if let myARty = myARty {
+                    newMyARty = try MyARty.makeFromModelChange(
+                        uid: uid,
+                        model: model,
+                        status: myARty.status,
+                        pointOfView: pointOfView,
+                        basePosition: myARty.basePosition
+                    )
+                } else {
+                    newMyARty = try MyARty.makeNew(uid: uid, model: model, pointOfView: pointOfView)
+                }
+                addMyARtyToScene(newMyARty)
+                setRecentEmotes(for: newMyARty)
+                Database.updateModel(arty: newMyARty) { error in
                     if let error = error {
                         print(error)
                     }
@@ -300,10 +313,10 @@ private extension MainViewController {
     }
 
     @IBAction func didTapChooseEmotesButton(_ sender: Any) {
-        guard let arty = arty else {
+        guard let myARty = myARty else {
             return
         }
-        let controller = ChooseEmotesViewController.make(arty: arty)
+        let controller = ChooseEmotesViewController.make(myARty: myARty)
         let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
@@ -313,7 +326,7 @@ private extension MainViewController {
     }
 
     @IBAction func didTapEditStatusButton(_ sender: Any) {
-        guard let arty = arty else {
+        guard let myARty = myARty else {
             return
         }
         let alert = UIAlertController(
@@ -322,7 +335,7 @@ private extension MainViewController {
             preferredStyle: .alert
         )
         alert.addTextField { textField in
-            textField.text = arty.status
+            textField.text = myARty.status
             textField.placeholder = "Enter a status"
             textField.clearButtonMode = .whileEditing
         }
@@ -330,7 +343,7 @@ private extension MainViewController {
             guard let status = alert?.textFields?[0].text else {
                 return
             }
-            arty.status = status
+            myARty.status = status
         })
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
@@ -345,23 +358,17 @@ private extension MainViewController {
     }
 
     func showChooseARtyViewController() {
-        let controller = ChooseARtyViewController(currentARty: arty?.model ?? "", delegate: self)
+        let controller = ChooseARtyViewController(currentARty: myARty?.model ?? "", delegate: self)
         let navigationController = UINavigationController(rootViewController: controller)
         present(navigationController, animated: true)
     }
 
-    func addARtyToScene(_ arty: ARty) {
-        if let basePosition = self.arty?.basePosition {
-            arty.basePosition = basePosition
-            arty.position = basePosition
-        } else {
-            arty.setBasePosition()
-        }
-        self.arty = arty
-        sceneView.scene.rootNode.childNode(withName: arty.uid, recursively: false)?.removeFromParentNode()
+    func addMyARtyToScene(_ myARty: MyARty) {
+        self.myARty = myARty
+        sceneView.scene.rootNode.childNode(withName: myARty.uid, recursively: false)?.removeFromParentNode()
         DispatchQueue.main.async { [weak self] in
-            self?.sceneView.scene.rootNode.addChildNode(arty)
-            arty.turnToCamera()
+            self?.sceneView.scene.rootNode.addChildNode(myARty)
+            myARty.turnToCamera()
         }
     }
 }

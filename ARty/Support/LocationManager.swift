@@ -26,11 +26,8 @@ class LocationManager: CLLocationManager {
         }
     }
 
-    func setLocationInDatabase(uid: String) {
-        guard let lastLocation = lastLocation else {
-            return
-        }
-        Database.setLocation(lastLocation, for: uid) { error in
+    func setLocationInDatabase(to location: CLLocation, for uid: String) {
+        Database.setLocation(location, for: uid) { error in
             if let error = error {
                 print(error)
             }

@@ -29,10 +29,6 @@ struct Schema {
         return try arty(model).walkAnimation
     }
 
-    func fallAnimation(for model: String) throws -> String {
-        return try arty(model).fallAnimation
-    }
-
     func setPassiveEmote(for model: String, to emote: String) throws -> String {
         return try isValidEmote(model: model, emote: emote) ?
             emote :
@@ -64,17 +60,7 @@ private extension Schema {
 
     func animationNames(for model: String) throws -> [String] {
         var names = try emotes(for: model)
-
-        let walkAnimation = try self.walkAnimation(for: model)
-        if walkAnimation != "" {
-            names.append(walkAnimation)
-        }
-
-        let fallAnimation = try self.fallAnimation(for: model)
-        if fallAnimation != "" {
-            names.append(fallAnimation)
-        }
-
+        names.append(try walkAnimation(for: model))
         return names
     }
 

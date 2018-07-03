@@ -3,7 +3,6 @@ struct ARtySchema {
     let emotes: [String]
     let idleAnimation: String
     let walkAnimation: String
-    let fallAnimation: String
     let defaultPassiveEmote: String
     let defaultPokeEmote: String
     let animationRepeatCounts: [String: Float]

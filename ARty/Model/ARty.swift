@@ -1,101 +1,42 @@
 import SceneKit
 import CoreLocation
-import FirebaseFirestore
-
-protocol ARtyDelegate: class {
-    func arty(_ arty: ARty, userChangedModel user: User)
-    func arty(_ arty: ARty, didUpdateLocation location: CLLocation)
-}
 
 class ARty: SCNNode {
     let uid: String
-
     let model: String
-
     let emotes: [String]
-
-    private(set) var passiveEmote = ""
-
-    private(set) var pokeEmote = ""
-
-    private(set) var basePosition: SCNVector3?
-
-    private(set) var location: CLLocation?
-
+    let walkAnimation: String
+    var location: CLLocation?
+    private(set) var passiveEmote: String
+    private(set) var pokeEmote: String
     private let animations: [String: CAAnimation]
-
-    private let walkAnimation: String
-
-    private let pointOfView: SCNNode?
-
-    private var pokeTimestamp: Date?
-
-    private var userListener: ListenerRegistration?
-
-    private var locationListener: ListenerRegistration?
-
-    private weak var delegate: ARtyDelegate?
+    private let pointOfView: SCNNode
 
     init(uid: String,
          model: String,
-         passiveEmote: String = "",
-         pokeEmote: String = "",
+         passiveEmote: String,
+         pokeEmote: String,
          status: String,
-         pointOfView: SCNNode?,
-         delegate: ARtyDelegate?) throws {
+         pointOfView: SCNNode) throws {
         self.uid = uid
         self.model = model
+        self.emotes = try schema.emotes(for: model)
+        self.walkAnimation = try schema.walkAnimation(for: model)
+        self.passiveEmote = try schema.setPassiveEmote(for: model, to: passiveEmote)
+        self.pokeEmote = try schema.setPokeEmote(for: model, to: pokeEmote)
+        self.animations = try schema.animations(for: model)
         self.pointOfView = pointOfView
-        emotes = try schema.emotes(for: model)
-        animations = try schema.animations(for: model)
-        walkAnimation = try schema.walkAnimation(for: model)
 
         super.init()
 
         name = uid
+        constraints = []
         try addIdleScene()
-        try setPassiveEmote(to: passiveEmote)
-        try setPokeEmote(to: pokeEmote)
         loopPassiveEmote()
         centerPivot()
 
-        if delegate != nil {
-            self.delegate = delegate
-            makeListeners()
-        }
-
         defer {
             self.status = status
-        }
-    }
-
-    convenience init(user: User, pointOfView: SCNNode?, delegate: ARtyDelegate?) throws {
-        try self.init(
-            uid: user.uid,
-            model: user.model,
-            passiveEmote: user.passiveEmote(for: user.model),
-            pokeEmote: user.pokeEmote(for: user.model),
-            status: user.status,
-            pointOfView: pointOfView,
-            delegate: delegate
-        )
-    }
-
-    static func make(uid: String,
-                     pointOfView: SCNNode?,
-                     delegate: ARtyDelegate,
-                     completion: @escaping (Database.Result<ARty, Error>) -> Void) {
-        Database.user(uid) { result in
-            switch result {
-            case .fail(let error):
-                completion(.fail(error))
-            case .success(let user):
-                do {
-                    completion(.success(try .init(user: user, pointOfView: pointOfView, delegate: delegate)))
-                } catch {
-                    completion(.fail(error))
-                }
-            }
         }
     }
 
@@ -113,11 +54,9 @@ class ARty: SCNNode {
         }
     }
 
-    private lazy var billboardConstraint: SCNBillboardConstraint = {
-        let constraint = SCNBillboardConstraint()
-        constraint.freeAxes = [.Y]
-        return constraint
-    }()
+    var isIdle: Bool {
+        return animationKeys.isEmpty
+    }
 
     func setPassiveEmote(to emote: String) throws {
         passiveEmote = try schema.setPassiveEmote(for: model, to: emote)
@@ -125,17 +64,6 @@ class ARty: SCNNode {
 
     func setPokeEmote(to emote: String) throws {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
-    }
-
-    func setBasePosition() {
-        guard let pointOfView = pointOfView else {
-            return
-        }
-        let zAdjustment = SCNVector3(0, 0, -1)
-        var basePosition = pointOfView.convertPosition(zAdjustment, to: nil)
-        basePosition.y = -0.75
-        self.basePosition = basePosition
-        position = basePosition
     }
 
     func turnToCamera() {
@@ -156,7 +84,7 @@ class ARty: SCNNode {
         SCNTransaction.commit()
     }
 
-    func turnToDirection(_ direction: CLLocationDirection) {
+    func turnToDirection(_ direction: Double) {
         guard direction != -1, !isTurningToCamera else {
             return
         }
@@ -172,55 +100,16 @@ class ARty: SCNNode {
         runAction(rotateAction)
     }
 
-    func walk(location: CLLocation) throws {
-        let speed = location.speed
-        if speed != -1 {
-            if speed < 0.5 {
-                removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
-                turnToCamera()
-            } else if isIdle {
-                try playAnimation(walkAnimation)
-            }
-        } else {
-            guard let lastLocation = self.location else {
-                self.location = location
-                return
-            }
-            let distance = lastLocation.distance(from: location)
-            if distance > 5 {
-                if isIdle {
-                    try playAnimation(walkAnimation)
-                }
-                self.location = location
-            } else {
-                removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
-                turnToCamera()
-            }
-        }
-    }
-
-    func walk(to position: SCNVector3) throws {
-        if isIdle {
-            try playAnimation(walkAnimation)
-        }
-        let moveAction = SCNAction.move(to: position, duration: 5)
-        runAction(moveAction) { [weak self] in
-            guard let `self` = self else {
-                return
-            }
-            self.removeAnimation(forKey: self.walkAnimation, blendOutDuration: 0.5)
-        }
-    }
-
     func playAnimation(_ animation: String) throws {
         let caAnimation = try self.animation(animation)
         addAnimation(caAnimation, forKey: animation)
     }
 
-    deinit {
-        userListener?.remove()
-        locationListener?.remove()
-    }
+    private lazy var billboardConstraint: SCNBillboardConstraint = {
+        let constraint = SCNBillboardConstraint()
+        constraint.freeAxes = [.Y]
+        return constraint
+    }()
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -228,15 +117,10 @@ class ARty: SCNNode {
 }
 
 private extension ARty {
-    var isIdle: Bool {
-        return animationKeys.isEmpty
-    }
-
     var isTurningToCamera: Bool {
         if let constraints = constraints {
             return constraints.contains(billboardConstraint)
         } else {
-            constraints = []
             return false
         }
     }
@@ -270,50 +154,14 @@ private extension ARty {
 
     func centerPivot() {
         let (minBox, maxBox) = boundingBox
-        pivot = SCNMatrix4MakeTranslation(0, (maxBox.y - minBox.y)/2, 0)
-    }
-
-    func makeListeners() {
-        userListener = Database.userListener(uid) { [weak self] user in
-            guard let `self` = self else {
-                return
-            }
-            if user.model == self.model {
-                self.update(from: user)
-            } else {
-                self.delegate?.arty(self, userChangedModel: user)
-            }
-        }
-        locationListener = Database.locationListener(uid: uid) { [weak self] location in
-            guard let `self` = self else {
-                return
-            }
-            self.delegate?.arty(self, didUpdateLocation: location)
-            self.location = location
-        }
-    }
-
-    func update(from user: User) {
-        try? setPassiveEmote(to: user.passiveEmote(for: user.model))
-        try? setPokeEmote(to: user.pokeEmote(for: user.model))
-        setPokeTimestamp(to: user.pokeTimestamp)
-        if user.status != status {
-            status = user.status
-        }
-    }
-
-    func setPokeTimestamp(to date: Date) {
-        if pokeTimestamp != date {
-            try? playAnimation(pokeEmote)
-        }
-        pokeTimestamp = date
+        pivot = SCNMatrix4MakeTranslation(0, (maxBox.y - minBox.y) / 2, 0)
     }
 
     func addStatusNode(_ status: String) {
         childNode(withName: "status", recursively: false)?.removeFromParentNode()
 
         let material = SCNMaterial()
-        material.diffuse.contents = delegate == nil ? UIColor.green : UIColor.white
+        material.diffuse.contents = type(of: self) == MyARty.self ? UIColor.green : UIColor.white
 
         let text = SCNText(string: status, extrusionDepth: 1)
         text.materials = [material]

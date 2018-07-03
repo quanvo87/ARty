@@ -16,7 +16,6 @@ let elvira = ARtySchema(
     ],
     idleAnimation: "elvira_idle",
     walkAnimation: "elvira_walk",
-    fallAnimation: "",
     defaultPassiveEmote: "elvira_wave",
     defaultPokeEmote: "elvira_buttslap",
     animationRepeatCounts: ["elvira_wave": 4]
@@ -32,7 +31,6 @@ let mutant = ARtySchema(
     ],
     idleAnimation: "mutant_idle",
     walkAnimation: "mutant_walk",
-    fallAnimation: "mutant_fall",
     defaultPassiveEmote: "mutant_chestthump",
     defaultPokeEmote: "mutant_battlecry",
     animationRepeatCounts: [:]
@@ -48,7 +46,6 @@ let paladin = ARtySchema(
     ],
     idleAnimation: "paladin_idle",
     walkAnimation: "paladin_walk",
-    fallAnimation: "paladin_fall",
     defaultPassiveEmote: "paladin_wave",
     defaultPokeEmote: "paladin_fierce_attack",
     animationRepeatCounts: ["paladin_wave": 4]
@@ -64,7 +61,6 @@ let gunship_soldier = ARtySchema(
     ],
     idleAnimation: "gunship_soldier_idle",
     walkAnimation: "gunship_soldier_walk",
-    fallAnimation: "",
     defaultPassiveEmote: "gunship_soldier_fighting_stance",
     defaultPokeEmote: "gunship_soldier_backflip_uppercut",
     animationRepeatCounts: [

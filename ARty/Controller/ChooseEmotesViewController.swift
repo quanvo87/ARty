@@ -3,7 +3,7 @@ import UIKit
 class ChooseEmotesViewController: UIViewController {
     @IBOutlet weak var emoteTypePicker: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
-    private var arty: ARty?
+    private var myARty: MyARty?
     private var emotes = [String]()
 
     override func viewDidLoad() {
@@ -25,14 +25,14 @@ class ChooseEmotesViewController: UIViewController {
         tableView.reloadData()
     }
 
-    static func make(arty: ARty) -> ChooseEmotesViewController {
+    static func make(myARty: MyARty) -> ChooseEmotesViewController {
         guard let controller = UIStoryboard.main.instantiateViewController(
                 withIdentifier: String(describing: ChooseEmotesViewController.self)
             ) as? ChooseEmotesViewController else {
                 return ChooseEmotesViewController()
         }
-        controller.arty = arty
-        controller.emotes = arty.emotes.sorted()
+        controller.myARty = myARty
+        controller.emotes = myARty.emotes.sorted()
         return controller
     }
 }
@@ -50,8 +50,8 @@ extension ChooseEmotesViewController: UITableViewDataSource {
         cell.textLabel?.text = emote.emoteDisplayName
 
         let currentEmote = emoteTypePicker.selectedSegmentIndex == 0 ?
-            arty?.pokeEmote :
-            arty?.passiveEmote
+            myARty?.pokeEmote :
+            myARty?.passiveEmote
         cell.accessoryType = emote == currentEmote ? .checkmark : .none
 
         return cell
@@ -60,7 +60,7 @@ extension ChooseEmotesViewController: UITableViewDataSource {
 
 extension ChooseEmotesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let arty = arty else {
+        guard let myARty = myARty else {
             return
         }
 
@@ -68,15 +68,15 @@ extension ChooseEmotesViewController: UITableViewDelegate {
 
         switch emoteTypePicker.selectedSegmentIndex {
         case 0:
-            try? arty.setPokeEmote(to: emote)
-            Database.updatePokeEmote(to: emote, for: arty) { error in
+            try? myARty.setPokeEmote(to: emote)
+            Database.updatePokeEmote(to: emote, for: myARty) { error in
                 if let error = error {
                     print(error)
                 }
             }
         case 1:
-            try? arty.setPassiveEmote(to: emote)
-            Database.updatePassiveEmote(to: emote, for: arty) { error in
+            try? myARty.setPassiveEmote(to: emote)
+            Database.updatePassiveEmote(to: emote, for: myARty) { error in
                 if let error = error {
                     print(error)
                 }

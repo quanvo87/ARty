@@ -24,6 +24,7 @@ class FriendlyARty: ARty {
             pointOfView: pointOfView
         )
         makeListeners()
+        eulerAngles.y = Float(Double(arc4random_uniform(360)).radians)
     }
 
     static func make(uid: String,
@@ -42,10 +43,6 @@ class FriendlyARty: ARty {
                 }
             }
         }
-    }
-
-    func rotateToRandomAngle() {
-        eulerAngles.y = Float(Double(arc4random_uniform(360)).radians)
     }
 
     func walk(to position: SCNVector3) throws {
@@ -96,16 +93,12 @@ private extension FriendlyARty {
     func update(from user: User) {
         try? setPassiveEmote(to: user.passiveEmote(for: user.model))
         try? setPokeEmote(to: user.pokeEmote(for: user.model))
-        setPokeTimestamp(to: user.pokeTimestamp)
+        if pokeTimestamp == nil || pokeTimestamp != user.pokeTimestamp {
+            try? playAnimation(pokeEmote)
+            pokeTimestamp = user.pokeTimestamp
+        }
         if user.status != status {
             status = user.status
         }
-    }
-
-    func setPokeTimestamp(to date: Date) {
-        if pokeTimestamp != date {
-            try? playAnimation(pokeEmote)
-        }
-        pokeTimestamp = date
     }
 }

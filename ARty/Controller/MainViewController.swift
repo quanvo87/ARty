@@ -246,7 +246,6 @@ extension MainViewController: FriendlyARtyDelegate {
         let position = SCNVector3(location: location, worldOrigin: worldOrigin)
         if sceneView.scene.rootNode.childNode(withName: friendlyARty.uid, recursively: false) == nil {
             friendlyARty.position = position
-            friendlyARty.rotateToRandomAngle()
             DispatchQueue.main.async { [weak self] in
                 self?.sceneView.scene.rootNode.addChildNode(friendlyARty)
             }
@@ -278,7 +277,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
                 }
                 addMyARtyToScene(newMyARty)
                 setRecentEmotes(for: newMyARty)
-                Database.updateModel(arty: newMyARty) { error in
+                Database.updateModel(myARty: newMyARty) { error in
                     if let error = error {
                         print(error)
                     }

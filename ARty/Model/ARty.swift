@@ -10,7 +10,7 @@ class ARty: SCNNode {
     private(set) var passiveEmote: String
     private(set) var pokeEmote: String
     private let animations: [String: CAAnimation]
-    private let pointOfView: SCNNode?
+    private let pointOfView: SCNNode
 
     init(uid: String,
          model: String,

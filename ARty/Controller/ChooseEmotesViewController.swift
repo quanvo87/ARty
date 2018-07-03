@@ -60,7 +60,7 @@ extension ChooseEmotesViewController: UITableViewDataSource {
 
 extension ChooseEmotesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let arty = myARty else {
+        guard let myARty = myARty else {
             return
         }
 
@@ -68,15 +68,15 @@ extension ChooseEmotesViewController: UITableViewDelegate {
 
         switch emoteTypePicker.selectedSegmentIndex {
         case 0:
-            try? arty.setPokeEmote(to: emote)
-            Database.updatePokeEmote(to: emote, for: arty) { error in
+            try? myARty.setPokeEmote(to: emote)
+            Database.updatePokeEmote(to: emote, for: myARty) { error in
                 if let error = error {
                     print(error)
                 }
             }
         case 1:
-            try? arty.setPassiveEmote(to: emote)
-            Database.updatePassiveEmote(to: emote, for: arty) { error in
+            try? myARty.setPassiveEmote(to: emote)
+            Database.updatePassiveEmote(to: emote, for: myARty) { error in
                 if let error = error {
                     print(error)
                 }

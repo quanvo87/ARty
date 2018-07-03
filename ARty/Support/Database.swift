@@ -93,29 +93,29 @@ struct Database {
         }
     }
 
-    static func updateModel(arty: ARty, completion: @escaping (Error?) -> Void) {
-        usersCollection.document(arty.uid).updateData([
-            "model": arty.model
+    static func updateModel(myARty: MyARty, completion: @escaping (Error?) -> Void) {
+        usersCollection.document(myARty.uid).updateData([
+            "model": myARty.model
         ]) { error in
             completion(error)
         }
     }
 
     static func updatePassiveEmote(to emote: String,
-                                   for arty: ARty,
+                                   for myARty: MyARty,
                                    completion: @escaping (Error?) -> Void) {
-        usersCollection.document(arty.uid).updateData([
-            "passiveEmotes.\(arty.model)": emote
+        usersCollection.document(myARty.uid).updateData([
+            "passiveEmotes.\(myARty.model)": emote
         ]) { error in
             completion(error)
         }
     }
 
     static func updatePokeEmote(to emote: String,
-                                for arty: ARty,
+                                for myARty: MyARty,
                                 completion: @escaping (Error?) -> Void) {
-        usersCollection.document(arty.uid).updateData([
-            "pokeEmotes.\(arty.model)": emote
+        usersCollection.document(myARty.uid).updateData([
+            "pokeEmotes.\(myARty.model)": emote
         ]) { error in
             completion(error)
         }

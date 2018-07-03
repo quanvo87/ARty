@@ -20,7 +20,6 @@ class MyARty: ARty {
             status: status,
             pointOfView: pointOfView
         )
-        position = basePosition
     }
 
     static func makeNew(uid: String, model: String, pointOfView: SCNNode) throws -> MyARty {
@@ -80,6 +79,7 @@ class MyARty: ARty {
             } else if isIdle {
                 try playAnimation(walkAnimation)
             }
+            self.location = location
         } else {
             guard let lastLocation = self.location else {
                 self.location = location

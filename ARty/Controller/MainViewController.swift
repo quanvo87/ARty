@@ -49,9 +49,7 @@ class MainViewController: UIViewController {
             guard let transform = sceneView.hitTest(location, types: .featurePoint).first?.worldTransform else {
                 return
             }
-            let position = MyARty.basePosition(transform: transform)
-            myARty?.basePosition = position
-            myARty?.position = position
+            myARty?.basePosition = MyARty.basePosition(transform: transform)
         }
     }
 }
@@ -222,7 +220,7 @@ extension MainViewController: ARSessionManagerDelegate {
             guard let location = $0.location else {
                 return
             }
-            $0.position = SCNVector3.make(location: location, worldOrigin: worldOrigin)
+            $0.position = .init(location: location, worldOrigin: worldOrigin)
         }
     }
 }
@@ -245,7 +243,7 @@ extension MainViewController: FriendlyARtyDelegate {
         guard let worldOrigin = arSessionManager.worldOrigin else {
             return
         }
-        let position = SCNVector3.make(location: location, worldOrigin: worldOrigin)
+        let position = SCNVector3(location: location, worldOrigin: worldOrigin)
         if sceneView.scene.rootNode.childNode(withName: friendlyARty.uid, recursively: false) == nil {
             friendlyARty.position = position
             friendlyARty.rotateToRandomAngle()

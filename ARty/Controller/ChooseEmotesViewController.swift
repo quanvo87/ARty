@@ -3,7 +3,7 @@ import UIKit
 class ChooseEmotesViewController: UIViewController {
     @IBOutlet weak var emoteTypePicker: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
-    private var arty: MyARty?
+    private var myARty: MyARty?
     private var emotes = [String]()
 
     override func viewDidLoad() {
@@ -31,7 +31,7 @@ class ChooseEmotesViewController: UIViewController {
             ) as? ChooseEmotesViewController else {
                 return ChooseEmotesViewController()
         }
-        controller.arty = myARty
+        controller.myARty = myARty
         controller.emotes = myARty.emotes.sorted()
         return controller
     }
@@ -50,8 +50,8 @@ extension ChooseEmotesViewController: UITableViewDataSource {
         cell.textLabel?.text = emote.emoteDisplayName
 
         let currentEmote = emoteTypePicker.selectedSegmentIndex == 0 ?
-            arty?.pokeEmote :
-            arty?.passiveEmote
+            myARty?.pokeEmote :
+            myARty?.passiveEmote
         cell.accessoryType = emote == currentEmote ? .checkmark : .none
 
         return cell
@@ -60,7 +60,7 @@ extension ChooseEmotesViewController: UITableViewDataSource {
 
 extension ChooseEmotesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let arty = arty else {
+        guard let arty = myARty else {
             return
         }
 

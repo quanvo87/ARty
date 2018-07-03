@@ -66,7 +66,7 @@ class MyARty: ARty {
     }
 
     static func basePosition(transform: matrix_float4x4) -> SCNVector3 {
-        var position = SCNVector3.make(transform: transform).normalized
+        var position = SCNVector3(transform: transform).normalized
         position.y = -0.75
         return position
     }

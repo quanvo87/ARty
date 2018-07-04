@@ -144,6 +144,12 @@
                                     <action selector="didTapEditStatusButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="tAK-pA-hHn"/>
                                 </connections>
                             </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="right arrow" translatesAutoresizingMaskIntoConstraints="NO" id="xon-fb-Mym">
+                                <rect key="frame" x="327" y="319.5" width="48" height="48"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="left arrow" translatesAutoresizingMaskIntoConstraints="NO" id="Yai-ZX-Tqv">
+                                <rect key="frame" x="0.0" y="319.5" width="48" height="48"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -151,6 +157,8 @@
                             <constraint firstItem="uT0-tf-TfT" firstAttribute="top" secondItem="UpO-lG-qN3" secondAttribute="bottom" constant="10" id="2Wq-SH-ttr"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" constant="10" id="5jr-bJ-WSv"/>
                             <constraint firstItem="7az-ZH-489" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="DhY-Uu-1rd"/>
+                            <constraint firstItem="Yai-ZX-Tqv" firstAttribute="centerY" secondItem="6Pb-WM-QEe" secondAttribute="centerY" id="DlQ-hL-v0Z"/>
+                            <constraint firstItem="Yai-ZX-Tqv" firstAttribute="leading" secondItem="6Pb-WM-QEe" secondAttribute="leading" id="EK5-tC-Ls6"/>
                             <constraint firstItem="6dM-UU-1Cs" firstAttribute="trailing" secondItem="pYK-VT-FEI" secondAttribute="trailing" id="FBJ-v5-e2t"/>
                             <constraint firstItem="uT0-tf-TfT" firstAttribute="trailing" secondItem="UpO-lG-qN3" secondAttribute="trailing" id="KIU-kV-kB3"/>
                             <constraint firstItem="6dM-UU-1Cs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="MbE-ci-zFN"/>
@@ -160,6 +168,7 @@
                             <constraint firstItem="7az-ZH-489" firstAttribute="top" secondItem="pYK-VT-FEI" secondAttribute="bottom" constant="10" id="SKa-6e-qgR"/>
                             <constraint firstItem="9ep-KU-O3Q" firstAttribute="top" secondItem="uT0-tf-TfT" secondAttribute="bottom" constant="10" id="VXZ-gG-0G0"/>
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="XUW-Yb-qnm"/>
+                            <constraint firstItem="6Pb-WM-QEe" firstAttribute="trailing" secondItem="xon-fb-Mym" secondAttribute="trailing" id="dcA-md-WIC"/>
                             <constraint firstItem="uT0-tf-TfT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ivM-ky-J9c" secondAttribute="leading" constant="20" symbolic="YES" id="exD-5z-Iv0"/>
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="trailing" secondItem="7az-ZH-489" secondAttribute="trailing" id="gaW-HK-dae"/>
                             <constraint firstItem="agP-J1-c8H" firstAttribute="leading" secondItem="6Pb-WM-QEe" secondAttribute="leading" constant="10" id="mNz-H7-Nbd"/>
@@ -167,12 +176,15 @@
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="agP-J1-c8H" secondAttribute="trailing" constant="20" symbolic="YES" id="r7T-c5-AOG"/>
                             <constraint firstItem="UpO-lG-qN3" firstAttribute="top" secondItem="6Pb-WM-QEe" secondAttribute="top" id="rYn-9R-giT"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="7az-ZH-489" secondAttribute="bottom" constant="10" id="sLo-0y-vwu"/>
+                            <constraint firstItem="xon-fb-Mym" firstAttribute="centerY" secondItem="6Pb-WM-QEe" secondAttribute="centerY" id="uoR-co-UjR"/>
                             <constraint firstItem="6Pb-WM-QEe" firstAttribute="bottom" secondItem="agP-J1-c8H" secondAttribute="bottom" constant="10" id="zbV-Lb-yU2"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Pb-WM-QEe"/>
                     </view>
                     <connections>
                         <outlet property="label" destination="9ep-KU-O3Q" id="V1c-x3-ob8"/>
+                        <outlet property="leftArrow" destination="Yai-ZX-Tqv" id="END-xC-NUV"/>
+                        <outlet property="rightArrow" destination="xon-fb-Mym" id="xhn-VT-JAh"/>
                         <outlet property="sceneView" destination="dmk-l1-JGZ" id="ab2-eX-Tgj"/>
                     </connections>
                 </viewController>
@@ -221,4 +233,8 @@
             <point key="canvasLocation" x="2201" y="21"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="left arrow" width="48" height="48"/>
+        <image name="right arrow" width="48" height="48"/>
+    </resources>
 </document>

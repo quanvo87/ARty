@@ -2,7 +2,7 @@ import SceneKit
 import CoreLocation
 
 class MyARty: ARty {
-    var basePosition: SCNVector3
+    private(set) var basePosition: SCNVector3
 
     private init(uid: String,
                  model: String,
@@ -64,10 +64,10 @@ class MyARty: ARty {
         )
     }
 
-    static func basePosition(transform: matrix_float4x4) -> SCNVector3 {
+    func setBasePosition(transform: matrix_float4x4) {
         var position = SCNVector3(transform: transform).normalized
         position.y = -0.75
-        return position
+        basePosition = position
     }
 
     func walk(location: CLLocation) throws {

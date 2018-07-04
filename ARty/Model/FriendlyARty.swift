@@ -18,10 +18,10 @@ class FriendlyARty: ARty {
         try super.init(
             uid: user.uid,
             model: user.model,
+            pointOfView: pointOfView,
             passiveEmote: user.passiveEmote(for: user.model),
             pokeEmote: user.pokeEmote(for: user.model),
-            status: user.status,
-            pointOfView: pointOfView
+            status: user.status
         )
         makeListeners()
         eulerAngles.y = Float(Double(arc4random_uniform(360)).radians)

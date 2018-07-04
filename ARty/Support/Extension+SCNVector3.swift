@@ -38,16 +38,8 @@ extension SCNVector3 {
     }
     // swiftlint:enable shorthand_operator
 
-    static func / (vector: SCNVector3, scalar: Float) -> SCNVector3 {
-        return .init(vector.x / scalar, vector.y / scalar, vector.z / scalar)
-    }
-
     var length: Float {
         return sqrt(x * x + y * y + z * z)
-    }
-
-    var normalized: SCNVector3 {
-        return self / length
     }
 
     func distance(to vector: SCNVector3) -> Float {

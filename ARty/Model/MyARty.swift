@@ -2,7 +2,7 @@ import SceneKit
 import CoreLocation
 
 class MyARty: ARty {
-    private(set) var basePosition: SCNVector3
+    var basePosition: SCNVector3
 
     private init(uid: String,
                  model: String,
@@ -15,15 +15,14 @@ class MyARty: ARty {
         try super.init(
             uid: uid,
             model: model,
+            pointOfView: pointOfView,
             passiveEmote: passiveEmote,
             pokeEmote: pokeEmote,
-            status: status,
-            pointOfView: pointOfView
+            status: status
         )
     }
 
     static func makeNew(uid: String, model: String, pointOfView: SCNNode) throws -> MyARty {
-        let basePosition = MyARty.basePosition(simdWorldFront: pointOfView.simdWorldFront)
         return try MyARty(
             uid: uid,
             model: model,
@@ -31,12 +30,11 @@ class MyARty: ARty {
             pokeEmote: "",
             status: "Hello :)",
             pointOfView: pointOfView,
-            basePosition: basePosition
+            basePosition: MyARty.basePosition(simdWorldFront: pointOfView.simdWorldFront)
         )
     }
 
     static func makeFromUser(_ user: User, pointOfView: SCNNode) throws -> MyARty {
-        let basePosition = MyARty.basePosition(simdWorldFront: pointOfView.simdWorldFront)
         return try MyARty(
             uid: user.uid,
             model: user.model,
@@ -44,7 +42,7 @@ class MyARty: ARty {
             pokeEmote: user.pokeEmote(for: user.model),
             status: user.status,
             pointOfView: pointOfView,
-            basePosition: basePosition
+            basePosition: MyARty.basePosition(simdWorldFront: pointOfView.simdWorldFront)
         )
     }
 
@@ -64,10 +62,8 @@ class MyARty: ARty {
         )
     }
 
-    func setBasePosition(transform: matrix_float4x4) {
-        var position = SCNVector3(transform: transform).normalized
-        position.y = -0.75
-        basePosition = position
+    func setBasePosition() {
+        basePosition = MyARty.basePosition(simdWorldFront: pointOfView.simdWorldFront)
     }
 
     func walk(location: CLLocation) throws {

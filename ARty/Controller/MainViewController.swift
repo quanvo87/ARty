@@ -51,10 +51,7 @@ class MainViewController: UIViewController {
                 try? friendlyARty.playAnimation(friendlyARty.pokeEmote)
             }
         } else {
-            guard let transform = sceneView.hitTest(location, types: .featurePoint).first?.worldTransform else {
-                return
-            }
-            myARty?.setBasePosition(transform: transform)
+            myARty?.setBasePosition()
             myARty?.turnToCamera()
             leftArrow.isHidden = true
             rightArrow.isHidden = true

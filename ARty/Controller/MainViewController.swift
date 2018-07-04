@@ -4,6 +4,8 @@ import CoreLocation
 class MainViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var leftArrow: UIImageView!
+    @IBOutlet weak var rightArrow: UIImageView!
 
     private var uid: String?
     private var myARty: MyARty?
@@ -16,14 +18,17 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        leftArrow.isHidden = true
+        rightArrow.isHidden = true
+
         let scene = SCNScene()
         sceneView.scene = scene
-//        sceneView.autoenablesDefaultLighting = true
-//        sceneView.debugOptions = ARSCNDebugOptions.showWorldOrigin
-//        sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         sceneView.session.delegate = self
         sceneView.session.run(ARWorldTrackingConfiguration())
+
         authManager.listenForAuthState()
+
         arSessionManager.load()
     }
 
@@ -46,10 +51,10 @@ class MainViewController: UIViewController {
                 try? friendlyARty.playAnimation(friendlyARty.pokeEmote)
             }
         } else {
-            guard let transform = sceneView.hitTest(location, types: .featurePoint).first?.worldTransform else {
-                return
-            }
-            myARty?.basePosition = MyARty.basePosition(transform: transform)
+            myARty?.setBasePosition()
+            myARty?.turnToCamera()
+            leftArrow.isHidden = true
+            rightArrow.isHidden = true
         }
     }
 }
@@ -62,6 +67,31 @@ extension MainViewController: ARSessionDelegate {
                 return
         }
         myARty.position = myARty.basePosition + currentPosition
+        showArrowToMyARty(myARty)
+    }
+
+    private func showArrowToMyARty(_ myARty: MyARty) {
+        let width = Float(sceneView.frame.width)
+        let position = sceneView.projectPoint(myARty.position)
+
+        if position.z < 1 {
+            if position.x > width {
+                leftArrow.isHidden = true
+                rightArrow.isHidden = false
+            } else if position.x < 0 {
+                leftArrow.isHidden = false
+                rightArrow.isHidden = true
+            } else {
+                leftArrow.isHidden = true
+                rightArrow.isHidden = true
+            }
+        } else if position.x < 0 {
+            leftArrow.isHidden = true
+            rightArrow.isHidden = false
+        } else {
+            leftArrow.isHidden = false
+            rightArrow.isHidden = true
+        }
     }
 }
 

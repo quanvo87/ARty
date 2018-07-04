@@ -4,28 +4,28 @@ import CoreLocation
 class ARty: SCNNode {
     let uid: String
     let model: String
+    let pointOfView: SCNNode
     let emotes: [String]
     let walkAnimation: String
     var location: CLLocation?
     private(set) var passiveEmote: String
     private(set) var pokeEmote: String
     private let animations: [String: CAAnimation]
-    private let pointOfView: SCNNode
 
     init(uid: String,
          model: String,
+         pointOfView: SCNNode,
          passiveEmote: String,
          pokeEmote: String,
-         status: String,
-         pointOfView: SCNNode) throws {
+         status: String) throws {
         self.uid = uid
         self.model = model
+        self.pointOfView = pointOfView
         self.emotes = try schema.emotes(for: model)
         self.walkAnimation = try schema.walkAnimation(for: model)
         self.passiveEmote = try schema.setPassiveEmote(for: model, to: passiveEmote)
         self.pokeEmote = try schema.setPokeEmote(for: model, to: pokeEmote)
         self.animations = try schema.animations(for: model)
-        self.pointOfView = pointOfView
 
         super.init()
 

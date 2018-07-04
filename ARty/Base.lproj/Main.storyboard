@@ -182,6 +182,7 @@
                         <viewLayoutGuide key="safeArea" id="6Pb-WM-QEe"/>
                     </view>
                     <connections>
+                        <outlet property="holdPositionButton" destination="6dM-UU-1Cs" id="qbO-HO-fpY"/>
                         <outlet property="label" destination="9ep-KU-O3Q" id="V1c-x3-ob8"/>
                         <outlet property="leftArrow" destination="Yai-ZX-Tqv" id="END-xC-NUV"/>
                         <outlet property="rightArrow" destination="xon-fb-Mym" id="xhn-VT-JAh"/>

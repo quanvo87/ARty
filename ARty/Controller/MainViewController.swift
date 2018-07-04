@@ -3,14 +3,15 @@ import CoreLocation
 
 class MainViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
-    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var holdPositionButton: UIButton!
     @IBOutlet weak var leftArrow: UIImageView!
     @IBOutlet weak var rightArrow: UIImageView!
+    @IBOutlet weak var label: UILabel!
 
     private var uid: String?
     private var myARty: MyARty?
     private var friendlyARties = [String: ARty]()
-    private let locationDatabase = LocationDatabase()
+    private var isHoldingPosition = false
     private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var locationManager = LocationManager(delegate: self)
@@ -18,6 +19,8 @@ class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        holdPositionButton.layer.cornerRadius = 5
 
         leftArrow.isHidden = true
         rightArrow.isHidden = true
@@ -66,8 +69,10 @@ extension MainViewController: ARSessionDelegate {
             let currentPosition = sceneView.pointOfView?.position else {
                 return
         }
-        myARty.position = myARty.basePosition + currentPosition
         showArrowToMyARty(myARty)
+        if !isHoldingPosition {
+            myARty.position = myARty.basePosition + currentPosition
+        }
     }
 
     private func showArrowToMyARty(_ myARty: MyARty) {
@@ -108,17 +113,15 @@ extension MainViewController: CLLocationManagerDelegate {
         }
         if locationManager.isValidLocation(newLocation) {
             locationManager.lastLocation = newLocation
-
             if myARty != nil {
                 locationManager.setLocationInDatabase(to: newLocation, for: uid)
             }
-
             if appStateObserver.appIsActive {
-                myARty?.turnToDirection(newLocation.course)
-                try? myARty?.walk(location: newLocation)
-
+                if !isHoldingPosition {
+                    myARty?.turnToDirection(newLocation.course)
+                    try? myARty?.walk(location: newLocation)
+                }
                 arSessionManager.setWorldOrigin(newLocation)
-
                 nearbyUsers(
                     uid: uid,
                     latitude: newLocation.coordinate.latitude,
@@ -129,7 +132,7 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 
     private func nearbyUsers(uid: String, latitude: Double, longitude: Double) {
-        locationDatabase.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
+        LocationDatabase.shared.nearbyUsers(uid: uid, latitude: latitude, longitude: longitude) { [weak self] result in
             switch result {
             case .fail(let error):
                 print(error)
@@ -337,6 +340,13 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
 
 private extension MainViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
+        if isHoldingPosition {
+            isHoldingPosition = false
+            holdPositionButton.backgroundColor = .clear
+        } else {
+            isHoldingPosition = true
+            holdPositionButton.backgroundColor = .white
+        }
     }
 
     @IBAction func didTapChooseEmotesButton(_ sender: Any) {

@@ -118,11 +118,7 @@ class ARty: SCNNode {
 
 private extension ARty {
     var isTurningToCamera: Bool {
-        if let constraints = constraints {
-            return constraints.contains(billboardConstraint)
-        } else {
-            return false
-        }
+        return constraints?.contains(billboardConstraint) ?? false
     }
 
     var lookAtConstraint: SCNLookAtConstraint {

@@ -1,8 +1,11 @@
 import Alamofire
 
 class LocationDatabase {
+    static let shared = LocationDatabase()
     private static let url = "https://arty-backend.herokuapp.com"
     private var isQuerying = false
+
+    private init() {}
 
     static func setUid(_ uid: String, complation: @escaping (Error?) -> Void) {
         let query = "/user/create?uid=\(uid)"

@@ -11,6 +11,7 @@ class ARty: SCNNode {
     private(set) var passiveEmote: String
     private(set) var pokeEmote: String
     private let animations: [String: CAAnimation]
+    private var isFacingCamera = false
 
     init(uid: String,
          model: String,
@@ -67,37 +68,30 @@ class ARty: SCNNode {
     }
 
     func turnToCamera() {
-        guard !isTurningToCamera else {
+        guard !isTurningToCamera && !isFacingCamera else {
             return
         }
+        removeAllActions()
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 5
         SCNTransaction.completionBlock = { [weak self] in
-            guard let `self` = self else {
-                return
-            }
-            if let index = self.constraints?.index(of: self.billboardConstraint) {
-                self.constraints?.remove(at: index)
-            }
+            self?.isFacingCamera = true
+            self?.removeBillboardConstraint()
         }
         constraints?.append(billboardConstraint)
         SCNTransaction.commit()
     }
 
     func turnToDirection(_ direction: Double) {
-        guard direction != -1, !isTurningToCamera else {
+        guard direction != -1 else {
             return
         }
+        removeBillboardConstraint()
         let adjustedDirection = -1 * (direction - 180)
-        let radians = adjustedDirection.radians
-        let rotateAction = SCNAction.rotateTo(
-            x: 0,
-            y: CGFloat(radians),
-            z: 0,
-            duration: 1,
-            usesShortestUnitArc: true
-        )
+        let radians = CGFloat(adjustedDirection.radians)
+        let rotateAction = SCNAction.rotateTo(x: 0, y: radians, z: 0, duration: 1, usesShortestUnitArc: true)
         runAction(rotateAction)
+        isFacingCamera = false
     }
 
     func playAnimation(_ animation: String) throws {
@@ -177,6 +171,12 @@ private extension ARty {
         node.constraints = [lookAtConstraint]
 
         addChildNode(node)
+    }
+
+    func removeBillboardConstraint() {
+        if let index = constraints?.index(of: billboardConstraint) {
+            constraints?.remove(at: index)
+        }
     }
 
     func animation(_ animation: String) throws -> CAAnimation {

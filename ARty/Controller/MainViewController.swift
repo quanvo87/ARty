@@ -10,7 +10,7 @@ class MainViewController: UIViewController {
 
     private var uid: String?
     private var myARty: MyARty?
-    private var friendlyARties = [String: ARty]()
+    private var friendlyARties = [String: FriendlyARty]()
     private var isHoldingPosition = false
     private lazy var appStateObserver = AppStateObserver(delegate: self)
     private lazy var authManager = AuthManager(delegate: self)
@@ -42,7 +42,9 @@ class MainViewController: UIViewController {
         let hitTest = sceneView.hitTest(location)
         if let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid {
             if let myARty = myARty, uid == myARty.uid {
-                myARty.turnToCamera()
+                if !isHoldingPosition {
+                    myARty.turnToCamera()
+                }
                 try? myARty.playAnimation(myARty.pokeEmote)
                 Database.updatePokeTimestamp(for: uid) { error in
                     if let error = error {
@@ -55,7 +57,6 @@ class MainViewController: UIViewController {
             }
         } else {
             myARty?.setBasePosition()
-            myARty?.turnToCamera()
             leftArrow.isHidden = true
             rightArrow.isHidden = true
         }
@@ -263,10 +264,10 @@ extension MainViewController: FriendlyARtyDelegate {
         guard let pointOfView = sceneView.pointOfView else {
             return
         }
-        sceneView.scene.rootNode.childNode(withName: user.uid, recursively: false)?.removeFromParentNode()
         do {
             let friendlyARty = try FriendlyARty(user: user, pointOfView: pointOfView, delegate: self)
             friendlyARties[friendlyARty.uid] = friendlyARty
+            sceneView.scene.rootNode.childNode(withName: user.uid, recursively: false)?.removeFromParentNode()
         } catch {
             print(error)
         }

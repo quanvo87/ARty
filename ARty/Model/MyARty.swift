@@ -6,10 +6,10 @@ class MyARty: ARty {
 
     private init(uid: String,
                  model: String,
+                 pointOfView: SCNNode,
                  passiveEmote: String,
                  pokeEmote: String,
                  status: String,
-                 pointOfView: SCNNode,
                  basePosition: SCNVector3) throws {
         self.basePosition = basePosition
         try super.init(
@@ -26,10 +26,10 @@ class MyARty: ARty {
         return try MyARty(
             uid: uid,
             model: model,
+            pointOfView: pointOfView,
             passiveEmote: "",
             pokeEmote: "",
             status: "Hello :)",
-            pointOfView: pointOfView,
             basePosition: MyARty.basePosition(simdWorldFront: pointOfView.simdWorldFront)
         )
     }
@@ -38,10 +38,10 @@ class MyARty: ARty {
         return try MyARty(
             uid: user.uid,
             model: user.model,
+            pointOfView: pointOfView,
             passiveEmote: user.passiveEmote(for: user.model),
             pokeEmote: user.pokeEmote(for: user.model),
             status: user.status,
-            pointOfView: pointOfView,
             basePosition: MyARty.basePosition(simdWorldFront: pointOfView.simdWorldFront)
         )
     }
@@ -54,10 +54,10 @@ class MyARty: ARty {
         return try MyARty(
             uid: uid,
             model: model,
+            pointOfView: pointOfView,
             passiveEmote: "",
             pokeEmote: "",
             status: status,
-            pointOfView: pointOfView,
             basePosition: basePosition
         )
     }

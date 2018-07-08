@@ -71,7 +71,7 @@ class ARty: SCNNode {
         guard !isTurningToCamera && !isFacingCamera else {
             return
         }
-        removeAllActions()
+        removeAction(forKey: "rotate")
         SCNTransaction.begin()
         SCNTransaction.animationDuration = 5
         SCNTransaction.completionBlock = { [weak self] in
@@ -89,8 +89,8 @@ class ARty: SCNNode {
         removeBillboardConstraint()
         let adjustedDirection = -1 * (direction - 180)
         let radians = CGFloat(adjustedDirection.radians)
-        let rotateAction = SCNAction.rotateTo(x: 0, y: radians, z: 0, duration: 1, usesShortestUnitArc: true)
-        runAction(rotateAction)
+        let rotateAction = SCNAction.rotateTo(x: 0, y: radians, z: 0, duration: 1)
+        runAction(rotateAction, forKey: "rotate")
         isFacingCamera = false
     }
 

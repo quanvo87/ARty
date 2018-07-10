@@ -197,7 +197,6 @@ extension ViewController: AuthManagerDelegate {
         self.uid = uid
         appStateObserver.start()
         locationManager.requestAlwaysAuthorization()
-        locationManager.startUpdatingLocation()
         loadUser(uid)
     }
 

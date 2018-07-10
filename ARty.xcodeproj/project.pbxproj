@@ -153,8 +153,8 @@
 				59B386EB20BF491D003BC2E5 /* ChooseARtyViewController.swift */,
 				59CAF1BE20C1B0BA0011C4F6 /* ChooseEmotesViewController.swift */,
 				5908372920C0FEB700A36103 /* LoginViewController.swift */,
-				59412B8D20B5721300A2ED02 /* ViewController.swift */,
 				59CAEA3F20F4385E003E77ED /* StatusViewController.swift */,
+				59412B8D20B5721300A2ED02 /* ViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";

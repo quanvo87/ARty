@@ -351,6 +351,8 @@ private extension ViewController {
         if isHoldingPosition {
             isHoldingPosition = false
             holdPositionButton.backgroundColor = .clear
+            myARty?.setBasePosition()
+            myARty?.turnToCamera(force: true)
         } else {
             isHoldingPosition = true
             holdPositionButton.backgroundColor = .white

@@ -269,6 +269,7 @@
                             <constraint firstItem="wzb-eh-jdc" firstAttribute="top" secondItem="lap-mW-XtM" secondAttribute="bottom" constant="20" id="Mmp-5X-5ID"/>
                             <constraint firstItem="lap-mW-XtM" firstAttribute="centerX" secondItem="UsN-4S-ngm" secondAttribute="centerX" id="azg-ps-sUO"/>
                         </constraints>
+                        <viewLayoutGuide key="safeArea" id="ZMY-vn-lgk"/>
                     </view>
                     <connections>
                         <outlet property="spinner" destination="lap-mW-XtM" id="bAL-6u-V8Z"/>

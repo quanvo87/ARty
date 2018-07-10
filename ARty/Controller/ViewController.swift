@@ -68,6 +68,10 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: ARSessionDelegate {
+    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
+        statusViewController.update(.trackingState(camera.trackingState))
+    }
+
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         guard
             let myARty = myARty,
@@ -183,7 +187,7 @@ extension ViewController: AppStateObserverDelegate {
 
     func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
         arSessionManager.pause()
-        statusViewController.show()
+        statusViewController.update(.waitingOnLocationUpdates(true))
     }
 }
 
@@ -207,7 +211,7 @@ extension ViewController: AuthManagerDelegate {
         locationManager.stopUpdatingLocation()
         arSessionManager.pause()
         showLoginViewController()
-        statusViewController.show()
+        statusViewController.update(.waitingOnLocationUpdates(true))
     }
 
     private func loadUser(_ uid: String) {
@@ -256,7 +260,7 @@ extension ViewController: AuthManagerDelegate {
 
 extension ViewController: ARSessionManagerDelegate {
     func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
-        statusViewController.hide()
+        statusViewController.update(.waitingOnLocationUpdates(false))
         friendlyARties.values.forEach {
             guard let location = $0.location else {
                 return
@@ -398,7 +402,7 @@ private extension ViewController {
 
     @IBAction func didTapReloadButton(_ sender: Any) {
         arSessionManager.pause()
-        statusViewController.show()
+        statusViewController.update(.waitingOnLocationUpdates(true))
     }
 
     @IBAction func didTapLogOutButton(_ sender: Any) {

@@ -1,12 +1,11 @@
 import ARKit
 import CoreLocation
 
-class MainViewController: UIViewController {
+class ViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var holdPositionButton: UIButton!
     @IBOutlet weak var leftArrow: UIImageView!
     @IBOutlet weak var rightArrow: UIImageView!
-    @IBOutlet weak var label: UILabel!
 
     private var uid: String?
     private var myARty: MyARty?
@@ -16,6 +15,10 @@ class MainViewController: UIViewController {
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var locationManager = LocationManager(delegate: self)
     private lazy var arSessionManager = ARSessionManager(session: sceneView.session, delegate: self)
+
+    private lazy var statusViewController: StatusViewController = {
+        return childViewControllers.lazy.compactMap { $0 as? StatusViewController }.first!
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,7 +46,7 @@ class MainViewController: UIViewController {
         if let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid {
             if let myARty = myARty, uid == myARty.uid {
                 if !isHoldingPosition {
-                    myARty.turnToCamera()
+                    myARty.turnToCamera(force: false)
                 }
                 try? myARty.playAnimation(myARty.pokeEmote)
                 Database.updatePokeTimestamp(for: uid) { error in
@@ -52,18 +55,23 @@ class MainViewController: UIViewController {
                     }
                 }
             } else if let friendlyARty = friendlyARties[uid] {
-                friendlyARty.turnToCamera()
+                friendlyARty.turnToCamera(force: false)
                 try? friendlyARty.playAnimation(friendlyARty.pokeEmote)
             }
         } else {
             myARty?.setBasePosition()
+            myARty?.turnToCamera(force: true)
             leftArrow.isHidden = true
             rightArrow.isHidden = true
         }
     }
 }
 
-extension MainViewController: ARSessionDelegate {
+extension ViewController: ARSessionDelegate {
+    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
+        statusViewController.update(.trackingState(camera.trackingState))
+    }
+
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         guard
             let myARty = myARty,
@@ -101,7 +109,7 @@ extension MainViewController: ARSessionDelegate {
     }
 }
 
-extension MainViewController: CLLocationManagerDelegate {
+extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
             locationManager.startUpdatingLocation()
@@ -174,21 +182,21 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 }
 
-extension MainViewController: AppStateObserverDelegate {
+extension ViewController: AppStateObserverDelegate {
     func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {}
 
     func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
         arSessionManager.pause()
+        statusViewController.update(.waitingOnLocationUpdates(true))
     }
 }
 
-extension MainViewController: AuthManagerDelegate {
+extension ViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
         UIApplication.shared.isIdleTimerDisabled = true
         self.uid = uid
         appStateObserver.start()
         locationManager.requestAlwaysAuthorization()
-        locationManager.startUpdatingLocation()
         loadUser(uid)
     }
 
@@ -202,6 +210,7 @@ extension MainViewController: AuthManagerDelegate {
         locationManager.stopUpdatingLocation()
         arSessionManager.pause()
         showLoginViewController()
+        statusViewController.update(.waitingOnLocationUpdates(true))
     }
 
     private func loadUser(_ uid: String) {
@@ -248,8 +257,9 @@ extension MainViewController: AuthManagerDelegate {
     }
 }
 
-extension MainViewController: ARSessionManagerDelegate {
+extension ViewController: ARSessionManagerDelegate {
     func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
+        statusViewController.update(.waitingOnLocationUpdates(false))
         friendlyARties.values.forEach {
             guard let location = $0.location else {
                 return
@@ -259,7 +269,7 @@ extension MainViewController: ARSessionManagerDelegate {
     }
 }
 
-extension MainViewController: FriendlyARtyDelegate {
+extension ViewController: FriendlyARtyDelegate {
     func friendlyARty(_ friendlyARty: FriendlyARty, userChangedModel user: User) {
         guard let pointOfView = sceneView.pointOfView else {
             return
@@ -290,7 +300,7 @@ extension MainViewController: FriendlyARtyDelegate {
     }
 }
 
-extension MainViewController: ChooseARtyViewControllerDelegate {
+extension ViewController: ChooseARtyViewControllerDelegate {
     func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String) {
         guard let uid = uid, let pointOfView = sceneView.pointOfView else {
             return
@@ -339,11 +349,13 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
     }
 }
 
-private extension MainViewController {
+private extension ViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
         if isHoldingPosition {
             isHoldingPosition = false
             holdPositionButton.backgroundColor = .clear
+            myARty?.setBasePosition()
+            myARty?.turnToCamera(force: true)
         } else {
             isHoldingPosition = true
             holdPositionButton.backgroundColor = .white
@@ -389,6 +401,7 @@ private extension MainViewController {
 
     @IBAction func didTapReloadButton(_ sender: Any) {
         arSessionManager.pause()
+        statusViewController.update(.waitingOnLocationUpdates(true))
     }
 
     @IBAction func didTapLogOutButton(_ sender: Any) {
@@ -406,7 +419,7 @@ private extension MainViewController {
         sceneView.scene.rootNode.childNode(withName: myARty.uid, recursively: false)?.removeFromParentNode()
         DispatchQueue.main.async { [weak self] in
             self?.sceneView.scene.rootNode.addChildNode(myARty)
-            myARty.turnToCamera()
+            myARty.turnToCamera(force: false)
         }
     }
 }

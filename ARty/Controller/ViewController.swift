@@ -1,12 +1,11 @@
 import ARKit
 import CoreLocation
 
-class MainViewController: UIViewController {
+class ViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var holdPositionButton: UIButton!
     @IBOutlet weak var leftArrow: UIImageView!
     @IBOutlet weak var rightArrow: UIImageView!
-    @IBOutlet weak var label: UILabel!
 
     private var uid: String?
     private var myARty: MyARty?
@@ -16,6 +15,10 @@ class MainViewController: UIViewController {
     private lazy var authManager = AuthManager(delegate: self)
     private lazy var locationManager = LocationManager(delegate: self)
     private lazy var arSessionManager = ARSessionManager(session: sceneView.session, delegate: self)
+
+    private lazy var statusViewController: StatusViewController = {
+        return childViewControllers.lazy.compactMap { $0 as? StatusViewController }.first!
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,13 +60,14 @@ class MainViewController: UIViewController {
             }
         } else {
             myARty?.setBasePosition()
+            myARty?.turnToCamera()
             leftArrow.isHidden = true
             rightArrow.isHidden = true
         }
     }
 }
 
-extension MainViewController: ARSessionDelegate {
+extension ViewController: ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         guard
             let myARty = myARty,
@@ -101,7 +105,7 @@ extension MainViewController: ARSessionDelegate {
     }
 }
 
-extension MainViewController: CLLocationManagerDelegate {
+extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
             locationManager.startUpdatingLocation()
@@ -174,15 +178,16 @@ extension MainViewController: CLLocationManagerDelegate {
     }
 }
 
-extension MainViewController: AppStateObserverDelegate {
+extension ViewController: AppStateObserverDelegate {
     func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {}
 
     func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
         arSessionManager.pause()
+        statusViewController.show()
     }
 }
 
-extension MainViewController: AuthManagerDelegate {
+extension ViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
         UIApplication.shared.isIdleTimerDisabled = true
         self.uid = uid
@@ -202,6 +207,7 @@ extension MainViewController: AuthManagerDelegate {
         locationManager.stopUpdatingLocation()
         arSessionManager.pause()
         showLoginViewController()
+        statusViewController.show()
     }
 
     private func loadUser(_ uid: String) {
@@ -248,8 +254,9 @@ extension MainViewController: AuthManagerDelegate {
     }
 }
 
-extension MainViewController: ARSessionManagerDelegate {
+extension ViewController: ARSessionManagerDelegate {
     func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
+        statusViewController.hide()
         friendlyARties.values.forEach {
             guard let location = $0.location else {
                 return
@@ -259,7 +266,7 @@ extension MainViewController: ARSessionManagerDelegate {
     }
 }
 
-extension MainViewController: FriendlyARtyDelegate {
+extension ViewController: FriendlyARtyDelegate {
     func friendlyARty(_ friendlyARty: FriendlyARty, userChangedModel user: User) {
         guard let pointOfView = sceneView.pointOfView else {
             return
@@ -290,7 +297,7 @@ extension MainViewController: FriendlyARtyDelegate {
     }
 }
 
-extension MainViewController: ChooseARtyViewControllerDelegate {
+extension ViewController: ChooseARtyViewControllerDelegate {
     func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String) {
         guard let uid = uid, let pointOfView = sceneView.pointOfView else {
             return
@@ -339,7 +346,7 @@ extension MainViewController: ChooseARtyViewControllerDelegate {
     }
 }
 
-private extension MainViewController {
+private extension ViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
         if isHoldingPosition {
             isHoldingPosition = false
@@ -389,6 +396,7 @@ private extension MainViewController {
 
     @IBAction func didTapReloadButton(_ sender: Any) {
         arSessionManager.pause()
+        statusViewController.show()
     }
 
     @IBAction func didTapLogOutButton(_ sender: Any) {

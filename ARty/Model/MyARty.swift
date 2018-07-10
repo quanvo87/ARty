@@ -71,7 +71,7 @@ class MyARty: ARty {
         if speed != -1 {
             if speed < 0.5 {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
-                turnToCamera()
+                turnToCamera(force: false)
             } else if isIdle {
                 try playAnimation(walkAnimation)
             }
@@ -89,7 +89,7 @@ class MyARty: ARty {
                 self.location = location
             } else {
                 removeAnimation(forKey: walkAnimation, blendOutDuration: 0.5)
-                turnToCamera()
+                turnToCamera(force: false)
             }
         }
     }

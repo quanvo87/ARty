@@ -67,8 +67,8 @@ class ARty: SCNNode {
         pokeEmote = try schema.setPokeEmote(for: model, to: emote)
     }
 
-    func turnToCamera() {
-        guard !isTurningToCamera && !isFacingCamera else {
+    func turnToCamera(force: Bool) {
+        guard !isTurningToCamera && (force || !isFacingCamera) else {
             return
         }
         removeAction(forKey: "rotate")

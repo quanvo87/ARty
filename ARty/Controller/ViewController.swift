@@ -46,7 +46,7 @@ class ViewController: UIViewController {
         if let uid = (hitTest.first?.node.parent?.parent as? ARty)?.uid {
             if let myARty = myARty, uid == myARty.uid {
                 if !isHoldingPosition {
-                    myARty.turnToCamera()
+                    myARty.turnToCamera(force: false)
                 }
                 try? myARty.playAnimation(myARty.pokeEmote)
                 Database.updatePokeTimestamp(for: uid) { error in
@@ -55,12 +55,12 @@ class ViewController: UIViewController {
                     }
                 }
             } else if let friendlyARty = friendlyARties[uid] {
-                friendlyARty.turnToCamera()
+                friendlyARty.turnToCamera(force: false)
                 try? friendlyARty.playAnimation(friendlyARty.pokeEmote)
             }
         } else {
             myARty?.setBasePosition()
-            myARty?.turnToCamera()
+            myARty?.turnToCamera(force: true)
             leftArrow.isHidden = true
             rightArrow.isHidden = true
         }
@@ -414,7 +414,7 @@ private extension ViewController {
         sceneView.scene.rootNode.childNode(withName: myARty.uid, recursively: false)?.removeFromParentNode()
         DispatchQueue.main.async { [weak self] in
             self?.sceneView.scene.rootNode.addChildNode(myARty)
-            myARty.turnToCamera()
+            myARty.turnToCamera(force: false)
         }
     }
 }

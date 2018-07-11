@@ -41,11 +41,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>ARty uses the camera for Augmented Reality.</string>
+	<string>For Augmented Reality.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>ARty uses location for Augmented Reality.</string>
+	<string>ARty needs &apos;Always Allow&apos; for an optimum experience.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>ARty uses location for Augmented Reality.</string>
+	<string>ARty needs &apos;Always Allow&apos; for an optimum experience.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

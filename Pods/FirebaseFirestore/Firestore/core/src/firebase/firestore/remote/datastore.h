@@ -17,18 +17,19 @@
 #ifndef FIRESTORE_CORE_SRC_FIREBASE_FIRESTORE_REMOTE_DATASTORE_H_
 #define FIRESTORE_CORE_SRC_FIREBASE_FIRESTORE_REMOTE_DATASTORE_H_
 
+#include "Firestore/core/src/firebase/firestore/util/status.h"
+#include "grpcpp/support/status.h"
+
 namespace firebase {
 namespace firestore {
 namespace remote {
 
 class Datastore {
  public:
-  Datastore();
-  ~Datastore();
+  static util::Status ConvertStatus(grpc::Status grpc_error);
 
   Datastore(const Datastore& other) = delete;
   Datastore(Datastore&& other) = delete;
-
   Datastore& operator=(const Datastore& other) = delete;
   Datastore& operator=(Datastore&& other) = delete;
 };

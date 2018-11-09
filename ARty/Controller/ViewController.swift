@@ -17,7 +17,7 @@ class ViewController: UIViewController {
     private lazy var arSessionManager = ARSessionManager(session: sceneView.session, delegate: self)
 
     private lazy var statusViewController: StatusViewController = {
-        return childViewControllers.lazy.compactMap { $0 as? StatusViewController }.first!
+        return children.lazy.compactMap { $0 as? StatusViewController }.first!
     }()
 
     override func viewDidLoad() {
@@ -149,7 +149,7 @@ extension ViewController: CLLocationManagerDelegate {
                 uids.forEach {
                     self?.observeUser($0)
                 }
-                self?.removeStaleUsers(uids)
+                self?.removeFarAwayUsers(uids)
             }
         }
     }
@@ -170,7 +170,7 @@ extension ViewController: CLLocationManagerDelegate {
         }
     }
 
-    private func removeStaleUsers(_ uids: [String]) {
+    private func removeFarAwayUsers(_ uids: [String]) {
         friendlyARties.keys
             .filter {
                 return !uids.contains($0)
@@ -209,8 +209,8 @@ extension ViewController: AuthManagerDelegate {
         appStateObserver.stop()
         locationManager.stopUpdatingLocation()
         arSessionManager.pause()
-        showLoginViewController()
         statusViewController.update(.waitingOnLocationUpdates(true))
+        showLoginViewController()
     }
 
     private func loadUser(_ uid: String) {
@@ -307,26 +307,30 @@ extension ViewController: ChooseARtyViewControllerDelegate {
         }
         if model != myARty?.model {
             do {
-                var newMyARty: MyARty
                 if let myARty = myARty {
-                    newMyARty = try MyARty.makeFromModelChange(
-                        uid: uid,
-                        model: model,
-                        status: myARty.status,
-                        pointOfView: pointOfView,
-                        basePosition: myARty.basePosition
+                    setupMyARty(
+                        try MyARty.makeFromModelChange(
+                            uid: uid,
+                            model: model,
+                            status: myARty.status,
+                            pointOfView: pointOfView,
+                            basePosition: myARty.basePosition
+                        )
                     )
                 } else {
-                    newMyARty = try MyARty.makeNew(uid: uid, model: model, pointOfView: pointOfView)
-                }
-                addMyARtyToScene(newMyARty)
-                setRecentEmotes(for: newMyARty)
-                Database.updateModel(myARty: newMyARty) { error in
-                    if let error = error {
-                        print(error)
-                    }
+                    setupMyARty(try MyARty.makeNew(uid: uid, model: model, pointOfView: pointOfView))
                 }
             } catch {
+                print(error)
+            }
+        }
+    }
+
+    private func setupMyARty(_ myARty: MyARty) {
+        addMyARtyToScene(myARty)
+        setRecentEmotes(for: myARty)
+        Database.updateModel(myARty: myARty) { error in
+            if let error = error {
                 print(error)
             }
         }

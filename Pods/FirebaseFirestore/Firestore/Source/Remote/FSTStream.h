@@ -16,18 +16,18 @@
 
 #import <Foundation/Foundation.h>
 
-#import "Firestore/Source/Core/FSTTypes.h"
 #import "Firestore/Source/Util/FSTDispatchQueue.h"
 
 #include "Firestore/core/src/firebase/firestore/auth/credentials_provider.h"
 #include "Firestore/core/src/firebase/firestore/core/database_info.h"
+#include "Firestore/core/src/firebase/firestore/model/snapshot_version.h"
+#include "Firestore/core/src/firebase/firestore/model/types.h"
 
 @class FSTDispatchQueue;
 @class FSTMutation;
 @class FSTMutationResult;
 @class FSTQueryData;
 @class FSTSerializerBeta;
-@class FSTSnapshotVersion;
 @class FSTWatchChange;
 @class FSTWatchStream;
 @class FSTWriteStream;
@@ -87,13 +87,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * See https://github.com/grpc/grpc/issues/10957 for the kinds of things we're trying to avoid.
  */
-@interface FSTStream <__covariant FSTStreamDelegate> : NSObject
+@interface FSTStream<__covariant FSTStreamDelegate> : NSObject
 
 - (instancetype)initWithDatabase:(const firebase::firestore::core::DatabaseInfo *)database
              workerDispatchQueue:(FSTDispatchQueue *)workerDispatchQueue
                connectionTimerID:(FSTTimerID)connectionTimerID
                      idleTimerID:(FSTTimerID)idleTimerID
-                     credentials:(firebase::firestore::auth::CredentialsProvider *)credentials  // no passing ownership
+                     credentials:(firebase::firestore::auth::CredentialsProvider *)
+                                     credentials  // no passing ownership
             responseMessageClass:(Class)responseMessageClass NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -179,7 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
  * WatchChange responses sent back by the server.
  */
 - (void)watchStreamDidChange:(FSTWatchChange *)change
-             snapshotVersion:(FSTSnapshotVersion *)snapshotVersion;
+             snapshotVersion:(const firebase::firestore::model::SnapshotVersion &)snapshotVersion;
 
 /**
  * Called by the FSTWatchStream when the underlying streaming RPC is interrupted for whatever
@@ -229,7 +230,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)watchQuery:(FSTQueryData *)query;
 
 /** Unregisters interest in the results of the query associated with the given target ID. */
-- (void)unwatchTargetID:(FSTTargetID)targetID;
+- (void)unwatchTargetID:(firebase::firestore::model::TargetId)targetID;
 
 @end
 
@@ -250,7 +251,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Called by the FSTWriteStream upon receiving a StreamingWriteResponse from the server that
  * contains mutation results.
  */
-- (void)writeStreamDidReceiveResponseWithVersion:(FSTSnapshotVersion *)commitVersion
+- (void)writeStreamDidReceiveResponseWithVersion:
+            (const firebase::firestore::model::SnapshotVersion &)commitVersion
                                  mutationResults:(NSArray<FSTMutationResult *> *)results;
 
 /**

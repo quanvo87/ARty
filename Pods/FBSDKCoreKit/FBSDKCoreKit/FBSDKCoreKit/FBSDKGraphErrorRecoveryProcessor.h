@@ -44,7 +44,7 @@
 
  return NO if the processor should not process the error. For example,
  if you want to prevent alerts of localized messages but otherwise perform retries and recoveries,
- you could return NO for errors where userInfo[FBSDKGraphRequestErrorCategoryKey] equal to FBSDKGraphRequestErrorCategoryOther
+ you could return NO for errors where userInfo[FBSDKGraphRequestErrorKey] equal to FBSDKGraphRequestErrorOther
  */
 - (BOOL)processorWillProcessError:(FBSDKGraphErrorRecoveryProcessor *)processor error:(NSError *)error;
 
@@ -56,7 +56,7 @@
  Facebook NSErrors can contain FBSDKErrorRecoveryAttempting instances to recover from errors, or
  localized messages to present to the user. This class will process the instances as follows:
 
- 1. If the error is temporary as indicated by FBSDKGraphRequestErrorCategoryKey, assume the recovery succeeded and
+ 1. If the error is temporary as indicated by FBSDKGraphRequestErrorKey, assume the recovery succeeded and
  notify the delegate.
  2. If a FBSDKErrorRecoveryAttempting instance is available, display an alert (dispatched to main thread)
  with the recovery options and call the instance's [ attemptRecoveryFromError:optionIndex:...].
@@ -69,7 +69,7 @@
  Note that Facebook recovery attempters can present UI or even cause app switches (such as to login). Any such
  work is dispatched to the main thread (therefore your request handlers may then run on the main thread).
 
- Login recovery requires FBSDKLoginKit. Login will use FBSDKLoginBehaviorNative and will prompt the user
+ Login recovery requires FBSDKLoginKit. Login will prompt the user
  for all permissions last granted. If any are declined on the new request, the recovery is not successful but
  the `[FBSDKAccessToken currentAccessToken]` might still have been updated.
  .

@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="WLz-NS-WUy">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="WLz-NS-WUy">
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,23 +11,23 @@
             <objects>
                 <viewController storyboardIdentifier="LoginViewController" id="FTP-Z3-WXW" customClass="LoginViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9AK-hU-jiN">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="XGX-dm-hiY">
-                                <rect key="frame" x="20" y="168.5" width="335" height="30"/>
+                                <rect key="frame" x="20" y="135" width="560" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="emailAddress" textContentType="email"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="6ld-PN-c6A">
-                                <rect key="frame" x="20" y="208.5" width="335" height="30"/>
+                                <rect key="frame" x="20" y="175" width="560" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES" textContentType="password"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oTu-rB-Ggx">
-                                <rect key="frame" x="20" y="248.5" width="335" height="30"/>
+                                <rect key="frame" x="20" y="215" width="560" height="30"/>
                                 <color key="backgroundColor" red="0.73333333329999995" green="0.87058823529999996" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Sign up"/>
                                 <connections>
@@ -39,7 +35,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EJq-h9-lkF">
-                                <rect key="frame" x="20" y="328.5" width="335" height="30"/>
+                                <rect key="frame" x="20" y="295" width="560" height="30"/>
                                 <color key="backgroundColor" red="0.73333333329999995" green="0.87058823529999996" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Facebook login"/>
                                 <connections>
@@ -47,7 +43,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cfg-Vw-qde">
-                                <rect key="frame" x="20" y="288.5" width="335" height="30"/>
+                                <rect key="frame" x="20" y="255" width="560" height="30"/>
                                 <color key="backgroundColor" red="0.73333333329999995" green="0.87058823529999996" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Log in"/>
                                 <connections>
@@ -84,70 +80,70 @@
             </objects>
             <point key="canvasLocation" x="1503" y="21"/>
         </scene>
-        <!--View Controller-->
+        <!--Main View Controller-->
         <scene sceneID="e5h-Sr-vBI">
             <objects>
-                <viewController id="WLz-NS-WUy" customClass="ViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="WLz-NS-WUy" customClass="MainViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ivM-ky-J9c">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dmk-l1-JGZ">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="812"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="812" id="FV7-91-y8p"/>
                                 </constraints>
                             </arscnView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UpO-lG-qN3">
-                                <rect key="frame" x="310" y="20" width="55" height="30"/>
+                                <rect key="frame" x="535" y="20" width="55" height="30"/>
                                 <state key="normal" title="Log Out"/>
                                 <connections>
                                     <action selector="didTapLogOutButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="LhO-9w-q2n"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uT0-tf-TfT">
-                                <rect key="frame" x="318" y="60" width="47" height="30"/>
+                                <rect key="frame" x="543" y="60" width="47" height="30"/>
                                 <state key="normal" title="Reload"/>
                                 <connections>
                                     <action selector="didTapReloadButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="GDb-l5-QXq"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6dM-UU-1Cs">
-                                <rect key="frame" x="274" y="547" width="91" height="30"/>
+                                <rect key="frame" x="499" y="480" width="91" height="30"/>
                                 <state key="normal" title="Hold Position"/>
                                 <connections>
                                     <action selector="didTapHoldPositionButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="e0D-ad-vrI"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYK-VT-FEI">
-                                <rect key="frame" x="257" y="587" width="108" height="30"/>
+                                <rect key="frame" x="482" y="520" width="108" height="30"/>
                                 <state key="normal" title="Choose Emotes"/>
                                 <connections>
                                     <action selector="didTapChooseEmotesButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="txw-Wn-IKP"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7az-ZH-489">
-                                <rect key="frame" x="275" y="627" width="90" height="30"/>
+                                <rect key="frame" x="500" y="560" width="90" height="30"/>
                                 <state key="normal" title="Choose ARty"/>
                                 <connections>
                                     <action selector="didTapChooseARtyButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="ZeX-Zk-S1R"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="agP-J1-c8H">
-                                <rect key="frame" x="10" y="627" width="75" height="30"/>
+                                <rect key="frame" x="10" y="560" width="75" height="30"/>
                                 <state key="normal" title="Edit Status"/>
                                 <connections>
                                     <action selector="didTapEditStatusButton:" destination="WLz-NS-WUy" eventType="touchUpInside" id="tAK-pA-hHn"/>
                                 </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="right arrow" translatesAutoresizingMaskIntoConstraints="NO" id="xon-fb-Mym">
-                                <rect key="frame" x="327" y="320" width="48" height="48"/>
+                                <rect key="frame" x="584" y="302" width="16" height="16"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="left arrow" translatesAutoresizingMaskIntoConstraints="NO" id="Yai-ZX-Tqv">
-                                <rect key="frame" x="0.0" y="320" width="48" height="48"/>
+                                <rect key="frame" x="0.0" y="302" width="16" height="16"/>
                             </imageView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w1O-yq-E7g">
-                                <rect key="frame" x="37" y="279" width="300" height="128"/>
+                                <rect key="frame" x="150" y="246" width="300" height="128"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="300" id="78Q-aK-81c"/>
                                     <constraint firstAttribute="height" constant="128" id="sAx-Si-MKC"/>
@@ -205,18 +201,18 @@
             <objects>
                 <viewController storyboardIdentifier="ChooseEmotesViewController" id="cVf-u5-qGL" customClass="ChooseEmotesViewController" customModule="ARty" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="zvh-M6-sDD">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="wZX-2p-qG3">
-                                <rect key="frame" x="85" y="40" width="205" height="29"/>
+                                <rect key="frame" x="197.5" y="40" width="205" height="29"/>
                                 <segments>
                                     <segment title="Poke Emote"/>
                                     <segment title="Passive Emote"/>
                                 </segments>
                             </segmentedControl>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="BWo-gz-RWo">
-                                <rect key="frame" x="10" y="88" width="355" height="559"/>
+                                <rect key="frame" x="10" y="88" width="580" height="492"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -249,13 +245,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Augmenting reality...hold phone still..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wzb-eh-jdc">
-                                <rect key="frame" x="7" y="87" width="287" height="21"/>
+                                <rect key="frame" x="6.5" y="87" width="287" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="lap-mW-XtM">
-                                <rect key="frame" x="130.5" y="27" width="40" height="40"/>
+                                <rect key="frame" x="130" y="27" width="40" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="O2c-S3-RrU"/>
                                     <constraint firstAttribute="width" constant="40" id="oPt-Bs-eu8"/>

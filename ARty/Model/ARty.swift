@@ -41,10 +41,10 @@ class ARty: SCNNode {
         centerPivot()
     }
 
-    var status: String = "" {
+    var status = "" {
         didSet {
-            let trimmed = status.trimmingCharacters(in: .init(charactersIn: " "))
-            let truncated = String(trimmed.prefix(10))
+            let trimmed = status.trimmingCharacters(in: .whitespaces)
+            let truncated = String(trimmed.prefix(144))
             status = truncated
             addStatusNode(truncated)
             Database.setStatus(truncated, for: uid) { error in

@@ -1,7 +1,7 @@
 import ARKit
 import CoreLocation
 
-class ViewController: UIViewController {
+class MainViewController: UIViewController {
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var holdPositionButton: UIButton!
     @IBOutlet weak var leftArrow: UIImageView!
@@ -67,7 +67,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: ARSessionDelegate {
+extension MainViewController: ARSessionDelegate {
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
         statusViewController.update(.trackingState(camera.trackingState))
     }
@@ -109,7 +109,7 @@ extension ViewController: ARSessionDelegate {
     }
 }
 
-extension ViewController: CLLocationManagerDelegate {
+extension MainViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
             locationManager.startUpdatingLocation()
@@ -182,7 +182,7 @@ extension ViewController: CLLocationManagerDelegate {
     }
 }
 
-extension ViewController: AppStateObserverDelegate {
+extension MainViewController: AppStateObserverDelegate {
     func appStateObserverAppDidBecomeActive(_ observer: AppStateObserver) {}
 
     func appStateObserverAppDidEnterBackground(_ observer: AppStateObserver) {
@@ -191,7 +191,7 @@ extension ViewController: AppStateObserverDelegate {
     }
 }
 
-extension ViewController: AuthManagerDelegate {
+extension MainViewController: AuthManagerDelegate {
     func authManager(_ manager: AuthManager, userDidLogIn uid: String) {
         UIApplication.shared.isIdleTimerDisabled = true
         self.uid = uid
@@ -257,7 +257,7 @@ extension ViewController: AuthManagerDelegate {
     }
 }
 
-extension ViewController: ARSessionManagerDelegate {
+extension MainViewController: ARSessionManagerDelegate {
     func arSessionManager(_ manager: ARSessionManager, didUpdateWorldOrigin worldOrigin: CLLocation) {
         statusViewController.update(.waitingOnLocationUpdates(false))
         friendlyARties.values.forEach {
@@ -269,7 +269,7 @@ extension ViewController: ARSessionManagerDelegate {
     }
 }
 
-extension ViewController: FriendlyARtyDelegate {
+extension MainViewController: FriendlyARtyDelegate {
     func friendlyARty(_ friendlyARty: FriendlyARty, userChangedModel user: User) {
         guard let pointOfView = sceneView.pointOfView else {
             return
@@ -300,7 +300,7 @@ extension ViewController: FriendlyARtyDelegate {
     }
 }
 
-extension ViewController: ChooseARtyViewControllerDelegate {
+extension MainViewController: ChooseARtyViewControllerDelegate {
     func chooseARtyViewController(_ controller: ChooseARtyViewController, didChooseARty model: String) {
         guard let uid = uid, let pointOfView = sceneView.pointOfView else {
             return
@@ -353,7 +353,7 @@ extension ViewController: ChooseARtyViewControllerDelegate {
     }
 }
 
-private extension ViewController {
+private extension MainViewController {
     @IBAction func didTapHoldPositionButton(_ sender: Any) {
         if isHoldingPosition {
             isHoldingPosition = false

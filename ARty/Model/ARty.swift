@@ -30,15 +30,15 @@ class ARty: SCNNode {
 
         super.init()
 
+        defer {
+            self.status = status
+        }
+
         name = uid
         constraints = []
         try addIdleScene()
         loopPassiveEmote()
         centerPivot()
-
-        defer {
-            self.status = status
-        }
     }
 
     var status: String = "" {
@@ -174,7 +174,7 @@ private extension ARty {
     }
 
     func removeBillboardConstraint() {
-        if let index = constraints?.index(of: billboardConstraint) {
+        if let index = constraints?.firstIndex(of: billboardConstraint) {
             constraints?.remove(at: index)
         }
     }

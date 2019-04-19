@@ -2,13 +2,7 @@ import FirebaseFirestore
 import CoreLocation
 
 struct Database {
-    private static let database: Firestore = {
-        let database = Firestore.firestore()
-        let settings = database.settings
-        settings.areTimestampsInSnapshotsEnabled = true
-        database.settings = settings
-        return database
-    }()
+    private static let database = Firestore.firestore()
 
     private static let usersCollection = database.collection("users")
 
